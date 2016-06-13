@@ -10,7 +10,7 @@ from flask import render_template, request, abort, flash, current_app
 from libcrowds_analyst import analysis, auth, forms
 
 
-queue = Queue('analyst', connection=Redis())
+queue = Queue('libcrowds_analyst', connection=Redis())
 
 
 def _get_first_result(project_id, **kwargs):
