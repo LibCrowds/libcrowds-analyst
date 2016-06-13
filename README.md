@@ -1,5 +1,11 @@
 # libcrowds-analyst
 
+[![Build Status](https://travis-ci.org/LibCrowds/libcrowds-analyst.svg?branch=master)]
+(https://travis-ci.org/LibCrowds/libcrowds-analyst)
+[![Coverage Status](https://coveralls.io/repos/github/LibCrowds/libcrowds-analyst/badge.svg?branch=master)]
+(https://coveralls.io/github/LibCrowds/libcrowds-analyst?branch=master)
+
+
 A web application to help with analysis of LibCrowds results, inspired by the
 PyBossa [webhooks](https://github.com/PyBossa/webhooks) module.
 
