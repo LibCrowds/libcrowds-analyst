@@ -6,13 +6,12 @@
 (https://coveralls.io/github/LibCrowds/libcrowds-analyst?branch=master)
 
 
-A web application to help with analysis of LibCrowds results, inspired by the
-PyBossa [webhooks](https://github.com/PyBossa/webhooks) module.
+A web application to help with real-time analysis of LibCrowds results.
 
 ## Requirements
 
-- PyBossa >= 1.2.0.
-- A running Redis server.
+- [PyBossa](https://github.com/PyBossa/pybossa) >= 1.2.0.
+- A running [Redis](https://github.com/antirez/redis) server.
 
 
 ## Installing, configuring and running
@@ -23,27 +22,41 @@ Run the following commands:
 python setup.py install          # Install
 cp settings.py.tmpl settings.py  # Copy (then edit) the settings
 python run.py                    # Run the server
-rqworker mywebhooks              # Run background worker
+rqworker libcrowds_analyst       # Run a background worker
 ```
 
 
 ## Usage
 
 All webhook payloads should be directed to the root url of this server. If an
-analyser has been set up for the related category, the result will be analysed
-and updated.
+analyser has been set up for the related category, results will be analysed
+and updated automatically.
 
 ### Endpoints
 
-- To process unanalysed results visit `/<project_short_name>`.
+- To process any unanalysed results visit:
 
-- To directly edit a result visit `/<project_short_name>/<result_id>`.
+```http
+GET /<project_short_name>
+```
 
-- To trigger reanalysis for all of a project's results visit `/<project_short_name>/reanalyse`.
+- To directly edit a result visit:
 
 
-## Analysing a new category
+```http
+GET /<project_short_name>/<result_id>/edit
+```
 
-To develop an analyser for a new category you need to create a function in
-[analysis.py](analysis.py) called **category_<category_id>** and a template
-in [templates](templates) called **category_<category_id>.html**.
+- To trigger reanalysis for all of a project's results visit:
+
+```http
+GET /<project_short_name>/reanalyse
+```
+
+
+## Creating a new analyser
+
+To create an analyser for a new category you need to create:
+
+- A function in [analysis.py](analysis.py) called **category_\<category_id>**
+- A template in [templates](templates) called **category_\<category_id>.html**
