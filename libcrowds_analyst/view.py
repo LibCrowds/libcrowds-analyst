@@ -5,7 +5,6 @@ import json
 import enki
 from redis import Redis
 from rq import Queue
-from flask import Blueprint
 from flask import render_template, request, abort, flash, current_app
 from libcrowds_analyst import analysis, auth, forms
 
@@ -50,7 +49,6 @@ def index():
 def analyse_empty_result(short_name):
     """View for analysing empty results."""
     try:
-        print short_name
         e = enki.Enki(current_app.config['API_KEY'],
                       current_app.config['ENDPOINT'], short_name)
     except enki.ProjectNotFound:

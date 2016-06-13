@@ -12,10 +12,16 @@ def create_app():
     app = Flask(__name__)
     app.config.from_object(settings)
     app.config.from_envvar('LIBCROWDS_ANALYST_SETTINGS', silent=True)
-    CsrfProtect(app)
+    setup_csrf(app)
     setup_url_rules(app)
     setup_auth(app)
     return app
+
+
+def setup_csrf(app):
+    """Setup csrf protection."""
+    csrf = CsrfProtect(app)
+    csrf.exempt(view.index)
 
 
 def setup_url_rules(app):
@@ -32,6 +38,7 @@ def setup_auth(app):
     """Setup basic auth for all requests."""
     @app.before_request
     def requires_auth():
-        creds = request.authorization
-        if not creds or not auth.check_auth(creds.username, creds.password):
-            return auth.authenticate()
+        if request.endpoint != 'index' and request.method != 'POST':
+            cred = request.authorization
+            if not cred or not auth.check_auth(cred.username, cred.password):
+                return auth.authenticate()
