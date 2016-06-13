@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <p>
+        All webhook payloads should be directed to <strong>{{ request.base_url }}</strong>
+    </p>
+
+    <h3>Endpoints</h3>
+    <ul>
+        <li>To process unanalysed results visit:<br>
+        <strong>{{ request.base_url }}&lt;project_short_name&gt;</strong></li><br>
+
+        <li>To directly edit a result visit:<br>
+        <strong>{{ request.base_url }}&lt;project_short_name&gt;/&lt;result_id&gt;/edit</strong></li><br>
+
+        <li>To trigger reanalysis for all of a project's results visit:<br>
+        <strong>{{ request.base_url }}&lt;project_short_name&gt;/reanalyse</strong></li><br>
+    </ul>
+{% endblock %}
