@@ -4,6 +4,7 @@ import pytest
 from wtforms.validators import ValidationError
 from libcrowds_analyst.forms import JSONValidator, EditResultForm
 
+
 class TestForms(object):
 
     def test_json_validator(self, app):

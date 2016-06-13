@@ -14,6 +14,7 @@ def app(request):
     print flask_app
     ctx = flask_app.app_context()
     ctx.push()
+
     def teardown():
         ctx.pop()
     request.addfinalizer(teardown)
@@ -34,7 +35,7 @@ def auth_headers():
 @pytest.fixture
 def analysis_kwargs():
     return {'api_key': 'k', 'endpoint': 'e', 'project_short_name':
-        'sn', 'task_id': 123, 'sleep': 0}
+            'sn', 'task_id': 123, 'sleep': 0}
 
 
 @pytest.fixture(scope='session')

@@ -81,7 +81,7 @@ def edit_result(short_name, result_id):
     except enki.ProjectNotFound:
         abort(404)
     result = _get_first_result(e.project.id, id=result_id)
-    title="Editing result {0}".format(result.id)
+    title = "Editing result {0}".format(result.id)
     form = forms.EditResultForm(request.form)
     if request.method == 'POST' and form.validate():
         result.info = json.loads(form.info.data)

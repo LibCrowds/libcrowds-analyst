@@ -14,6 +14,5 @@ def check_auth(username, password):
 
 def authenticate():
     """Sends a 401 response that enables basic auth."""
-    return Response(
-    'You have to login with proper credentials', 401,
-    {'WWW-Authenticate': 'Basic realm="Login Required"'})
+    return Response('You have to login with proper credentials', 401,
+                    {'WWW-Authenticate': 'Basic realm="Login Required"'})
