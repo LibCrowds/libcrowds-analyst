@@ -1,6 +1,8 @@
 # -*- coding: utf8 -*-
 
 import os
+import json
+import enki
 import pytest
 import base64
 from libcrowds_analyst.app import create_app
@@ -38,11 +40,23 @@ def analysis_kwargs():
             'sn', 'task_id': 123, 'sleep': 0}
 
 
+@pytest.fixture
+def result():
+    return enki.pbclient.DomainObject({'id': 1, 'task_id': 1,
+                                       'info': {'n': 1}})
+
+
+@pytest.fixture
+def task():
+    return enki.pbclient.DomainObject({'id': 1})
+
+
 @pytest.fixture(scope='session')
 def payload():
-    return dict(fired_at=u'2014-11-17 09:49:27',
-                project_short_name=u'project',
-                project_id=1,
-                task_id=1,
-                result_id=1,
-                event=u'task_completed')
+    pl = dict(fired_at=u'2014-11-17 09:49:27',
+              project_short_name=u'project',
+              project_id=1,
+              task_id=1,
+              result_id=1,
+              event=u'task_completed')
+    return json.dumps(pl)
