@@ -1,0 +1,11 @@
+[uwsgi]
+socket = /tmp/libcrowds-analyst.sock
+chmod-socket = 666
+chdir = /home/libcrowds-analyst
+pythonpath = ..
+virtualenv = /home/libcrowds-analyst/env
+module = run:app
+cpu-affinity = 1
+processes = 2
+threads = 2
+buffer-size = 65535

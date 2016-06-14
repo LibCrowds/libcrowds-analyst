@@ -26,6 +26,15 @@ rqworker libcrowds_analyst       # Run a background worker
 ```
 
 
+## Deploying
+
+For deployment using nginx and uwsgi, the following template files are provided:
+
+- [contrib/uwsgi/libcrowds-analyst.ini.tmpl](contrib/uwsgi/libcrowds-analyst.ini.tmpl)
+- [contrib/nginx/libcrowds-analyst](contrib/nginx/libcrowds-analyst)
+- [contrib/supervisor/libcrowds-analyst.conf.tmpl](contrib/supervisor/libcrowds-analyst.conf.tmpl)
+
+
 ## Usage
 
 All webhook payloads should be directed to the root url of this server. If an
