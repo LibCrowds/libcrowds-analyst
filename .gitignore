@@ -60,3 +60,4 @@ target/
 
 # Local
 settings.py
+*.ini
