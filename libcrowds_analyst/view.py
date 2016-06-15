@@ -119,11 +119,11 @@ def reanalyse(short_name):
         flash('No analyst configured for this category of project.', 'danger')
     elif request.method == 'POST':
         e.get_tasks()
-        print e.tasks
+        sleep = request.args.get('sleep', 2)  # To handle API rate limit
         for t in e.tasks:
             queue.enqueue(analyst_func, current_app.config['API_KEY'],
                           current_app.config['ENDPOINT'], short_name, t.id,
-                          sleep=2)
+                          sleep=sleep)
         flash('''Results for {0} completed tasks will be reanalysed.
               '''.format(len(e.tasks)), 'success')
     return render_template('reanalyse.html', title="Reanalyse results",
