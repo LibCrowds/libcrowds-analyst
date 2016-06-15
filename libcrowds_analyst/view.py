@@ -18,9 +18,7 @@ def _get_first_result(project_id, **kwargs):
     res = enki.pbclient.find_results(project_id, limit=1, all=1, **kwargs)
     if isinstance(res, dict) and 'status_code' in res:  # pragma: no cover
         abort(res['status_code'])
-    elif not res:  # pragma: no cover
-        abort(404)
-    return res[0]
+    return res[0] if res else None
 
 
 def _update_result(result):
@@ -67,12 +65,15 @@ def analyse_empty_result(short_name):
         data.pop('csrf_token', None)
         result = _get_first_result(e.project.id, id=result_id)
         if not result:  # pragma: no cover
-            flash('No unanalysed results to process!', 'success')
+            flash('That result does not exist!', 'danger')
             return redirect(url_for('.index'))
         result.info = json.dumps(data)
         _update_result(result)
 
     result = _get_first_result(e.project.id, info='Unanalysed')
+    if not result:  # pragma: no cover
+        flash('There are no unanlysed results to process!', 'success')
+        return redirect(url_for('.index'))
     e.get_tasks(task_id=result.task_id)
     e.get_task_runs()
     task = e.tasks[0]
@@ -91,6 +92,8 @@ def edit_result(short_name, result_id):
         abort(404)
 
     result = _get_first_result(e.project.id, id=result_id)
+    if not result:  # pragma: no cover
+        abort(404)
     title = "Editing result {0}".format(result.id)
     form = forms.EditResultForm(request.form)
     if request.method == 'POST' and form.validate():
