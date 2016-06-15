@@ -5,7 +5,7 @@ import json
 import enki
 import pytest
 import base64
-from libcrowds_analyst.app import create_app
+from libcrowds_analyst.core import create_app
 
 os.environ['LIBCROWDS_ANALYST_SETTINGS'] = '../settings_test.py'
 flask_app = create_app()
