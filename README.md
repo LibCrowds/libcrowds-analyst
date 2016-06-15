@@ -19,10 +19,14 @@ A web application to help with real-time analysis of LibCrowds results.
 Run the following commands:
 
 ```
-python setup.py install          # Install
-cp settings.py.tmpl settings.py  # Copy (then edit) the settings
-python run.py                    # Run the server
-rqworker libcrowds_analyst       # Run a background worker
+git clone https://github.com/LibCrowds/libcrowds-analyst  # Get the code
+cd libcrowds-analyst                                      # Change dir
+virtualenv env                                            # Create virtualenv
+source env/bin/activate                                   # Activate virtualenv
+pip install -r requirements.txt                           # Install
+cp settings.py.tmpl settings.py                           # Copy (then edit) the settings
+python run.py                                             # Run the server
+rqworker libcrowds_analyst                                # Run a background worker
 ```
 
 
