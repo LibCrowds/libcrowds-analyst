@@ -1,7 +1,7 @@
 # -*- coding: utf8 -*-
 """Main module for libcrowds-analyst."""
 
-import settings
+from libcrowds_analyst import default_settings
 from flask import Flask, request
 from flask_wtf.csrf import CsrfProtect
 from libcrowds_analyst import view, auth
@@ -10,7 +10,7 @@ from libcrowds_analyst import view, auth
 def create_app():
     """Application factory."""
     app = Flask(__name__)
-    app.config.from_object(settings)
+    app.config.from_object(default_settings)
     app.config.from_envvar('LIBCROWDS_ANALYST_SETTINGS', silent=True)
     setup_csrf(app)
     setup_url_rules(app)
