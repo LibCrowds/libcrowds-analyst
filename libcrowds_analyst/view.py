@@ -5,7 +5,8 @@ import json
 import enki
 from redis import Redis
 from rq import Queue
-from flask import render_template, request, abort, flash, current_app
+from flask import render_template, request, abort, flash, redirect, url_for
+from flask import current_app
 from libcrowds_analyst import analysis, auth, forms
 
 
@@ -66,7 +67,8 @@ def analyse_empty_result(short_name):
         data.pop('csrf_token', None)
         result = _get_first_result(e.project.id, id=result_id)
         if not result:  # pragma: no cover
-            abort(404)
+            flash('No unanalysed results to process!', 'success')
+            return redirect(url_for('.index'))
         result.info = json.dumps(data)
         _update_result(result)
 
