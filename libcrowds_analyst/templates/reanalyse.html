@@ -2,7 +2,7 @@
 
 {% block content %}
         <p>
-            <strong>WARNING: </strong>Clicking the button below will triggerreanalysis of all results and override all current result data.
+            <strong>WARNING: </strong>Clicking the button below will trigger reanalysis of all results and override all current result data.
             <form method="POST" role="form" action="{{url_for('reanalyse', short_name=project.short_name)}}">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
                 <input class="btn btn-danger" type="submit" value="Continue"></input>
