@@ -39,6 +39,12 @@ For deployment using nginx and uwsgi, the following template files are provided:
 - [contrib/supervisor/libcrowds-analyst.conf.tmpl](contrib/supervisor/libcrowds-analyst.conf.tmpl)
 
 
+## Theme Integration
+
+If the location of the server changes, the `LIBCROWDS_ANALYST_URL` variable
+should be updated in the main PyBossa configuration.
+
+
 ## Usage
 
 All webhook payloads should be directed to the root url of this server. If an
