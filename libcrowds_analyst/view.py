@@ -10,7 +10,8 @@ from flask import current_app
 from libcrowds_analyst import analysis, auth, forms
 
 
-queue = Queue('libcrowds_analyst', connection=Redis())
+queue = Queue('libcrowds_analyst',
+              connection=Redis(port=current_app['REDIS_PORT']))
 
 
 def _get_first_result(project_id, **kwargs):
