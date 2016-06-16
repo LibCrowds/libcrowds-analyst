@@ -19,6 +19,3 @@ PORT = 5001
 
 # Debugging
 DEBUG = False
-
-# Redis port
-REDIS_PORT = 6379
