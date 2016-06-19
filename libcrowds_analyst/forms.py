@@ -4,6 +4,7 @@
 import json
 from flask.ext.wtf import Form
 from wtforms import TextAreaField
+from wtforms.fields import IntegerField
 from wtforms.validators import ValidationError
 
 
@@ -23,3 +24,8 @@ class JSONValidator(object):
 class EditResultForm(Form):
     """Form for directly editing the info field of a result."""
     info = TextAreaField('Result Info:', validators=[JSONValidator()])
+
+
+class ReanalysisForm(Form):
+    """Form for triggering result reanalysis."""
+    sleep = IntegerField('Sleep:', default=2)

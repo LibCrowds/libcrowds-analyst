@@ -113,11 +113,11 @@ def reanalyse(short_name):
                       current_app.config['ENDPOINT'], short_name)
     except enki.ProjectNotFound:  # pragma: no cover
         abort(404)
-
+    form = forms.ReanalysisForm(request.form)
     analyst_func = analysis.get_analyst_func(e.project.category_id)
     if not analyst_func:
         flash('No analyst configured for this category of project.', 'danger')
-    elif request.method == 'POST':
+    elif request.method == 'POST' and form.validate():
         e.get_tasks()
         sleep = request.args.get('sleep', 2)  # To handle API rate limit
         for t in e.tasks:
@@ -127,4 +127,4 @@ def reanalyse(short_name):
         flash('''Results for {0} completed tasks will be reanalysed.
               '''.format(len(e.tasks)), 'success')
     return render_template('reanalyse.html', title="Reanalyse results",
-                           project=e.project)
+                           project=e.project, form=form)

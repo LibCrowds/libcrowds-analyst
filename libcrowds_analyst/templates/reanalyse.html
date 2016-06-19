@@ -1,10 +1,12 @@
 {% extends "base.html" %}
+{% from '_helpers.html' import render_field %}
 
 {% block content %}
         <p>
-            <strong>WARNING: </strong>Clicking the button below will trigger reanalysis of all results and override all current result data.
+            <strong>WARNING: </strong>Clicking the button below will trigger reanalysis of all results and override all current result data for the project.
             <form method="POST" role="form" action="{{url_for('reanalyse', short_name=project.short_name)}}">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                {{ render_field(form.sleep, class="form-control", type="number") }}
                 <input class="btn btn-danger" type="submit" value="Continue"></input>
             </form>
         </p>
