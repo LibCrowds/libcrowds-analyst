@@ -119,7 +119,7 @@ def reanalyse(short_name):
         flash('No analyst configured for this category of project.', 'danger')
     elif request.method == 'POST' and form.validate():
         e.get_tasks()
-        sleep = request.form.get('sleep', 2)  # To handle API rate limit
+        sleep = int(request.form.get('sleep', 2))  # To handle API rate limit
         for t in e.tasks:
             queue.enqueue(analyst_func, current_app.config['API_KEY'],
                           current_app.config['ENDPOINT'], short_name, t.id,

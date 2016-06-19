@@ -107,7 +107,8 @@ class TestView(object):
         analysis = mocker.patch('libcrowds_analyst.view.analysis')
         analyser_func = (lambda x: x + 1)
         analysis.get_analyst_func.return_value = analyser_func
-        test_client.post('/project/reanalyse', headers=auth_headers)
+        test_client.post('/project/reanalyse', headers=auth_headers,
+                         data={'sleep':1})
         mock_queue.enqueue.assert_called_once_with(analyser_func, 'yourkey',
                                                    'http://localhost:5001',
-                                                   'project', 1, sleep=2)
+                                                   'project', 1, sleep=1)
