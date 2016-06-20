@@ -9,8 +9,12 @@ from libcrowds_analyst import view
 
 class TestView(object):
 
+    def test_basic_auth_not_required_for_index(self, test_client, payload):
+        get_res = test_client.get('/')
+        assert get_res.status_code == 200
+
     def test_basic_auth_required(self, test_client):
-        res = test_client.get('/')
+        res = test_client.get('/project')
         assert res.status_code == 401
 
     def test_auth_credentials_accepted(self, test_client, auth_headers):
@@ -108,7 +112,7 @@ class TestView(object):
         analyser_func = (lambda x: x + 1)
         analysis.get_analyst_func.return_value = analyser_func
         test_client.post('/project/reanalyse', headers=auth_headers,
-                         data={'sleep':1})
+                         data={'sleep': 1})
         mock_queue.enqueue.assert_called_once_with(analyser_func, 'yourkey',
                                                    'http://localhost:5001',
                                                    'project', 1, sleep=1)

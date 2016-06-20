@@ -44,8 +44,7 @@ def setup_auth(app):
     """Setup basic auth for all requests."""
     @app.before_request
     def requires_auth():
-        if request.endpoint == 'index' and request.method == 'POST':
-            return
-        creds = request.authorization
-        if not creds or not auth.check_auth(creds.username, creds.password):
-            return auth.authenticate()
+        if request.endpoint != 'index':
+            cred = request.authorization
+            if not cred or not auth.check_auth(cred.username, cred.password):
+                return auth.authenticate()
