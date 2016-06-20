@@ -23,7 +23,7 @@ def _get_first_result(project_id, **kwargs):
 
 def _update_result(result):
     """Update a result or abort if exception thrown."""
-    res = enki.pbclient._update_result(result)
+    res = enki.pbclient.update_result(result)
     if isinstance(res, dict) and 'status_code' in res:  # pragma: no cover
         abort(res.status_code)
 
