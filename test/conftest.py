@@ -13,7 +13,6 @@ flask_app = create_app()
 
 @pytest.fixture(scope='session')
 def app(request):
-    print flask_app
     ctx = flask_app.app_context()
     ctx.push()
 
