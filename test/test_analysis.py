@@ -31,8 +31,10 @@ class TestCategoryOneAnalysis(TestAnalysis):
 
     def setup(self):
         super(TestCategoryOneAnalysis, self)
-        self.tr_data = {'oclc': '123', 'shelfmark': '456'}
-        self.empty_tr_data = {'oclc': '', 'shelfmark': ''}
+        self.tr_data = {'oclc': '123', 'shelfmark': '456', 'title': 'card.jpg',
+                        'comments': 'hello'}
+        self.empty_tr_data = {'oclc': '', 'shelfmark': '', 'title': 'card.jpg',
+                              'comments': 'hello'}
 
     def analyse(self, data, mock_enki, analysis_kwargs):
         mock_info = PropertyMock()

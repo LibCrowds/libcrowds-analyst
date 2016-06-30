@@ -7,14 +7,28 @@ import time
 import numpy as np
 
 
-def _normalise_shelfmarks(df):
-    """Normalise all shelfmarks in a dataframe."""
-    df['shelfmark'].replace(r',', '.', inplace=True)
-    df['shelfmark'].replace(r'\s+', '.', inplace=True)
-    df['shelfmark'].replace(r'\.+', '.', inplace=True)
-    df['shelfmark'].replace(r'\.$', '', inplace=True)
-    df['shelfmark'].replace(r'^\.', '.', inplace=True)
-    df['shelfmark'].replace(r'(?i)^chi', 'CHI', inplace=True)
+def _concat(df, col):
+    """Return concatenated, non-duplicated column values.
+
+    :param df: The dataframe of task runs (i.e enki.task_runs_df[task_id]).
+    :param col: The name of the column.
+    """
+    deduped_df = df[col].drop_duplicates(keep='first')
+    return '; '.join([item for item in deduped_df])
+
+
+def _normalise_shelfmarks(df, col):
+    """Normalise all shelfmarks in a dataframe.
+
+    :param df: The dataframe.
+    :param col: The name of the column.
+    """
+    df[col].replace(r',', '.', inplace=True)
+    df[col].replace(r'\s+', '.', inplace=True)
+    df[col].replace(r'\.+', '.', inplace=True)
+    df[col].replace(r'\.$', '', inplace=True)
+    df[col].replace(r'^\.', '.', inplace=True)
+    df[col].replace(r'(?i)^chi', 'CHI', inplace=True)
 
 
 def get_analyst_func(category_id):
@@ -26,7 +40,16 @@ def get_analyst_func(category_id):
 
 
 def category_1(api_key, endpoint, project_short_name, task_id, sleep=0):
-    """Analyser for Convert-a-Card projects."""
+    """Analyser for Convert-a-Card projects.
+
+    The fields being compared are 'oclc' and 'shelfmark'. For all tasks where
+    two or more contributors submitted the same answer the result will be set
+    to that answer. For those tasks where no contributors were able to find a
+    matching WorldCat record the result will be set to a blank value for both
+    'oclc' and 'shelfmark'. All other tasks will remain unanalysed.
+
+    The 'comments' and 'title' keys are added for all analysed results.
+    """
     time.sleep(sleep)  # To throttle when many API calls
     e = enki.Enki(api_key, endpoint, project_short_name)
     e.get_tasks(task_id=task_id)
@@ -34,20 +57,25 @@ def category_1(api_key, endpoint, project_short_name, task_id, sleep=0):
     for t in e.tasks:
         r = enki.pbclient.find_results(e.project.id, task_id=task_id, all=1)[0]
         df = e.task_runs_df[t.id][['oclc', 'shelfmark']]
+        title = e.task_runs_df[t.id]['title'][0]
+        comments = _concat(e.task_runs_df[t.id], 'comments')
+        _normalise_shelfmarks(df, 'shelfmark')
 
         # Check for populated rows
         df = df.replace('', np.nan)
         if df.dropna(how='all').empty:
-            r.info = dict(oclc="", shelfmark="")
+            r.info = dict(oclc="", shelfmark="", title=title,
+                          comments=comments)
             enki.pbclient.update_result(r)
             continue
 
         # Check for two or more matches
-        _normalise_shelfmarks(df)
         df = df[df.duplicated(['oclc', 'shelfmark'], keep=False)]
         if not df.dropna(how='all').empty:
             r.info = dict(oclc=df.iloc[0]['oclc'],
-                          shelfmark=df.iloc[0]['shelfmark'])
+                          shelfmark=df.iloc[0]['shelfmark'],
+                          title=title,
+                          comments=comments)
             enki.pbclient.update_result(r)
             continue
 
