@@ -106,5 +106,5 @@ GET /<project_short_name>/reanalyse
 
 To create an analyser for a new category you need to create:
 
-- A function in [libcrowds_analyst/analysis.py](analysis.py) called **category_\<category_id>**
-- A template in [libcrowds_analyst/templates](templates) called **category_\<category_id>.html**
+- A function in [analysis.py](libcrowds_analyst/analysis.py) called **category_\<category_id>**
+- A template in [templates](libcrowds_analyst/templates) called **category_\<category_id>.html**
