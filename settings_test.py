@@ -8,3 +8,5 @@ PORT = 5001
 DEBUG = True
 TESTING = True
 WTF_CSRF_ENABLED = False
+Z3950_DATABASES = {"loc": {"db": "Voyager", "host": "z3950.loc.gov",
+                           "port": 7090}}

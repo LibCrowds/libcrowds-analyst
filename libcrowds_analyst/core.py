@@ -6,6 +6,7 @@ from libcrowds_analyst import default_settings
 from flask import Flask, request
 from flask_wtf.csrf import CsrfProtect
 from libcrowds_analyst import view, auth
+from libcrowds_analyst.extensions import z3950_manager
 
 
 def create_app():
@@ -21,6 +22,7 @@ def create_app():
     setup_csrf(app)
     setup_url_rules(app)
     setup_auth(app)
+    setup_z3950_manager(app)
     return app
 
 
@@ -48,3 +50,8 @@ def setup_auth(app):
             cred = request.authorization
             if not cred or not auth.check_auth(cred.username, cred.password):
                 return auth.authenticate()
+
+
+def setup_z3950_manager(app):
+    """Setup Flask-Z3950."""
+    z3950_manager.init_app(app)
