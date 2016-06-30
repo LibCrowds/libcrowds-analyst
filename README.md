@@ -14,23 +14,52 @@ A web application to help with real-time analysis of LibCrowds results.
 - A running [Redis](https://github.com/antirez/redis) server.
 
 
-## Installing, configuring and running
+## Installation
 
-Run the following commands:
+Install the required development packages:
 
 ```
-git clone https://github.com/LibCrowds/libcrowds-analyst  # Get the code
-cd libcrowds-analyst                                      # Change dir
-virtualenv env                                            # Create virtualenv
-source env/bin/activate                                   # Activate virtualenv
-pip install -r requirements.txt                           # Install
-cp settings.py.tmpl settings.py                           # Copy (then edit) the settings
-python run.py                                             # Run the server
-rqworker libcrowds_analyst                                # Run a background worker
+sudo apt-get install libxml2-dev libxslt-dev python-dev lib32z1-dev
+```
+
+Install libcrowds-analyst:
+
+```
+git clone https://github.com/LibCrowds/libcrowds-analyst
+cd libcrowds-analyst
+virtualenv env
+source env/bin/activate
+pip install -r requirements.txt
+```
+
+## Configuration
+
+Copy the template settings file:
+
+```
+cp settings.py.tmpl settings.py
+```
+
+Now edit this file according to the comments contained within.
+
+
+## Running
+
+Run the server:
+
+```
+python run.py
 ```
 
 
-## Deploying
+Run a background worker:
+
+```
+rqworker libcrowds_analyst
+```
+
+
+## Deploying with nginx and uwsgi
 
 For deployment using nginx and uwsgi, the following template files are provided:
 
@@ -39,7 +68,7 @@ For deployment using nginx and uwsgi, the following template files are provided:
 - [contrib/supervisor/libcrowds-analyst.conf.tmpl](contrib/supervisor/libcrowds-analyst.conf.tmpl)
 
 
-## Theme Integration
+## LibCrowds Theme Integration
 
 If the location of the server changes, the `LIBCROWDS_ANALYST_URL` variable
 should be updated in the main PyBossa configuration.
