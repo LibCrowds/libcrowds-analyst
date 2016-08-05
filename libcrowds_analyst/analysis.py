@@ -48,7 +48,7 @@ def category_1(api_key, endpoint, project_short_name, task_id, sleep=0):
     matching WorldCat record the result will be set to a blank value for both
     'oclc' and 'shelfmark'. All other tasks will remain unanalysed.
 
-    The 'comments' and 'title' keys are added for all analysed results.
+    The 'comments' and all task info keys are added for all analysed results.
     """
     time.sleep(sleep)  # To throttle when many API calls
     e = enki.Enki(api_key, endpoint, project_short_name)
@@ -57,15 +57,13 @@ def category_1(api_key, endpoint, project_short_name, task_id, sleep=0):
     for t in e.tasks:
         r = enki.pbclient.find_results(e.project.id, task_id=task_id, all=1)[0]
         df = e.task_runs_df[t.id][['oclc', 'shelfmark']]
-        title = e.task_runs_df[t.id]['title'][0]
         comments = _concat(e.task_runs_df[t.id], 'comments')
         _normalise_shelfmarks(df, 'shelfmark')
 
         # Check for populated rows
         df = df.replace('', np.nan)
         if df.dropna(how='all').empty:
-            r.info = dict(oclc="", shelfmark="", title=title,
-                          comments=comments)
+            r.info = dict(oclc="", shelfmark="", comments=comments, **t.info)
             enki.pbclient.update_result(r)
             continue
 
@@ -73,9 +71,8 @@ def category_1(api_key, endpoint, project_short_name, task_id, sleep=0):
         df = df[df.duplicated(['oclc', 'shelfmark'], keep=False)]
         if not df.dropna(how='all').empty:
             r.info = dict(oclc=df.iloc[0]['oclc'],
-                          shelfmark=df.iloc[0]['shelfmark'],
-                          title=title,
-                          comments=comments)
+                          shelfmark=df.iloc[0]['shelfmark'], comments=comments,
+                          **t.info)
             enki.pbclient.update_result(r)
             continue
 
