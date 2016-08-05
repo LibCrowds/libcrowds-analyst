@@ -36,9 +36,9 @@ def setup_csrf(app):
 def setup_url_rules(app):
     """Setup URL rules"""
     rules = {'/': view.index,
-             '/<short_name>': view.analyse_empty_result,
-             '/<short_name>/<int:result_id>/edit': view.edit_result,
-             '/<short_name>/reanalyse': view.reanalyse}
+             '/<short_name>/': view.analyse_empty_result,
+             '/<short_name>/<int:result_id>/edit/': view.edit_result,
+             '/<short_name>/reanalyse/': view.reanalyse}
     for route, func in rules.items():
         app.add_url_rule(route, view_func=func, methods=['GET', 'POST'])
 
