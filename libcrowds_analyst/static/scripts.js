@@ -19,6 +19,21 @@ $('#answer-form').on('submit', function() {
 });
 
 
+/** Perform a Z39.50 search.*/
+function z3950Search(query, callback) {
+    $.ajax({
+        type: 'GET',
+        url: '/z3950/search/oclc/html',
+        data: {query: query},
+        success: function(results) {
+            callback(results);
+        }, error: function(err) {
+            alert('Z3950 ERROR: ' + err.status + " " + err.statusText);
+        }
+    });
+}
+
+
 $(document).ready(function() {
     prettifyJSON();
 });
