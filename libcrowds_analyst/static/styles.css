@@ -1,0 +1,12 @@
+record {
+    border-bottom: 1px solid #EFEFEF;
+    display: block;
+    padding: 20px 0px
+}
+
+.comment {
+    font-size: 1.2em
+    font-style: italic;
+    display: block;
+    margin-bottom: 20px;
+}
