@@ -92,7 +92,7 @@ GET /<project_short_name>
 
 
 ```http
-GET /<project_short_name>/<result_id>/edit
+GET /<project_short_name>/<result_id>
 ```
 
 - To trigger reanalysis for all of a project's results visit:
