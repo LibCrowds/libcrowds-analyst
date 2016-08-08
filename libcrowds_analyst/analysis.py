@@ -14,7 +14,7 @@ def _concat(df, col):
     :param col: The name of the column.
     """
     deduped_df = df[col].drop_duplicates(keep='first')
-    return '; '.join([item for item in deduped_df])
+    return '; '.join([item for item in deduped_df if len(item) > 0])
 
 
 def _normalise_shelfmarks(df, col):
