@@ -60,7 +60,8 @@ class TestView(object):
         res = test_client.post('/short_name/1/', headers=auth_headers)
         mock_pbclient.update_result.assert_called_once_with(result)
 
-    def test_next_unanalysed_result(self, test_client, auth_headers, mocker, result):
+    def test_next_unanalysed_result(self, test_client, auth_headers, mocker,
+                                    result):
         mock_enki = mocker.patch('libcrowds_analyst.view.enki')
         mock_pbclient = mocker.patch('libcrowds_analyst.view.enki.pbclient')
         mock_pbclient.find_results.return_value = [result]

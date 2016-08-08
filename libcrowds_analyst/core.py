@@ -9,7 +9,6 @@ from libcrowds_analyst import default_settings
 from libcrowds_analyst import view, auth
 
 
-
 def create_app():
     """Application factory."""
     app = Flask(__name__)
