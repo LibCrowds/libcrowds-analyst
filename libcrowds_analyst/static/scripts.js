@@ -5,7 +5,6 @@ function prettifyJSON() {
         var obj = JSON.parse(ugly);
         var pretty = JSON.stringify(obj, undefined, 4);
         $(this).val(pretty);
-        console.log(pretty);
     });
 }
 
@@ -21,6 +20,9 @@ $('#answer-form').on('submit', function() {
 
 /** Perform a Z39.50 search.*/
 function z3950Search(query, callback) {
+    if (query.length === 0) {
+        return;
+    }
     $.ajax({
         type: 'GET',
         url: '/z3950/search/oclc/html',

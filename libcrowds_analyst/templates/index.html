@@ -7,8 +7,11 @@
 
     <h3>Endpoints</h3>
     <ul>
-        <li>To process unanalysed results visit:<br>
+        <li>To process the next unanalysed result visit:<br>
         <strong>{{ request.base_url }}&lt;project_short_name&gt;</strong></li><br>
+
+        <li>To process a specific result visit:<br>
+        <strong>{{ request.base_url }}&lt;project_short_name&gt;/&lt;result_id&gt;</strong></li><br>
 
         <li>To directly edit a result visit:<br>
         <strong>{{ request.base_url }}&lt;project_short_name&gt;/&lt;result_id&gt;/edit</strong></li><br>

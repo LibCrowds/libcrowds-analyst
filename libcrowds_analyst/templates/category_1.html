@@ -15,11 +15,10 @@
             <span id="{{ tr.info['oclc'] }}" class="worldcat-record"></span>
             {% endif %}
         {% endfor %}
-        <form id="answer-form" method="POST" role="form" action="{{url_for('analyse_empty_result', short_name=project.short_name)}}">
+        <form id="answer-form" method="POST" role="form" action="{{url_for('analyse_result', short_name=project.short_name, result_id=result.id)}}">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-            <input type="hidden" name="result_id" value="{{ result.id }}" />
-            {{ render_tr_field(task_runs, key='oclc', required=True) }}
-            {{ render_tr_field(task_runs, key='shelfmark', required=True) }}
+            {{ render_tr_field(task_runs, result=result, key='oclc', required=True) }}
+            {{ render_tr_field(task_runs, result=result, key='shelfmark', required=True) }}
             <div class="form-group text-right">
                 <input class="btn btn-success" type="submit" value="Accept"></input>
             </div>
