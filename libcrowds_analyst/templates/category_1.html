@@ -60,7 +60,7 @@ $(document).ready(function() {
         }
         query = query + '(1,12)="' + $(this).context.id + '"';
     });
-    z3950Search(query, handleResults);
+    z3950Search("{{ config['Z3950_URL'] }}", query, handleResults);
 });
 </script>
 {% endblock %}

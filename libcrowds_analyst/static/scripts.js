@@ -19,13 +19,14 @@ $('#answer-form').on('submit', function() {
 
 
 /** Perform a Z39.50 search.*/
-function z3950Search(query, callback) {
+function z3950Search(baseUrl, query, callback) {
+    var url = (baseUrl + '/html').replace('//', '/');
     if (query.length === 0) {
         return;
     }
     $.ajax({
         type: 'GET',
-        url: '/z3950/search/oclc/html',
+        url: url,
         data: {query: query},
         success: function(results) {
             callback(results);
