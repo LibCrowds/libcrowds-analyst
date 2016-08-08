@@ -14,7 +14,7 @@
 {% endmacro %}
 
 
-{% macro render_tr_field(task_runs, key, input_type='text', required=False) %}
+{% macro render_tr_field(task_runs, key, result, input_type='text', required=False) %}
     <input type="hidden" id="{{ key }}" />
     <strong>{{ key }}</strong>
     <div class="answer-group" data-key="{{ key }}">
@@ -22,7 +22,12 @@
             {% if tr.info[key]|length > 0 %}
                 <div class="form-group">
                     <div class="radio">
-                        <label><input type="radio" name="{{ key }}" value="{{ tr.info[key] }}">{{ tr.info[key] }}</label>
+                        <label>
+                            <input type="radio" name="{{ key }}" value="{{ tr.info[key] }}"
+                                   {% if result.info != 'Unanalysed' and result.info[key] == tr.info[key] %}
+                                       checked="checked"
+                                    {% endif %}>{{ tr.info[key] }}
+                        </label>
                     </div>
                 </div>
             {% endif %}

@@ -2,11 +2,12 @@
 """Main module for libcrowds-analyst."""
 
 import os
-from libcrowds_analyst import default_settings
 from flask import Flask, request
 from flask_wtf.csrf import CsrfProtect
+from flask.ext.z3950 import Z3950Manager
+from libcrowds_analyst import default_settings
 from libcrowds_analyst import view, auth
-from libcrowds_analyst.extensions import z3950_manager
+
 
 
 def create_app():
@@ -35,9 +36,10 @@ def setup_csrf(app):
 def setup_url_rules(app):
     """Setup URL rules"""
     rules = {'/': view.index,
-             '/<short_name>': view.analyse_empty_result,
-             '/<short_name>/<int:result_id>/edit': view.edit_result,
-             '/<short_name>/reanalyse': view.reanalyse}
+             '/<short_name>/': view.analyse_next_empty_result,
+             '/<short_name>/<int:result_id>/': view.analyse_result,
+             '/<short_name>/<int:result_id>/edit/': view.edit_result,
+             '/<short_name>/reanalyse/': view.reanalyse}
     for route, func in rules.items():
         app.add_url_rule(route, view_func=func, methods=['GET', 'POST'])
 
@@ -54,4 +56,5 @@ def setup_auth(app):
 
 def setup_z3950_manager(app):
     """Setup Flask-Z3950."""
-    z3950_manager.init_app(app)
+    z3950_manager = Z3950Manager(app)
+    z3950_manager.register_blueprint(url_prefix='/z3950')

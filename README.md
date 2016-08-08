@@ -82,10 +82,16 @@ and updated automatically.
 
 ### Endpoints
 
-- To process any unanalysed results visit:
+- To process the next unanalysed result visit:
 
 ```http
 GET /<project_short_name>
+
+
+- To process a specific result visit:
+
+```http
+GET /<project_short_name>/<result_id>
 ```
 
 - To directly edit a result visit:

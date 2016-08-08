@@ -51,29 +51,44 @@ def index():
             abort(404)
 
 
-def analyse_empty_result(short_name):
-    """View for analysing empty results."""
+def analyse_next_empty_result(short_name):
+    """View for analysing the next empty result."""
     try:
         e = enki.Enki(current_app.config['API_KEY'],
                       current_app.config['ENDPOINT'], short_name)
     except enki.ProjectNotFound:  # pragma: no cover
         abort(404)
 
-    if request.method == 'POST':
-        data = dict((k, request.form.getlist(k)) for k in request.form.keys())
-        result_id = data.pop('result_id', None)
-        data.pop('csrf_token', None)
-        result = _get_first_result(e.project.id, id=result_id)
-        if not result:  # pragma: no cover
-            flash('That result does not exist!', 'danger')
-            return redirect(url_for('.index'))
-        result.info = json.dumps(data)
-        _update_result(result)
-
     result = _get_first_result(e.project.id, info='Unanalysed')
     if not result:  # pragma: no cover
         flash('There are no unanlysed results to process!', 'success')
         return redirect(url_for('.index'))
+    return redirect(url_for('.analyse_result', short_name=short_name,
+                            result_id=result.id))
+
+
+def analyse_result(short_name, result_id):
+    """View for analysing a result."""
+    try:
+        e = enki.Enki(current_app.config['API_KEY'],
+                      current_app.config['ENDPOINT'], short_name)
+    except enki.ProjectNotFound:  # pragma: no cover
+        abort(404)
+
+    result = _get_first_result(e.project.id, id=result_id)
+    if not result:  # pragma: no cover
+        flash('Result {0} not found for {1}!'.format(result_id, short_name),
+              'warning')
+        return redirect(url_for('.index'))
+
+    if request.method == 'POST':
+        data = request.form.to_dict()
+        data.pop('csrf_token', None)
+        result.info = data
+        _update_result(result)
+        return redirect(url_for('.analyse_next_empty_result',
+                                short_name=short_name))
+
     e.get_tasks(task_id=result.task_id)
     e.get_task_runs()
     task = e.tasks[0]
