@@ -108,6 +108,13 @@ GET /<project_short_name>/reanalyse
 ```
 
 
+- To filter and download the Flickr images associated with each task visit:
+
+```http
+GET /<project_short_name>/flickr/download?key1=value1&key2=value2
+```
+
+
 ## Creating a new analyser
 
 To create an analyser for a new category you need to create:

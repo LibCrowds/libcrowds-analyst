@@ -63,3 +63,4 @@ settings.py
 *.ini
 env/
 *.rdb
+*.zip

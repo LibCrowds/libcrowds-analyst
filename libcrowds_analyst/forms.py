@@ -4,8 +4,8 @@
 import json
 from flask.ext.wtf import Form
 from wtforms import TextAreaField
-from wtforms.fields import IntegerField
-from wtforms.validators import ValidationError
+from wtforms.fields import IntegerField, SelectField
+from wtforms.validators import ValidationError, required
 
 
 class JSONValidator(object):
@@ -29,3 +29,9 @@ class EditResultForm(Form):
 class ReanalysisForm(Form):
     """Form for triggering result reanalysis."""
     sleep = IntegerField('Sleep:', default=2)
+
+
+class DownloadForm(Form):
+    """Form for downloading original task input."""
+    task_ids = TextAreaField('Task IDs:', validators=[required()])
+    importer = SelectField('Importer Type:', choices=[('flickr', 'Flickr')])
