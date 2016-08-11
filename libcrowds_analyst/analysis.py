@@ -14,7 +14,7 @@ def _concat(df, col):
     :param col: The name of the column.
     """
     deduped_df = df[col].drop_duplicates(keep='first')
-    return '; '.join([item for item in deduped_df])
+    return '; '.join([item for item in deduped_df if len(item) > 0])
 
 
 def _normalise_shelfmarks(df, col):
@@ -46,9 +46,8 @@ def category_1(api_key, endpoint, project_short_name, task_id, sleep=0):
     two or more contributors submitted the same answer the result will be set
     to that answer. For those tasks where no contributors were able to find a
     matching WorldCat record the result will be set to a blank value for both
-    'oclc' and 'shelfmark'. All other tasks will remain unanalysed.
-
-    The 'comments' and all task info keys are added for all analysed results.
+    'oclc' and 'shelfmark'. All other tasks will remain unanalysed. The
+    'comments' are added for all analysed results.
     """
     time.sleep(sleep)  # To throttle when many API calls
     e = enki.Enki(api_key, endpoint, project_short_name)
@@ -63,7 +62,7 @@ def category_1(api_key, endpoint, project_short_name, task_id, sleep=0):
         # Check for populated rows
         df = df.replace('', np.nan)
         if df.dropna(how='all').empty:
-            r.info = dict(oclc="", shelfmark="", comments=comments, **t.info)
+            r.info = dict(oclc="", shelfmark="", comments=comments)
             enki.pbclient.update_result(r)
             continue
 
@@ -71,8 +70,7 @@ def category_1(api_key, endpoint, project_short_name, task_id, sleep=0):
         df = df[df.duplicated(['oclc', 'shelfmark'], keep=False)]
         if not df.dropna(how='all').empty:
             r.info = dict(oclc=df.iloc[0]['oclc'],
-                          shelfmark=df.iloc[0]['shelfmark'], comments=comments,
-                          **t.info)
+                          shelfmark=df.iloc[0]['shelfmark'], comments=comments)
             enki.pbclient.update_result(r)
             continue
 

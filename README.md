@@ -108,6 +108,13 @@ GET /<project_short_name>/reanalyse
 ```
 
 
+- To download the original input (e.g. the images) associated with a list of tasks:
+
+```http
+GET /<project_short_name>/download
+```
+
+
 ## Creating a new analyser
 
 To create an analyser for a new category you need to create:

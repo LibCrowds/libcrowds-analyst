@@ -19,3 +19,10 @@ PORT = 5001
 
 # Debugging
 DEBUG = False
+
+# Flask-Z3950
+Z3950_DATABASES = {}
+Z3950_URL = ""
+
+# Folder to store downloadable zip files
+ZIP_FOLDER = "/"

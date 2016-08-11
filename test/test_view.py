@@ -31,7 +31,8 @@ class TestView(object):
                          headers={'Content-type': 'application/json'})
         mock_queue.enqueue.assert_called_once_with(analyser_func, 'yourkey',
                                                    'http://localhost:5001',
-                                                   'short_name', 100)
+                                                   'short_name', 100,
+                                                   timeout=600)
 
     def test_webhook_404_when_no_analyser(self, test_client, payload, mocker):
         mock_enki = mocker.patch('libcrowds_analyst.view.enki')
@@ -114,4 +115,5 @@ class TestView(object):
                          data={'sleep': 1})
         mock_queue.enqueue.assert_called_once_with(analyser_func, 'yourkey',
                                                    'http://localhost:5001',
-                                                   'short_name', 100, sleep=1)
+                                                   'short_name', 100, sleep=1,
+                                                   timeout=3600)
