@@ -58,7 +58,7 @@ class ZipBuilder(object):
         with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as archive:
             for t in tasks:
                 url = t.info['url']
-                img_path = os.path.join(zip_dir, t.info['title'])
+                img_path = os.path.join(zip_dir, t.info['title'] + ".jpg")
                 img = requests.get(url).content
                 archive.writestr(img_path, img)
 
