@@ -5,7 +5,6 @@ import os
 import json
 import enki
 import time
-import pbclient
 from redis import Redis
 from rq import Queue
 from flask import render_template, request, abort, flash, redirect, url_for
@@ -20,7 +19,7 @@ queue = Queue('libcrowds_analyst', connection=Redis())
 
 def _get_first_result(project_id, **kwargs):
     """Return a result or abort an exception is thrown."""
-    resp = pbclient.find_results(project_id, limit=1, all=1, **kwargs)
+    resp = enki.pbclient.find_results(project_id, limit=1, all=1, **kwargs)
     if isinstance(resp, dict) and 'status_code' in resp:  # pragma: no cover
         abort(resp['status_code'])
     return resp[0] if resp else None
@@ -28,7 +27,7 @@ def _get_first_result(project_id, **kwargs):
 
 def _update_result(result):
     """Update a result or abort if an exception is thrown."""
-    resp = pbclient._update_result(result)
+    resp = enki.pbclient.update_result(result)
     if isinstance(resp, dict) and 'status_code' in resp:  # pragma: no cover
         abort(resp.status_code)
 
