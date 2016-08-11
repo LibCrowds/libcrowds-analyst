@@ -8,7 +8,7 @@ import time
 from redis import Redis
 from rq import Queue
 from flask import render_template, request, abort, flash, redirect, url_for
-from flask import current_app, Response, send_file
+from flask import current_app, Response, send_file, jsonify
 from werkzeug.utils import secure_filename
 from libcrowds_analyst import analysis, auth, forms
 from libcrowds_analyst.core import zip_builder
@@ -177,10 +177,17 @@ def prepare_zip(short_name):
                            project=e.project, form=form)
 
 
+def check_zip(short_name, filename):
+    """Check if a zip file is ready for download."""
+    download_ready = zip_builder.check_zip(filename)
+    return jsonify(download_ready=download_ready)
+
+
 def download_zip(short_name, filename):
     """View to download a zip file."""
-    resp = zip_builder.response_zip(filename)
-    if resp is not None:
-        return resp
+    if request.method == 'POST':
+        resp = zip_builder.response_zip(filename)
+        if resp is not None:
+            return resp
     return render_template('download_zip.html', title="Download task input",
                            short_name=short_name, filename=filename)

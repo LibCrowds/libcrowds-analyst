@@ -84,15 +84,20 @@ class ZipBuilder(object):
             self._build_flickr_zip(filename, tasks)
         else:
             raise ValueError("Unknown importer type")
-
         self._move_to_completed_folder(filename)
+
+    def check_zip(self, filename):
+        """Check if a zip file is ready for download."""
+        completed_path = os.path.join(self.completed_folder, filename)
+        return os.path.isfile(completed_path)
 
     def response_zip(self, filename):
         """Return a response to download the zip file."""
-        completed_path = os.path.join(self.completed_folder, filename)
-        if not os.path.isfile(completed_path):
+        if not self.check_zip(filename):
             return None
-        return send_file(filename_or_fp=completed_path,
-                         mimetype='application/zip',
+        completed_path = os.path.join(self.completed_folder, filename)
+        resp = send_file(filename_or_fp=completed_path,
+                         mimetype='application/octet-stream',
                          as_attachment=True,
                          attachment_filename=filename)
+        return resp

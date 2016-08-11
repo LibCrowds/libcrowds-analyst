@@ -1,13 +1,35 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <p id="dl" class="lead">Preparing your download, please wait...</p>
+    <p class="lead">
+        <span id="loading-icon" class="glyphicon glyphicon-refresh glyphicon-spin"></span>
+        <span id="loading-text">Preparing your download, please wait...</span>
+    </p>
+    <form action="" method="post" name="login">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+        <input id="dl-btn" type="submit" class="btn btn-disabled" value="Download" disabled>
+    </form>
     <script>
+        /** Check if the file is ready to download. */
+        function checkDownload() {
+            var url = "/{{ short_name }}/download/{{ filename }}";
+            $.ajax({ url: url + "/check", success: function(data){
+                if (data['download_ready']) {
+                    $('#dl-btn').removeClass('btn-disabled');
+                    $('#dl-btn').addClass('btn-success');
+                    $('#dl-btn').removeProp('disabled');
+                    $('#loading-icon').hide();
+                    $('#loading-text').html('Download ready!');
+                } else {
+                    setTimeout(function(){
+                        checkDownload();
+                    }, 5000);
+                }
+            }, dataType: "json"});
+        }
+
         $(document).ready(function() {
-            setTimeout(function() {
-                var url = "/{{ short_name }}/download/{{ filename }}";
-                window.location.replace(url);
-            }, 5000);
+            checkDownload();
         });
     </script>
 {% endblock %}

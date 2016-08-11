@@ -39,6 +39,7 @@ def setup_url_rules(app):
              '/<short_name>/<int:result_id>/edit/': view.edit_result,
              '/<short_name>/reanalyse/': view.reanalyse,
              '/<short_name>/download/': view.prepare_zip,
+             '/<short_name>/download/<path:filename>/check': view.check_zip,
              '/<short_name>/download/<path:filename>': view.download_zip}
     for route, func in rules.items():
         app.add_url_rule(route, view_func=func, methods=['GET', 'POST'])
