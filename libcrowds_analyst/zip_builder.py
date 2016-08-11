@@ -3,7 +3,7 @@
 
 import os
 import enki
-import time
+import shutil
 import requests
 import zipfile
 from redis import Redis
@@ -69,12 +69,6 @@ class ZipBuilder(object):
         tasks = [t for t in e.tasks if str(t.id) in task_ids]
         return tasks
 
-    def _move_to_completed_folder(self, filename):
-        """Move a zip file to the completed folder."""
-        build_path = os.path.join(self.build_folder, filename)
-        completed_path = os.path.join(self.completed_folder, filename)
-        os.rename(build_path, completed_path)
-
     def build(self, short_name, task_ids, filename, importer):
         """Build a zip file containing original task input."""
         tasks = self._get_valid_tasks(short_name, task_ids)
@@ -84,7 +78,12 @@ class ZipBuilder(object):
             self._build_flickr_zip(filename, tasks)
         else:
             raise ValueError("Unknown importer type")
-        self._move_to_completed_folder(filename)
+
+        # Move to completed folder and schedule removal
+        build_path = os.path.join(self.build_folder, filename)
+        completed_path = os.path.join(self.completed_folder, filename)
+        os.rename(build_path, completed_path)
+        scheduler.enqueue_in(timedelta(minutes=30), os.remove, completed_path)
 
     def check_zip(self, filename):
         """Check if a zip file is ready for download."""
