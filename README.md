@@ -108,10 +108,10 @@ GET /<project_short_name>/reanalyse
 ```
 
 
-- To filter and download the Flickr images associated with each task visit:
+- To download the original input (e.g. the images) associated with a list of tasks:
 
 ```http
-GET /<project_short_name>/flickr/download?key1=value1&key2=value2
+GET /<project_short_name>/download
 ```
 
 
