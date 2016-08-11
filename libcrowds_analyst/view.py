@@ -9,8 +9,10 @@ import pbclient
 from redis import Redis
 from rq import Queue
 from flask import render_template, request, abort, flash, redirect, url_for
-from flask import current_app, Response, send_from_directory
-from libcrowds_analyst import analysis, auth, forms, zip_builder
+from flask import current_app, Response, send_file
+from werkzeug.utils import secure_filename
+from libcrowds_analyst import analysis, auth, forms
+from libcrowds_analyst.core import zip_builder
 
 
 queue = Queue('libcrowds_analyst', connection=Redis())
@@ -164,13 +166,11 @@ def prepare_zip(short_name):
         importer = form.importer.data
         task_ids = form.task_ids.data.split()
         filename = '{0}_input_{1}.zip'.format(short_name, int(time.time()))
-        zip_path = os.path.join(current_app.config['ZIP_FOLDER'], filename)
-        queue.enqueue(zip_builder.build, current_app.config['API_KEY'],
-                      current_app.config['ENDPOINT'], zip_path, short_name,
-                      importer, task_ids, timeout=3600)
+        filename = secure_filename(filename)
+        queue.enqueue(zip_builder.build, short_name, task_ids, filename,
+                      importer, timeout=3600)
         return redirect(url_for('.download_zip', filename=filename,
                                 short_name=e.project.short_name))
-
     elif request.method == 'POST' and not form.validate():  # pragma: no cover
         flash('Please correct the errors.', 'danger')
 
@@ -180,9 +180,8 @@ def prepare_zip(short_name):
 
 def download_zip(short_name, filename):
     """View to download a zip file."""
-    zip_path = os.path.join(current_app.config['ZIP_FOLDER'], filename)
-    zf = zip_builder.get_zip(zip_path)
-    if zf is not None:
-        return send_from_directory(current_app.config['ZIP_FOLDER'], filename, as_attachment=True)
+    resp = zip_builder.response_zip(filename)
+    if resp is not None:
+        return resp
     return render_template('download_zip.html', title="Download task input",
                            short_name=short_name, filename=filename)

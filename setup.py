@@ -3,7 +3,7 @@ from setuptools import setup
 
 requirements = [
     "Flask>=0.10.1, <0.10.2",
-    "Flask-Z3950>=0.3.0, <1.0",
+    "Flask-Z3950>=0.3.1, <1.0",
     "rq>=0.6.0, <1.0",
     "Flask-WTF>=0.9.5, <1.0",
     "enki>=1.0.3, <2.0",

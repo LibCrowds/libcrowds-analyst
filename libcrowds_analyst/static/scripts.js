@@ -35,8 +35,3 @@ function z3950Search(baseUrl, query, callback) {
         }
     });
 }
-
-
-$(document).ready(function() {
-    prettifyJSON();
-});

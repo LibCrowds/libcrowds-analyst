@@ -2,11 +2,9 @@
 """Main module for libcrowds-analyst."""
 
 import os
-import pbclient
 from flask import Flask, request
-from flask_wtf.csrf import CsrfProtect
-from flask.ext.z3950 import Z3950Manager
 from libcrowds_analyst import default_settings
+from libcrowds_analyst.extensions import zip_builder, csrf, z3950_manager
 from libcrowds_analyst import view, auth
 
 
@@ -14,10 +12,11 @@ def create_app():
     """Application factory."""
     app = Flask(__name__)
     configure_app(app)
-    setup_csrf(app)
     setup_url_rules(app)
     setup_auth(app)
+    setup_csrf(app)
     setup_z3950_manager(app)
+    zip_builder.init_app(app)
     return app
 
 
@@ -30,12 +29,6 @@ def configure_app(app):
         config_path = os.path.join(os.path.dirname(here), 'settings.py')
         if os.path.exists(config_path):
             app.config.from_pyfile(config_path)
-
-
-def setup_csrf(app):
-    """Setup csrf protection."""
-    csrf = CsrfProtect(app)
-    csrf.exempt(view.index)
 
 
 def setup_url_rules(app):
@@ -61,7 +54,13 @@ def setup_auth(app):
                 return auth.authenticate()
 
 
+def setup_csrf(app):
+    """Setup csrf protection."""
+    csrf.init_app(app)
+    csrf.exempt(view.index)
+
+
 def setup_z3950_manager(app):
     """Setup Flask-Z3950."""
-    z3950_manager = Z3950Manager(app)
+    z3950_manager.init_app(app)
     z3950_manager.register_blueprint(url_prefix='/z3950')
