@@ -23,7 +23,8 @@ test_requirements = [
 
 # Remove once issue fixed - https://github.com/PyBossa/enki/issues/17
 dependency_links = [
-    'git+https://github.com/alexandermendes/enki.git@issue-retrieve-all-projects#egg=enki'
+    'git+https://github.com/alexandermendes/enki.git'
+    '@issue-retrieve-all-projects#egg=enki'
 ]
 
 version = re.search('^__version__\s*=\s*"(.*)"',
