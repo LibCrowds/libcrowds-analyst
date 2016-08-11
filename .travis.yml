@@ -12,8 +12,6 @@ install:
   - pip install -U pip setuptools
   - pip install pep8 pytest pytest-cov mock coveralls
   - python setup.py install
-before_script:
-  - cp settings.py.tmpl settings.py
 script: 
   - python setup.py test
   - pep8
