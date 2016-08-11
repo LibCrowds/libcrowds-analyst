@@ -5,7 +5,7 @@
         <span id="loading-icon" class="glyphicon glyphicon-refresh glyphicon-spin"></span>
         <span id="loading-text">Preparing your download, please wait...</span>
     </p>
-    <form action="" method="post" name="login">
+    <form action="" method="post" name="login" target="_blank">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
         <input id="dl-btn" type="submit" class="btn btn-disabled" value="Download" disabled>
     </form>
