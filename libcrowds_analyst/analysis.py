@@ -81,5 +81,3 @@ def category_1(api_key, endpoint, project_short_name, task_id, sleep=0):
         # Unanalysed result
         r.info = 'Unanalysed'
         api_client.update_result(r)
-
-    return "OK"
