@@ -34,6 +34,7 @@ def configure_app(app):
 def setup_url_rules(app):
     """Setup URL rules."""
     from libcrowds_analyst import view
+
     rules = {'/': view.index,
              '/<short_name>/': view.analyse_next_empty_result,
              '/<short_name>/<int:result_id>/': view.analyse_result,
@@ -49,6 +50,7 @@ def setup_url_rules(app):
 def setup_auth(app):
     """Setup basic auth for all requests."""
     from libcrowds_analyst import auth
+
     @app.before_request
     def requires_auth():
         if request.endpoint != 'index':
