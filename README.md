@@ -32,6 +32,8 @@ source env/bin/activate
 pip install -r requirements.txt
 ```
 
+Install the [libcrowds-auth](https://github.com/LibCrowds/libcrowds-auth) plugin.
+
 ## Configuration
 
 Copy the template settings file:
