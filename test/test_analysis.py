@@ -42,22 +42,28 @@ class TestCategoryOneAnalysis(TestAnalysis):
         return mock_result, mock_info
 
     def test_cat_1_analysis_no_answers(self, mocker, analysis_kwargs, task):
-        e = mocker.patch('libcrowds_analyst.analysis.enki')
+        mock_enki = mocker.patch('libcrowds_analyst.analysis.enki')
+        mock_client = mocker.patch('libcrowds_analyst.analysis.api_client')
         data = [self.empty_tr_data for i in range(3)]
-        (mock_result, mock_info) = self.analyse(data, e, analysis_kwargs, task)
-        e.pbclient.update_result.assert_called_once_with(mock_result)
+        (mock_result, mock_info) = self.analyse(data, mock_enki,
+                                                analysis_kwargs, task)
+        mock_client.update_result.assert_called_once_with(mock_result)
         mock_info.assert_called_once_with(self.empty_tr_data)
 
     def test_cat_1_analysis_two_matches(self, mocker, analysis_kwargs, task):
-        e = mocker.patch('libcrowds_analyst.analysis.enki')
+        mock_enki = mocker.patch('libcrowds_analyst.analysis.enki')
+        mock_client = mocker.patch('libcrowds_analyst.analysis.api_client')
         data = [self.empty_tr_data] + [self.tr_data for i in range(2)]
-        (mock_result, mock_info) = self.analyse(data, e, analysis_kwargs, task)
-        e.pbclient.update_result.assert_called_once_with(mock_result)
+        (mock_result, mock_info) = self.analyse(data, mock_enki,
+                                                analysis_kwargs, task)
+        mock_client.update_result.assert_called_once_with(mock_result)
         mock_info.assert_called_once_with(self.tr_data)
 
     def test_cat_1_no_matches(self, mocker, analysis_kwargs, task):
-        e = mocker.patch('libcrowds_analyst.analysis.enki')
+        mock_enki = mocker.patch('libcrowds_analyst.analysis.enki')
+        mock_client = mocker.patch('libcrowds_analyst.analysis.api_client')
         data = [self.tr_data] + [self.empty_tr_data for i in range(2)]
-        (mock_result, mock_info) = self.analyse(data, e, analysis_kwargs, task)
-        e.pbclient.update_result.assert_called_once_with(mock_result)
+        (mock_result, mock_info) = self.analyse(data, mock_enki,
+                                                analysis_kwargs, task)
+        mock_client.update_result.assert_called_once_with(mock_result)
         mock_info.assert_called_once_with('Unanalysed')
