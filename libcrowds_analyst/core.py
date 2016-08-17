@@ -4,8 +4,7 @@
 import os
 from flask import Flask, request
 from libcrowds_analyst import default_settings
-from libcrowds_analyst.extensions import zip_builder, csrf, z3950_manager
-from libcrowds_analyst import view, auth
+from libcrowds_analyst.extensions import *
 
 
 def create_app():
@@ -17,6 +16,7 @@ def create_app():
     setup_csrf(app)
     setup_z3950_manager(app)
     zip_builder.init_app(app)
+    api_client.init_app(app)
     return app
 
 
@@ -33,6 +33,7 @@ def configure_app(app):
 
 def setup_url_rules(app):
     """Setup URL rules."""
+    from libcrowds_analyst import view
     rules = {'/': view.index,
              '/<short_name>/': view.analyse_next_empty_result,
              '/<short_name>/<int:result_id>/': view.analyse_result,
@@ -47,6 +48,7 @@ def setup_url_rules(app):
 
 def setup_auth(app):
     """Setup basic auth for all requests."""
+    from libcrowds_analyst import auth
     @app.before_request
     def requires_auth():
         if request.endpoint != 'index':
@@ -57,8 +59,9 @@ def setup_auth(app):
 
 def setup_csrf(app):
     """Setup csrf protection."""
+    from libcrowds_analyst.view import index
     csrf.init_app(app)
-    csrf.exempt(view.index)
+    csrf.exempt(index)
 
 
 def setup_z3950_manager(app):

@@ -3,33 +3,18 @@
 
 import os
 import json
-import enki
 import time
+import enki
 from redis import Redis
 from rq import Queue
 from flask import render_template, request, abort, flash, redirect, url_for
 from flask import current_app, Response, send_file, jsonify
 from werkzeug.utils import secure_filename
 from libcrowds_analyst import analysis, auth, forms
-from libcrowds_analyst.core import zip_builder
+from libcrowds_analyst.core import zip_builder, api_client
 
 
 queue = Queue('libcrowds_analyst', connection=Redis())
-
-
-def _get_first_result(project_id, **kwargs):
-    """Return a result or abort an exception is thrown."""
-    resp = enki.pbclient.find_results(project_id, limit=1, all=1, **kwargs)
-    if isinstance(resp, dict) and 'status_code' in resp:  # pragma: no cover
-        abort(resp['status_code'])
-    return resp[0] if resp else None
-
-
-def _update_result(result):
-    """Update a result or abort if an exception is thrown."""
-    resp = enki.pbclient.update_result(result)
-    if isinstance(resp, dict) and 'status_code' in resp:  # pragma: no cover
-        abort(resp.status_code)
 
 
 def index():
@@ -37,14 +22,11 @@ def index():
     if request.method == 'GET':
         return render_template('index.html', title="LibCrowds Analyst")
     else:
-        try:
-            e = enki.Enki(current_app.config['API_KEY'],
-                          current_app.config['ENDPOINT'],
-                          request.json['project_short_name'])
-        except enki.ProjectNotFound:  # pragma: no cover
+        project = api_client.get_project(request.json['project_short_name'])
+        if not project:  # pragma: no cover
             abort(404)
 
-        analyst_func = analysis.get_analyst_func(e.project.category_id)
+        analyst_func = analysis.get_analyst_func(project.category_id)
         if analyst_func:
             queue.enqueue(analyst_func, current_app.config['API_KEY'],
                           current_app.config['ENDPOINT'],
@@ -57,13 +39,11 @@ def index():
 
 def analyse_next_empty_result(short_name):
     """View for analysing the next empty result."""
-    try:
-        e = enki.Enki(current_app.config['API_KEY'],
-                      current_app.config['ENDPOINT'], short_name)
-    except enki.ProjectNotFound:  # pragma: no cover
+    project = api_client.get_project(short_name)
+    if not project:  # pragma: no cover
         abort(404)
 
-    result = _get_first_result(e.project.id, info='Unanalysed')
+    result = api_client.get_first_result(project.id, info='Unanalysed')
     if not result:  # pragma: no cover
         flash('There are no unanlysed results to process!', 'success')
         return redirect(url_for('.index'))
@@ -79,17 +59,15 @@ def analyse_result(short_name, result_id):
     except enki.ProjectNotFound:  # pragma: no cover
         abort(404)
 
-    result = _get_first_result(e.project.id, id=result_id)
+    result = api_client.get_first_result(e.project.id, id=result_id)
     if not result:  # pragma: no cover
-        flash('Result {0} not found for {1}!'.format(result_id, short_name),
-              'warning')
-        return redirect(url_for('.index'))
+        abort(404)
 
     if request.method == 'POST':
         data = request.form.to_dict()
         data.pop('csrf_token', None)
         result.info = data
-        _update_result(result)
+        api_client.update_result(result)
         return redirect(url_for('.analyse_next_empty_result',
                                 short_name=short_name))
 
@@ -104,20 +82,18 @@ def analyse_result(short_name, result_id):
 
 def edit_result(short_name, result_id):
     """View for directly editing a result."""
-    try:
-        e = enki.Enki(current_app.config['API_KEY'],
-                      current_app.config['ENDPOINT'], short_name)
-    except enki.ProjectNotFound:  # pragma: no cover
+    project = api_client.get_project(short_name)
+    if not project:  # pragma: no cover
         abort(404)
 
-    result = _get_first_result(e.project.id, id=result_id)
+    result = api_client.get_first_result(project.id, id=result_id)
     if not result:  # pragma: no cover
         abort(404)
 
     form = forms.EditResultForm(request.form)
     if request.method == 'POST' and form.validate():
         result.info = json.loads(form.info.data)
-        _update_result(result)
+        api_client.update_result(result)
         flash('Result updated.', 'success')
     elif request.method == 'POST' and not form.validate():  # pragma: no cover
         flash('Please correct the errors.', 'danger')
@@ -133,6 +109,7 @@ def reanalyse(short_name):
                       current_app.config['ENDPOINT'], short_name)
     except enki.ProjectNotFound:  # pragma: no cover
         abort(404)
+
     form = forms.ReanalysisForm(request.form)
     analyst_func = analysis.get_analyst_func(e.project.category_id)
     if not analyst_func:
@@ -154,10 +131,8 @@ def reanalyse(short_name):
 
 def prepare_zip(short_name):
     """View to prepare a zip file for download."""
-    try:
-        e = enki.Enki(current_app.config['API_KEY'],
-                      current_app.config['ENDPOINT'], short_name)
-    except enki.ProjectNotFound:  # pragma: no cover
+    project = api_client.get_project(short_name)
+    if not project:  # pragma: no cover
         abort(404)
 
     form = forms.DownloadForm(request.form)
@@ -169,12 +144,12 @@ def prepare_zip(short_name):
         queue.enqueue(zip_builder.build, short_name, task_ids, filename,
                       importer, timeout=3600)
         return redirect(url_for('.download_zip', filename=filename,
-                                short_name=e.project.short_name))
+                                short_name=project.short_name))
     elif request.method == 'POST' and not form.validate():  # pragma: no cover
         flash('Please correct the errors.', 'danger')
 
     return render_template('prepare_zip.html', title="Download task input",
-                           project=e.project, form=form)
+                           project=project, form=form)
 
 
 def check_zip(short_name, filename):

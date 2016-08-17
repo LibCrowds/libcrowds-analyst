@@ -1,11 +1,15 @@
 # -*- coding: utf8 -*-
-"""Analyst module for libcrowds-analyst."""
+"""Analysis module for libcrowds-analyst."""
 
 import sys
 import enki
 import time
 import numpy as np
+from libcrowds_analyst.core import api_client
 
+
+class Analyst(object):
+    """Analyst class for analysing results."""
 
 def _concat(df, col):
     """Return concatenated, non-duplicated column values.
@@ -63,7 +67,7 @@ def category_1(api_key, endpoint, project_short_name, task_id, sleep=0):
         df = df.replace('', np.nan)
         if df.dropna(how='all').empty:
             r.info = dict(oclc="", shelfmark="", comments=comments)
-            enki.pbclient.update_result(r)
+            api_client.update_result(r)
             continue
 
         # Check for two or more matches
@@ -71,11 +75,11 @@ def category_1(api_key, endpoint, project_short_name, task_id, sleep=0):
         if not df.dropna(how='all').empty:
             r.info = dict(oclc=df.iloc[0]['oclc'],
                           shelfmark=df.iloc[0]['shelfmark'], comments=comments)
-            enki.pbclient.update_result(r)
+            api_client.update_result(r)
             continue
 
         # Unanalysed result
         r.info = 'Unanalysed'
-        enki.pbclient.update_result(r)
+        api_client.update_result(r)
 
     return "OK"
