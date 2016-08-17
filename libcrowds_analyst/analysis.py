@@ -27,6 +27,7 @@ def _normalise_shelfmarks(df, col):
     :param df: The dataframe.
     :param col: The name of the column.
     """
+    df[col].fillna("", inplace=True)
     df[col].replace(r',', '.', inplace=True)
     df[col].replace(r'\s+', '.', inplace=True)
     df[col].replace(r'\.+', '.', inplace=True)
@@ -63,9 +64,12 @@ def category_1(api_key, endpoint, project_short_name, task_id, sleep=0):
         comments = _concat(e.task_runs_df[t.id], 'comments')
         _normalise_shelfmarks(df, 'shelfmark')
 
-        # Check for populated rows
+        # Drop empty rows
         df = df.replace('', np.nan)
-        if df.dropna(how='all').empty:
+        df = df.dropna(subset=['oclc', 'shelfmark'])
+
+        # Check for populated rows
+        if df.empty:
             r.info = dict(oclc="", shelfmark="", comments=comments)
             api_client.update_result(r)
             continue
