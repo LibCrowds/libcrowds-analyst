@@ -22,7 +22,7 @@ class TestView(object):
         assert res.status_code == 200
 
     def test_webhook_triggers_analysis(self, test_client, payload, mocker):
-        mock_enki = mocker.patch('libcrowds_analyst.view.enki')
+        mocker.patch('libcrowds_analyst.view.api_client')
         mock_queue = mocker.patch('libcrowds_analyst.view.queue')
         analysis = mocker.patch('libcrowds_analyst.view.analysis')
         analyser_func = (lambda x: x + 1)
@@ -35,16 +35,16 @@ class TestView(object):
                                                    timeout=600)
 
     def test_webhook_404_when_no_analyser(self, test_client, payload, mocker):
-        mock_enki = mocker.patch('libcrowds_analyst.view.enki')
+        mocker.patch('libcrowds_analyst.view.api_client')
         res = test_client.post('/', data=payload, follow_redirects=True,
                                headers={'Content-type': 'application/json'})
         assert res.status_code == 404
 
     def test_unanalysed_result_get(self, test_client, auth_headers, mocker,
                                    result):
-        mock_enki = mocker.patch('libcrowds_analyst.view.enki')
-        mock_pbclient = mocker.patch('libcrowds_analyst.view.enki.pbclient')
-        mock_pbclient.find_results.return_value = [result]
+        mocker.patch('libcrowds_analyst.view.enki')
+        mock_client = mocker.patch('libcrowds_analyst.view.api_client')
+        mock_client.get_first_result.return_value = result
         mock_render = mocker.patch('libcrowds_analyst.view.render_template')
         mock_render.return_value = "OK"
         test_client.get('/short_name/1/', headers=auth_headers)
@@ -52,30 +52,26 @@ class TestView(object):
 
     def test_unanalysed_result_post(self, test_client, auth_headers, mocker,
                                     result):
-        mock_enki = mocker.patch('libcrowds_analyst.view.enki')
-        mock_pbclient = mocker.patch('libcrowds_analyst.view.enki.pbclient')
-        mock_pbclient.find_results.return_value = [result]
-        mock_pbclient.update_result.return_value = True
+        mocker.patch('libcrowds_analyst.view.enki')
+        mock_client = mocker.patch('libcrowds_analyst.view.api_client')
+        mock_client.get_first_result.return_value = result
         mock_render = mocker.patch('libcrowds_analyst.view.render_template')
         mock_render.return_value = "OK"
         res = test_client.post('/short_name/1/', headers=auth_headers)
-        mock_pbclient.update_result.assert_called_once_with(result)
+        mock_client.update_result.assert_called_once_with(result)
 
     def test_next_unanalysed_result(self, test_client, auth_headers, mocker,
                                     result):
-        mock_enki = mocker.patch('libcrowds_analyst.view.enki')
-        mock_pbclient = mocker.patch('libcrowds_analyst.view.enki.pbclient')
-        mock_pbclient.find_results.return_value = [result]
-        mock_pbclient.update_result.return_value = True
+        mock_client = mocker.patch('libcrowds_analyst.view.api_client')
+        mock_client.get_first_result.return_value = result
         mock_redirect = mocker.patch('libcrowds_analyst.view.redirect')
         mock_redirect.return_value = "OK"
         res = test_client.post('/short_name/', headers=auth_headers)
         mock_redirect.assert_called_once_with('/short_name/1/')
 
     def test_edit_result_get(self, test_client, auth_headers, mocker, result):
-        mock_enki = mocker.patch('libcrowds_analyst.view.enki')
-        mock_pbclient = mocker.patch('libcrowds_analyst.view.enki.pbclient')
-        mock_pbclient.find_results.return_value = [result]
+        mock_client = mocker.patch('libcrowds_analyst.view.api_client')
+        mock_client.get_first_result.return_value = result
         mock_render = mocker.patch('libcrowds_analyst.view.render_template')
         mock_render.return_value = "OK"
         test_client.get('/short_name/1/edit/', headers=auth_headers)
@@ -83,20 +79,18 @@ class TestView(object):
         assert form.info.data == json.dumps({"n": 1})
 
     def test_edit_result_post(self, test_client, auth_headers, mocker, result):
-        mock_enki = mocker.patch('libcrowds_analyst.view.enki')
-        mock_pbclient = mocker.patch('libcrowds_analyst.view.enki.pbclient')
-        mock_pbclient.find_results.return_value = [result]
-        mock_pbclient.update_result.return_value = True
+        mock_client = mocker.patch('libcrowds_analyst.view.api_client')
+        mock_client.get_first_result.return_value = result
         mock_render = mocker.patch('libcrowds_analyst.view.render_template')
         mock_render.return_value = "OK"
         form_data = {"info": json.dumps(result.info)}
         test_client.post('/short_name/1/edit/', data=form_data,
                          headers=auth_headers)
-        mock_pbclient.update_result.assert_called_once_with(result)
+        mock_client.update_result.assert_called_once_with(result)
 
     def test_reanalyse_get(self, test_client, auth_headers, mocker, result):
-        mock_enki = mocker.patch('libcrowds_analyst.view.enki')
         mock_project = MagicMock()
+        mock_enki = mocker.patch('libcrowds_analyst.view.enki')
         mock_enki.Enki.return_value.project = mock_project
         mock_render = mocker.patch('libcrowds_analyst.view.render_template')
         mock_render.return_value = "OK"
