@@ -8,9 +8,6 @@ import numpy as np
 from libcrowds_analyst.core import api_client
 
 
-class Analyst(object):
-    """Analyst class for analysing results."""
-
 def _concat(df, col):
     """Return concatenated, non-duplicated column values.
 
