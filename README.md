@@ -123,3 +123,6 @@ To create an analyser for a new category you need to create:
 
 - A function in [analysis.py](libcrowds_analyst/analysis.py) called **category_\<category_id>**
 - A template in [templates](libcrowds_analyst/templates) called **category_\<category_id>.html**
+
+Of course, if the category IDs are ever changed then the function and template above will
+need to be updated.
