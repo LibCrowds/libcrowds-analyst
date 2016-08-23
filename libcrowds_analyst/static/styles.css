@@ -16,6 +16,10 @@ record {
     animation: spin 1000ms infinite linear;
 }
 
+.answer-group {
+    margin-bottom: 50px;
+}
+
 @-webkit-keyframes spin {
     0% {
         -webkit-transform: rotate(0deg);

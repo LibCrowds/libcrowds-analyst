@@ -22,6 +22,34 @@
             {% include '_flash_messages.html' %}
             {% block content %}{% endblock %}
         </div>
+
+        <div id="analysisHelpModal" class="modal fade" role="dialog">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">How to analyse results</h4>
+                    </div>
+                    <div class="modal-body">
+                        <p>
+                            Use the radio buttons to select the correct answers, then click the accept button.
+                            These answers will be used to populate the task's final result.
+                        </p>
+                        <p>
+                            If no answers are correct, click the reject button. Alternatively, use
+                            the free text fields to modify or add any additional answers.
+                        </p>
+                        <p>
+
+                        </p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"
             integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS"
             crossorigin="anonymous">

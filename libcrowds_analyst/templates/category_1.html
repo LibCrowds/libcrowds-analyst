@@ -4,22 +4,24 @@
 {% block content %}
 <div class="row">
     <div class="col-xs-12 col-md-6 col-md-push-6">
-        <img src="{{ task.url_b }}" class="img-responsive">
+        <div class="image-container">
+            <img src="{{ task.url_b }}" class="img-responsive">
+        </div>
     </div>
     <div class="col-xs-12 col-md-6 col-md-pull-6">
         {% for tr in task_runs %}
-            {% if tr.info['comment']|length > 0 %}
-            <span id="{{ tr.info['comments'] }}" class="comment"></span>
-            {% endif %}
             {% if tr.info['oclc']|length > 0 %}
             <span id="{{ tr.info['oclc'] }}" class="worldcat-record"></span>
             {% endif %}
         {% endfor %}
         <form id="answer-form" method="POST" role="form" action="{{url_for('analyse_result', short_name=project.short_name, result_id=result.id)}}">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-            {{ render_tr_field(task_runs, result=result, key='oclc', required=True) }}
-            {{ render_tr_field(task_runs, result=result, key='shelfmark', required=True) }}
+            {{ render_tr_field(task_runs, result=result, key='comments') }}
+            {{ render_tr_field(task_runs, result=result, key='oclc') }}
+            {{ render_tr_field(task_runs, result=result, key='shelfmark') }}
             <div class="form-group text-right">
+                <button type="button" class="btn btn-info" data-toggle="modal" data-target="#analysisHelpModal">Help</button>
+                <a href="#" class="btn btn-danger reject-btn">Reject</a>
                 <input class="btn btn-success" type="submit" value="Accept"></input>
             </div>
         </form>

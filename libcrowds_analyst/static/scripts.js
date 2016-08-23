@@ -1,4 +1,4 @@
-/** Prettify JSON .*/
+/** Prettify JSON. */
 function prettifyJSON() {
     $.each( $('.prettify-json'), function() {
         var ugly = $(this).val();
@@ -9,7 +9,7 @@ function prettifyJSON() {
 }
 
 
-/** Populate value of radio buttons linked to text fields.*/
+/** Populate value of radio buttons linked to text fields. */
 $('#answer-form').on('submit', function() {
     $('.radio-text-group').each(function() {
         var text = $(this).find('input[type=text]').val();
@@ -18,7 +18,26 @@ $('#answer-form').on('submit', function() {
 });
 
 
-/** Perform a Z39.50 search.*/
+/** Handle rejection of form. */
+$('.reject-btn').on('click', function(evt) {
+    $('.radio-text-group input[type=text]').val('');
+    $('.radio-text-group input[type=radio]').val('');
+    $('.radio-text-group input[type=radio]').prop('checked', true);
+    $('#answer-form').submit();
+    evt.preventDefault();
+});
+
+
+/** Handle click of a free text field. */
+$('.radio-text-group input[type=text]').on('click', function(evt) {
+    $(this).siblings('.input-group-addon')
+           .find('input[type=radio]')
+           .first()
+           .prop('checked', true);
+});
+
+
+/** Perform a Z39.50 search. */
 function z3950Search(baseUrl, query, callback) {
     var url = (baseUrl + '/html').replace('//', '/');
     if (query.length === 0) {
