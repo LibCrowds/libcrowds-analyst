@@ -97,19 +97,19 @@ def category_7(api_key, endpoint, project_short_name, task_id, sleep=0):
     for t in e.tasks:
         r = enki.pbclient.find_results(e.project.id, task_id=task_id, all=1)[0]
         df = e.task_runs_df[t.id][['title', 'author', 'date', 'reference',
-                                   'former-reference', 'other-information']]
+                                   'former_reference', 'other_information']]
 
         # Check for two or more matches
         df = df[df.duplicated(['title', 'author', 'date', 'reference',
-                               'former-reference', 'other-information'
+                               'former_reference', 'other_information'
                                ], keep=False)]
         if not df.dropna(how='all').empty:
-            r.info = dict(oclc=df.iloc[0]['title'],
+            r.info = dict(title=df.iloc[0]['title'],
                           author=df.iloc[0]['author'],
                           date=df.iloc[0]['date'],
                           reference=df.iloc[0]['reference'],
-                          former_reference=df.iloc[0]['former-reference'],
-                          other_information=df.iloc[0]['other-information'])
+                          former_reference=df.iloc[0]['former_reference'],
+                          other_information=df.iloc[0]['other_information'])
             api_client.update_result(r)
             continue
 
