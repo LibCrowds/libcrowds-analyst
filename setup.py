@@ -8,7 +8,7 @@ requirements = [
     "Flask-WTF>=0.9.5, <1.0",
     "requests>=2.0.0, <3.0",
     "rq-scheduler>=0.7.0, <1.0",
-    "enki"
+    "enki>=1.1.0, <2.0"
 ]
 
 setup_requirements = [
@@ -19,12 +19,6 @@ test_requirements = [
     "pytest>=2.8.0, <3.0",
     "pytest-cov>=2.2.0, <3.0",
     "pytest-mock>=0.11.0, <1.0"
-]
-
-# Remove once issue fixed - https://github.com/PyBossa/enki/issues/17
-dependency_links = [
-    'git+https://github.com/alexandermendes/enki.git'
-    '@issue-retrieve-all-projects#egg=enki'
 ]
 
 version = re.search('^__version__\s*=\s*"(.*)"',
@@ -43,6 +37,5 @@ setup(
     install_requires=requirements,
     setup_requires=setup_requirements,
     tests_require=test_requirements,
-    dependency_links=dependency_links,
     test_suite="test",
 )

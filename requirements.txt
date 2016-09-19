@@ -1,4 +1,0 @@
---index-url https://pypi.python.org/simple/
-
--e git+https://github.com/alexandermendes/enki.git@issue-retrieve-all-projects#egg=enki
--e .

@@ -27,9 +27,7 @@ Install libcrowds-analyst:
 ```
 git clone https://github.com/LibCrowds/libcrowds-analyst
 cd libcrowds-analyst
-virtualenv env
-source env/bin/activate
-pip install -r requirements.txt
+python setup.py install
 ```
 
 Install the [libcrowds-auth](https://github.com/LibCrowds/libcrowds-auth) plugin.
