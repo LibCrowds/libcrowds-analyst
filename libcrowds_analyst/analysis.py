@@ -82,3 +82,37 @@ def category_1(api_key, endpoint, project_short_name, task_id, sleep=0):
         # Unanalysed result
         r.info = 'Unanalysed'
         api_client.update_result(r)
+
+
+def category_7(api_key, endpoint, project_short_name, task_id, sleep=0):
+    """Analyser for LCP projects.
+
+    For all tasks where two or more contributors submitted the same answer the
+    result will be set to that answer. All other tasks will remain unanalysed.
+    """
+    time.sleep(sleep)  # To throttle when many API calls
+    e = enki.Enki(api_key, endpoint, project_short_name)
+    e.get_tasks(task_id=task_id)
+    e.get_task_runs()
+    for t in e.tasks:
+        r = enki.pbclient.find_results(e.project.id, task_id=task_id, all=1)[0]
+        df = e.task_runs_df[t.id][['title', 'author', 'date', 'reference',
+                                   'former-reference', 'other-information']]
+
+        # Check for two or more matches
+        df = df[df.duplicated(['title', 'author', 'date', 'reference',
+                               'former-reference', 'other-information'
+                               ], keep=False)]
+        if not df.dropna(how='all').empty:
+            r.info = dict(oclc=df.iloc[0]['title'],
+                          author=df.iloc[0]['author'],
+                          date=df.iloc[0]['date'],
+                          reference=df.iloc[0]['reference'],
+                          former_reference=df.iloc[0]['former-reference'],
+                          other_information=df.iloc[0]['other-information'])
+            api_client.update_result(r)
+            continue
+
+        # Unanalysed result
+        r.info = 'Unanalysed'
+        api_client.update_result(r)
