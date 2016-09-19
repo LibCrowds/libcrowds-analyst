@@ -10,7 +10,7 @@ before_install:
   - sudo apt-get update
 install:
   - pip install -U pip setuptools
-  - pip install pep8 pytest pytest-cov mock coveralls
+  - pip install pep8 pytest pytest-cov mock coveralls Cython
   - python setup.py install
 script: 
   - python setup.py test
