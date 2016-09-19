@@ -13,13 +13,13 @@ requirements = [
 ]
 
 setup_requirements = [
-    "pytest-runner>-2.6.0, <3.0.0",
+    "pytest-runner",
 ]
 
 test_requirements = [
-    "pytest>=2.8.0, <3.0",
-    "pytest-cov>=2.2.0, <3.0",
-    "pytest-mock>=0.11.0, <1.0"
+    "pytest",
+    "pytest-cov",
+    "pytest-mock"
 ]
 
 version = re.search('^__version__\s*=\s*"(.*)"',
