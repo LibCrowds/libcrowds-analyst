@@ -64,7 +64,7 @@ class ZipBuilder(object):
 
     def _get_valid_tasks(self, short_name, task_ids):
         """Return tasks in the list of task IDs that belong to a project."""
-        e = enki.Enki(self.api_key, self.endpoint, short_name)
+        e = enki.Enki(self.api_key, self.endpoint, short_name, all=1)
         e.get_tasks()
         tasks = [t for t in e.tasks if str(t.id) in task_ids]
         return tasks

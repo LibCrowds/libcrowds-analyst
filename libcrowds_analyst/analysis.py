@@ -52,7 +52,7 @@ def category_1(api_key, endpoint, project_short_name, task_id, sleep=0):
     'comments' are added for all analysed results.
     """
     time.sleep(sleep)  # To throttle when many API calls
-    e = enki.Enki(api_key, endpoint, project_short_name)
+    e = enki.Enki(api_key, endpoint, project_short_name, all=1)
     e.get_tasks(task_id=task_id)
     e.get_task_runs()
     for t in e.tasks:
@@ -91,7 +91,7 @@ def category_7(api_key, endpoint, project_short_name, task_id, sleep=0):
     result will be set to that answer. All other tasks will remain unanalysed.
     """
     time.sleep(sleep)  # To throttle when many API calls
-    e = enki.Enki(api_key, endpoint, project_short_name)
+    e = enki.Enki(api_key, endpoint, project_short_name, all=1)
     e.get_tasks(task_id=task_id)
     e.get_task_runs()
     for t in e.tasks:

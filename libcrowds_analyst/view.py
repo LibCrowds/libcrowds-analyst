@@ -55,7 +55,7 @@ def analyse_result(short_name, result_id):
     """View for analysing a result."""
     try:
         e = enki.Enki(current_app.config['API_KEY'],
-                      current_app.config['ENDPOINT'], short_name)
+                      current_app.config['ENDPOINT'], short_name, all=1)
     except enki.ProjectNotFound:  # pragma: no cover
         abort(404)
 
@@ -106,7 +106,7 @@ def reanalyse(short_name):
     """View for triggering reanalysis of all results."""
     try:
         e = enki.Enki(current_app.config['API_KEY'],
-                      current_app.config['ENDPOINT'], short_name)
+                      current_app.config['ENDPOINT'], short_name, all=1)
     except enki.ProjectNotFound:  # pragma: no cover
         abort(404)
 
