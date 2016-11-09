@@ -70,9 +70,11 @@ For deployment using nginx and uwsgi, the following template files are provided:
 
 ## LibCrowds Theme Integration
 
-If the location of the server changes, the `LIBCROWDS_ANALYST_URL` variable
-should be updated in the main PyBossa configuration.
+Add the following variable to the main PyBossa configuration file:
 
+```Python
+LIBCROWDS_ANALYST_URL = 'http://{libcrowds-analyst-domain}' # (e.g. http://analyse.libcrowds.com)
+```
 
 ## Usage
 
