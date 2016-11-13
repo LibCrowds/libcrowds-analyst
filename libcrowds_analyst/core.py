@@ -2,9 +2,10 @@
 """Main module for libcrowds-analyst."""
 
 import os
-from flask import Flask, request
+import pbclient
+from flask import Flask, request, g
 from libcrowds_analyst import default_settings
-from libcrowds_analyst.extensions import *
+from libcrowds_analyst.extensions import zip_builder, csrf, pybossa_client
 
 
 def create_app():
@@ -14,9 +15,8 @@ def create_app():
     setup_url_rules(app)
     setup_auth(app)
     setup_csrf(app)
-    setup_z3950_manager(app)
     zip_builder.init_app(app)
-    api_client.init_app(app)
+    pybossa_client.init_app(app)
     return app
 
 
@@ -33,18 +33,8 @@ def configure_app(app):
 
 def setup_url_rules(app):
     """Setup URL rules."""
-    from libcrowds_analyst import view
-
-    rules = {'/': view.index,
-             '/<short_name>/': view.analyse_next_empty_result,
-             '/<short_name>/<int:result_id>/': view.analyse_result,
-             '/<short_name>/<int:result_id>/edit/': view.edit_result,
-             '/<short_name>/reanalyse/': view.reanalyse,
-             '/<short_name>/download/': view.prepare_zip,
-             '/<short_name>/download/<path:filename>/check': view.check_zip,
-             '/<short_name>/download/<path:filename>': view.download_zip}
-    for route, func in rules.items():
-        app.add_url_rule(route, view_func=func, methods=['GET', 'POST'])
+    from libcrowds_analyst.view import blueprint as bp
+    app.register_blueprint(bp, url_prefix='')
 
 
 def setup_auth(app):
@@ -53,10 +43,12 @@ def setup_auth(app):
 
     @app.before_request
     def requires_auth():
-        if request.endpoint != 'index':
+        if request.endpoint != 'analyse.index':
             cred = request.authorization
             if not cred or not auth.check_auth(cred.username, cred.password):
                 return auth.authenticate()
+
+
 
 
 def setup_csrf(app):
@@ -64,9 +56,3 @@ def setup_csrf(app):
     from libcrowds_analyst.view import index
     csrf.init_app(app)
     csrf.exempt(index)
-
-
-def setup_z3950_manager(app):
-    """Setup Flask-Z3950."""
-    z3950_manager.init_app(app)
-    z3950_manager.register_blueprint(url_prefix='/z3950')

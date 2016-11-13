@@ -4,96 +4,100 @@
 import os
 import json
 import time
-import enki
 from redis import Redis
 from rq import Queue
+from flask import Blueprint
 from flask import render_template, request, abort, flash, redirect, url_for
 from flask import current_app, Response, send_file, jsonify
 from werkzeug.utils import secure_filename
 from libcrowds_analyst import analysis, auth, forms
-from libcrowds_analyst.core import zip_builder, api_client
+from libcrowds_analyst.core import zip_builder, pybossa_client
 
+
+blueprint = Blueprint('analyse', __name__)
 
 queue = Queue('libcrowds_analyst', connection=Redis())
+MINUTE = 60
 
 
+@blueprint.route('/', methods=['GET', 'POST'])
 def index():
     """Index view."""
-    if request.method == 'GET':
-        return render_template('index.html', title="LibCrowds Analyst")
-    else:
-        project = api_client.get_project(request.json['project_short_name'])
-        if not project:  # pragma: no cover
-            abort(404)
-
-        analyst_func = analysis.get_analyst_func(project.category_id)
-        if analyst_func:
-            queue.enqueue(analyst_func, current_app.config['API_KEY'],
-                          current_app.config['ENDPOINT'],
-                          request.json['project_short_name'],
-                          request.json['task_id'], timeout=600)
-            return "OK"
-        else:
-            abort(404)
+    if request.method == 'POST':
+        queue.enqueue_call(func=analysis.analyse,
+                           kwargs=request.json,
+                           timeout=10*MINUTE)
+        return "OK"
+    return render_template('index.html', title="LibCrowds Analyst")
 
 
+@blueprint.route('/<short_name>/')
 def analyse_next_empty_result(short_name):
     """View for analysing the next empty result."""
-    project = api_client.get_project(short_name)
-    if not project:  # pragma: no cover
+    try:
+        project = pybossa_client.get_projects(short_name)[0]
+    except IndexError: # pragma: no cover
         abort(404)
 
-    result = api_client.get_first_result(project.id, info='Unanalysed')
-    if not result:  # pragma: no cover
+    try:
+        results = pybossa_client.get_results(project.id, info='Unanalysed')
+    except IndexError: # pragma: no cover
+        abort(404)
+
+
+    results = pybossa_client.get_results(project.id, info='Unanalysed')
+    if not results:  # pragma: no cover
         flash('There are no unanlysed results to process!', 'success')
         return redirect(url_for('.index'))
+    result = results[0]
     return redirect(url_for('.analyse_result', short_name=short_name,
                             result_id=result.id))
 
 
+@blueprint.route('/<short_name>/<result_id>/', methods=['GET', 'POST'])
 def analyse_result(short_name, result_id):
     """View for analysing a result."""
     try:
-        e = enki.Enki(current_app.config['API_KEY'],
-                      current_app.config['ENDPOINT'], short_name, all=1)
-    except enki.ProjectNotFound:  # pragma: no cover
+        project = pybossa_client.get_projects(short_name)[0]
+    except IndexError: # pragma: no cover
         abort(404)
 
-    result = api_client.get_first_result(e.project.id, id=result_id)
-    if not result:  # pragma: no cover
+    try:
+        results = pybossa_client.get_results(project.id, id=result_id)
+    except IndexError: # pragma: no cover
         abort(404)
 
     if request.method == 'POST':
         data = request.form.to_dict()
         data.pop('csrf_token', None)
         result.info = data
-        api_client.update_result(result)
+        pybossa_client.update_result(result)
         return redirect(url_for('.analyse_next_empty_result',
                                 short_name=short_name))
 
-    e.get_tasks(task_id=result.task_id)
-    e.get_task_runs()
-    task = e.tasks[0]
-    task_runs = e.task_runs[task.id]
-    url = 'category_{0}.html'.format(e.project.category_id)
-    return render_template(url, project=e.project, result=result, task=task,
-                           task_runs=task_runs, title=e.project.name)
+    task = pybossa_client.get_tasks(e.project.id, result.task_id)[0]
+    task_runs = pybossa_client.get_task_runs(e.project.id, result.task_id)
+    return render_template('analyse.html', project=e.project, result=result,
+                           task=task, task_runs=task_runs, title=project.name)
 
 
+@blueprint.route('/<short_name>/<result_id>/edit/', methods=['GET', 'POST'])
 def edit_result(short_name, result_id):
     """View for directly editing a result."""
-    project = api_client.get_project(short_name)
-    if not project:  # pragma: no cover
+    try:
+        project = pybossa_client.get_projects(short_name)[0]
+    except IndexError: # pragma: no cover
         abort(404)
 
-    result = api_client.get_first_result(project.id, id=result_id)
-    if not result:  # pragma: no cover
+    try:
+        result = pybossa_client.get_results(project.id, id=result_id)[0]
+    except IndexError: # pragma: no cover
         abort(404)
 
     form = forms.EditResultForm(request.form)
     if request.method == 'POST' and form.validate():
         result.info = json.loads(form.info.data)
-        api_client.update_result(result)
+        pybossa_client.update_result(result)
         flash('Result updated.', 'success')
     elif request.method == 'POST' and not form.validate():  # pragma: no cover
         flash('Please correct the errors.', 'danger')
@@ -102,37 +106,34 @@ def edit_result(short_name, result_id):
     return render_template('edit_result.html', form=form, title=title)
 
 
+@blueprint.route('/<short_name>/reanalyse/', methods=['GET', 'POST'])
 def reanalyse(short_name):
     """View for triggering reanalysis of all results."""
     try:
-        e = enki.Enki(current_app.config['API_KEY'],
-                      current_app.config['ENDPOINT'], short_name, all=1)
-    except enki.ProjectNotFound:  # pragma: no cover
+        project = pybossa_client.get_projects(short_name)[0]
+    except IndexError: # pragma: no cover
         abort(404)
 
     form = forms.ReanalysisForm(request.form)
-    analyst_func = analysis.get_analyst_func(e.project.category_id)
-    if not analyst_func:
-        flash('No analyst configured for this category of project.', 'danger')
-    elif request.method == 'POST' and form.validate():
-        e.get_tasks()
-        sleep = int(request.form.get('sleep', 2))  # To handle API rate limit
-        for t in e.tasks:
-            queue.enqueue(analyst_func, current_app.config['API_KEY'],
-                          current_app.config['ENDPOINT'], short_name, t.id,
-                          sleep=sleep, timeout=3600)
-        flash('''Results for {0} completed tasks will be reanalysed.
-              '''.format(len(e.tasks)), 'success')
-    elif request.method == 'POST' and not form.validate():  # pragma: no cover
+    if request.method == 'POST' and form.validate():
+        tasks = pybossa_client.get_tasks(project.id)
+        for task in tasks:
+            queue.enqueue_call(func=analysis.analyse,
+                               args=(project.id, task.id),
+                               timeout=10*MINUTE)
+        flash('{0} tasks will be reanalysed.'.format(len(tasks)), 'success')
+    elif request.method == 'POST':  # pragma: no cover
         flash('Please correct the errors.', 'danger')
     return render_template('reanalyse.html', title="Reanalyse results",
-                           project=e.project, form=form)
+                           project=project, form=form)
 
 
+@blueprint.route('/<short_name>/download/', methods=['GET', 'POST'])
 def prepare_zip(short_name):
     """View to prepare a zip file for download."""
-    project = api_client.get_project(short_name)
-    if not project:  # pragma: no cover
+    try:
+        project = pybossa_client.get_projects(short_name)[0]
+    except IndexError: # pragma: no cover
         abort(404)
 
     form = forms.DownloadForm(request.form)
@@ -152,12 +153,15 @@ def prepare_zip(short_name):
                            project=project, form=form)
 
 
+@blueprint.route('/<short_name>/download/<path:filename>/check/')
 def check_zip(short_name, filename):
     """Check if a zip file is ready for download."""
     download_ready = zip_builder.check_zip(filename)
     return jsonify(download_ready=download_ready)
 
 
+@blueprint.route('/<short_name>/download/<path:filename>/',
+                 methods=['GET', 'POST'])
 def download_zip(short_name, filename):
     """View to download a zip file."""
     if request.method == 'POST':

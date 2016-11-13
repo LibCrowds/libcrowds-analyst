@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% from '_helpers.html' import render_tr_field %}
+
+{% block content %}
+<div class="row">
+    <div class="col-xs-12 col-md-6 col-md-push-6">
+        <div class="image-container">
+            <img src="{{ task.url_b }}" class="img-responsive">
+        </div>
+    </div>
+    <div class="col-xs-12 col-md-6 col-md-pull-6">
+        <form id="answer-form" method="POST" role="form" action="{{url_for('analyse_result', short_name=project.short_name, result_id=result.id)}}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+            {% for key in keys %}
+                {{ render_tr_field(task_runs, result=result, key=key) }}
+            {% endfor %}
+            <div class="form-group text-right">
+                <button type="button" class="btn btn-info" data-toggle="modal" data-target="#analysisHelpModal">Help</button>
+                <a href="#" class="btn btn-danger reject-btn">Reject</a>
+                <input class="btn btn-success" type="submit" value="Accept"></input>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock %}
