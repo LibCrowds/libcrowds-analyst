@@ -1,4 +1,4 @@
-API_KEY = 'yourkey'
+API_KEY = 'key'
 ENDPOINT = 'http://localhost:5001'
 USERNAME = 'admin'
 PASSWORD = 'secret'
