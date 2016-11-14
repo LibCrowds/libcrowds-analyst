@@ -1,9 +1,7 @@
 # -*- coding: utf8 -*-
 """Analysis module for libcrowds-analyst."""
 
-import sys
 import time
-import enki
 import numpy as np
 from libcrowds_analyst.core import pybossa_client
 
