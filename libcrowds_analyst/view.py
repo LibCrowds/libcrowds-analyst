@@ -164,9 +164,18 @@ def check_zip(short_name, filename):
                  methods=['GET', 'POST'])
 def download_zip(short_name, filename):
     """View to download a zip file."""
+    try:
+        project = pybossa_client.get_projects(short_name)[0]
+    except IndexError: # pragma: no cover
+        abort(404)
+
     if request.method == 'POST':
-        resp = zip_builder.response_zip(filename)
-        if resp is not None:
-            return resp
+        try:
+            file_ready = check_zip(filename)
+        except ValueError: # pragma: no cover
+            abort(404)
+
+        if file_ready:
+            return zip_builder.response_zip(filename)
     return render_template('download_zip.html', title="Download task input",
                            short_name=short_name, filename=filename)
