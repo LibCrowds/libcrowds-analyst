@@ -140,13 +140,24 @@ def prepare_zip(short_name):
     if request.method == 'POST' and form.validate():
         importer = form.importer.data
         task_ids = form.task_ids.data.split()
-        filename = '{0}_input_{1}.zip'.format(short_name, int(time.time()))
-        filename = secure_filename(filename)
-        queue.enqueue(zip_builder.build, short_name, task_ids, filename,
-                      importer, timeout=3600)
-        return redirect(url_for('.download_zip', filename=filename,
+        tasks = pybossa_client.get_tasks(project_id=project.id)
+        tasks_to_export = [t for t in e.tasks if str(t.id) in task_ids]
+        invalid_tasks = [t.id for t in tasks if str(t.id) not in task_ids]
+        if invalid_tasks:
+            flash('''The following task IDs are invalid:
+                  {0}'''.format(invalid_tasks), 'danger')
+            return render_template('prepare_zip.html', project=project,
+                                   title="Download task input", form=form)
+
+        ts = int(time.time())
+        fn = '{0}_task_input_{1}.zip'.format(short_name, ts)
+        fn = secure_filename(fn)
+        queue.enqueue_call(func=zip_builder.build,
+                           args=(tasks, fn, importer),
+                           timeout=3600)
+        return redirect(url_for('.download_zip', filename=fn,
                                 short_name=project.short_name))
-    elif request.method == 'POST' and not form.validate():  # pragma: no cover
+    elif request.method == 'POST':  # pragma: no cover
         flash('Please correct the errors.', 'danger')
 
     return render_template('prepare_zip.html', title="Download task input",

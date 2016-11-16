@@ -2,14 +2,12 @@
 """Zip builder module for libcrowds-analyst."""
 
 import os
-import enki
 import requests
 import zipfile
 from redis import Redis
 from rq_scheduler import Scheduler
 from datetime import timedelta
 from flask import send_file
-from libcrowds_analyst.core import pybossa_client
 
 
 scheduler = Scheduler('libcrowds_analyst_scheduled', connection=Redis())
@@ -41,14 +39,6 @@ class ZipBuilder(object):
         mkdir_if_not_exists(self.build_folder)
         mkdir_if_not_exists(self.completed_folder)
 
-    def _build_empty_zip(self, filename):
-        """Build an empty zip file."""
-        zip_path = os.path.join(self.build_folder, filename)
-        zip_dir = os.path.splitext(os.path.basename(zip_path))[0]
-        with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as archive:
-            empty_file = os.path.join(zip_dir, 'no_data')
-            archive.writestr(empty_file, '')
-
     def _build_flickr_zip(self, filename, tasks):
         """Build an image set containing images downloaded from Flickr."""
         zip_path = os.path.join(self.build_folder, filename)
@@ -60,19 +50,9 @@ class ZipBuilder(object):
                 img = requests.get(url).content
                 archive.writestr(img_path, img)
 
-    def _get_tasks_to_export(self, short_name, task_ids):
-        """Return the tasks to be exported."""
-        project = pybossa_client.get_projects(short_name=short_name)[0]
-        tasks = pybossa_client.get_tasks(project_id=project.id)
-        tasks_to_export = [t for t in e.tasks if str(t.id) in task_ids]
-        return tasks_to_export
-
-    def build(self, short_name, task_ids, filename, importer):
+    def build(self, tasks, filename, importer):
         """Build a zip file containing original task input."""
-        tasks = self._get_tasks_to_export(short_name, task_ids)
-        if not tasks:
-            self._build_empty_zip(filename)
-        elif importer == 'flickr':
+        if importer == 'flickr':
             self._build_flickr_zip(filename, tasks)
         else:
             raise ValueError("Unknown importer type")
