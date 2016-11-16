@@ -3,7 +3,6 @@
 
 import os
 import enki
-import shutil
 import requests
 import zipfile
 from redis import Redis
