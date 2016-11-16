@@ -33,18 +33,19 @@ class ZipBuilder(object):
         def mkdir_if_not_exists(path):
             try:
                 os.makedirs(path)
-            except OSError:
+            except OSError: # pragma: no cover
                 if not os.path.isdir(path):
                     raise
         mkdir_if_not_exists(self.build_folder)
         mkdir_if_not_exists(self.completed_folder)
 
-    def _build_flickr_zip(self, filename, tasks):
+    def _build_flickr_zip(self, tasks, zip_path):
         """Build an image set containing images downloaded from Flickr."""
-        zip_path = os.path.join(self.build_folder, filename)
         zip_dir = os.path.splitext(os.path.basename(zip_path))[0]
         with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as archive:
             for t in tasks:
+                if not t.info.get('url') or not t.info.get('title'):
+                    raise ValueError('Invalid Flickr task')
                 url = t.info['url']
                 img_path = os.path.join(zip_dir, t.info['title'] + ".jpg")
                 img = requests.get(url).content
@@ -52,8 +53,9 @@ class ZipBuilder(object):
 
     def build(self, tasks, filename, importer):
         """Build a zip file containing original task input."""
+        zip_path = os.path.join(self.build_folder, filename)
         if importer == 'flickr':
-            self._build_flickr_zip(filename, tasks)
+            self._build_flickr_zip(tasks, zip_path)
         else:
             raise ValueError("Unknown importer type")
 
@@ -61,7 +63,7 @@ class ZipBuilder(object):
         build_path = os.path.join(self.build_folder, filename)
         completed_path = os.path.join(self.completed_folder, filename)
         os.rename(build_path, completed_path)
-        scheduler.enqueue_in(timedelta(minutes=30), os.remove, completed_path)
+        # scheduler.enqueue_in(timedelta(minutes=30), os.remove, completed_path)
 
     def check_zip(self, filename):
         """Check if a zip file is ready for download."""
