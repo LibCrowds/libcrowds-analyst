@@ -14,21 +14,6 @@ from libcrowds_analyst.core import pybossa_client
 #    """
 #    deduped_df = df[col].drop_duplicates(keep='first')
 #    return '; '.join([item for item in deduped_df if len(item) > 0])
-#
-#
-#def _normalise_shelfmarks(df, col):
-#    """Normalise all shelfmarks in a dataframe.
-#
-#    :param df: The dataframe.
-#    :param col: The name of the column.
-#    """
-#    df[col].fillna("", inplace=True)
-#    df[col].replace(r',', '.', inplace=True)
-#    df[col].replace(r'\s+', '.', inplace=True)
-#    df[col].replace(r'\.+', '.', inplace=True)
-#    df[col].replace(r'\.$', '', inplace=True)
-#    df[col].replace(r'^\.', '.', inplace=True)
-#    df[col].replace(r'(?i)^chi', 'CHI', inplace=True)
 
 
 def _extract_keys(df):
