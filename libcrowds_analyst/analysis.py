@@ -22,7 +22,7 @@ def _drop_empty_rows(df):
     return df
 
 
-def analyse(project_id, task_id, match_percentage):
+def analyse(project_id, task_id, match_percentage, exclude=[], sleep=2):
     """Analyser for all LibCrowds projects.
 
     Check that the info fields of each task run match n percent of the time
@@ -34,9 +34,9 @@ def analyse(project_id, task_id, match_percentage):
     empty values. For all other tasks the result will be set to the string
     'Unanalysed' so that the different answers can be checked manually later.
     """
-    time.sleep(2)  # To handle API rate limit when analysing many results
+    time.sleep(sleep)  # To handle API rate limit when analysing many results
     df = pybossa_client.get_task_run_dataframe(project_id, task_id)
-    keys = _extract_keys(df)
+    keys = [k for k in _extract_keys(df) if k not in exclude]
     df = df[keys]
     df = _drop_empty_rows(df)
     r = pybossa_client.get_results(project_id, task_id=task_id, limit=1)[0]

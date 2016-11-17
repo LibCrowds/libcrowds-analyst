@@ -36,7 +36,7 @@ class TestAnalysis(object):
         mock_client = mocker.patch('libcrowds_analyst.analysis.pybossa_client')
         mock_client.get_task_run_dataframe.return_value = df
         mock_client.get_results.return_value = [result]
-        analysis.analyse(project.id, task.id, 60)
+        analysis.analyse(project.id, task.id, 60, sleep=0)
         mock_client.update_result.assert_called_with(result)
         assert result.info == {'n': '', 'comment': ''}
 
@@ -50,7 +50,7 @@ class TestAnalysis(object):
         mock_client = mocker.patch('libcrowds_analyst.analysis.pybossa_client')
         mock_client.get_task_run_dataframe.return_value = df
         mock_client.get_results.return_value = [result]
-        analysis.analyse(project.id, task.id, 60)
+        analysis.analyse(project.id, task.id, 60, sleep=0)
         mock_client.update_result.assert_called_with(result)
         assert result.info == {'n': 42, 'comment': 'ok'}
 
@@ -64,7 +64,7 @@ class TestAnalysis(object):
         mock_client = mocker.patch('libcrowds_analyst.analysis.pybossa_client')
         mock_client.get_task_run_dataframe.return_value = df
         mock_client.get_results.return_value = [result]
-        analysis.analyse(project.id, task.id, 60)
+        analysis.analyse(project.id, task.id, 60, sleep=0)
         mock_client.update_result.assert_called_with(result)
         assert result.info == 'Unanalysed'
 
@@ -78,6 +78,17 @@ class TestAnalysis(object):
         mock_client = mocker.patch('libcrowds_analyst.analysis.pybossa_client')
         mock_client.get_task_run_dataframe.return_value = df
         mock_client.get_results.return_value = [result]
-        analysis.analyse(project.id, task.id, 60)
+        analysis.analyse(project.id, task.id, 60, sleep=0)
         mock_client.update_result.assert_called_with(result)
         assert result.info == 'Unanalysed'
+
+    def test_keys_excluded(self, create_task_run_df, mocker, project, task, result):
+        """Test that the specified keys are excluded from analysis."""
+        tr_info = [{'n': 42, 'comment': 'ok'}, {'n': 42, 'comment': 'ok'}]
+        df = create_task_run_df(tr_info)
+        mock_client = mocker.patch('libcrowds_analyst.analysis.pybossa_client')
+        mock_client.get_task_run_dataframe.return_value = df
+        mock_client.get_results.return_value = [result]
+        analysis.analyse(project.id, task.id, 60, exclude=['comment'], sleep=0)
+        mock_client.update_result.assert_called_with(result)
+        assert result.info == {'n': 42}
