@@ -6,16 +6,6 @@ import numpy as np
 from libcrowds_analyst.core import pybossa_client
 
 
-#def _concat(df, col):
-#    """Return concatenated, non-duplicated column values.
-#
-#    :param df: The dataframe of task runs (i.e enki.task_runs_df[task_id]).
-#    :param col: The name of the column.
-#    """
-#    deduped_df = df[col].drop_duplicates(keep='first')
-#    return '; '.join([item for item in deduped_df if len(item) > 0])
-
-
 def _extract_keys(df):
     """Return all keys from all task run info fields."""
     keyset = set()
