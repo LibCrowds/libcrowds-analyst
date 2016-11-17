@@ -81,31 +81,6 @@ def analyse_result(short_name, result_id):
                            task=task, task_runs=task_runs, title=project.name)
 
 
-@blueprint.route('/<short_name>/<result_id>/edit/', methods=['GET', 'POST'])
-def edit_result(short_name, result_id):
-    """View for directly editing a result."""
-    try:
-        project = pybossa_client.get_projects(short_name)[0]
-    except IndexError: # pragma: no cover
-        abort(404)
-
-    try:
-        result = pybossa_client.get_results(project.id, id=result_id)[0]
-    except IndexError: # pragma: no cover
-        abort(404)
-
-    form = forms.EditResultForm(request.form)
-    if request.method == 'POST' and form.validate():
-        result.info = json.loads(form.info.data)
-        pybossa_client.update_result(result)
-        flash('Result updated.', 'success')
-    elif request.method == 'POST' and not form.validate():  # pragma: no cover
-        flash('Please correct the errors.', 'danger')
-    form.info.data = json.dumps(result.info)
-    title = "Editing result {0}".format(result.id)
-    return render_template('edit_result.html', form=form, title=title)
-
-
 @blueprint.route('/<short_name>/reanalyse/', methods=['GET', 'POST'])
 def reanalyse(short_name):
     """View for triggering reanalysis of all results."""
