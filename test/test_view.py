@@ -1,6 +1,5 @@
 # -*- coding: utf8 -*-
 
-import enki
 import json
 from mock import MagicMock, patch
 from pytest_mock import mocker
@@ -8,18 +7,7 @@ from libcrowds_analyst import view, analysis
 
 
 class TestView(object):
-
-    def test_basic_auth_not_required_for_index(self, test_client):
-        get_res = test_client.get('/')
-        assert get_res.status_code == 200
-
-    def test_basic_auth_required_for_other_pages(self, test_client):
-        res = test_client.get('/short_name')
-        assert res.status_code == 401
-
-    def test_basic_auth_credentials_accepted(self, test_client, auth_headers):
-        res = test_client.get("/short_name", headers=auth_headers)
-        assert res.status_code == 301
+    """Test view module."""
 
     def test_result_analysis_queued(self, test_client, payload, mocker):
         mock_queue = mocker.patch('libcrowds_analyst.view.queue')
