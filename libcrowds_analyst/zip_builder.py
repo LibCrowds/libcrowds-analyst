@@ -33,7 +33,7 @@ class ZipBuilder(object):
         def mkdir_if_not_exists(path):
             try:
                 os.makedirs(path)
-            except OSError: # pragma: no cover
+            except OSError:  # pragma: no cover
                 if not os.path.isdir(path):
                     raise
         mkdir_if_not_exists(self.build_folder)
@@ -63,7 +63,6 @@ class ZipBuilder(object):
         build_path = os.path.join(self.build_folder, filename)
         completed_path = os.path.join(self.completed_folder, filename)
         os.rename(build_path, completed_path)
-        # scheduler.enqueue_in(timedelta(minutes=30), os.remove, completed_path)
 
     def check_zip(self, filename):
         """Check if a zip file is ready for download."""

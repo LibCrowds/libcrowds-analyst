@@ -20,7 +20,7 @@ class TestView(object):
                                                    timeout=600)
 
     def test_next_unanalysed_result_returned(self, test_client, auth_headers,
-                                        mocker, project, result):
+                                             mocker, project, result):
         """Test redirect to display next unanalysed result."""
         mock_client = mocker.patch('libcrowds_analyst.view.pybossa_client')
         mock_client.get_results.return_value = [result]

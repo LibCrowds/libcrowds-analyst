@@ -36,14 +36,13 @@ def analyse_next_empty_result(short_name):
     """View for analysing the next empty result."""
     try:
         project = pybossa_client.get_projects(short_name)[0]
-    except IndexError: # pragma: no cover
+    except IndexError:  # pragma: no cover
         abort(404)
 
     try:
         results = pybossa_client.get_results(project.id, info='Unanalysed')
-    except IndexError: # pragma: no cover
+    except IndexError:  # pragma: no cover
         abort(404)
-
 
     results = pybossa_client.get_results(project.id, info='Unanalysed')
     if not results:  # pragma: no cover
@@ -59,12 +58,12 @@ def analyse_result(short_name, result_id):
     """View for analysing a result."""
     try:
         project = pybossa_client.get_projects(short_name)[0]
-    except IndexError: # pragma: no cover
+    except IndexError:  # pragma: no cover
         abort(404)
 
     try:
         results = pybossa_client.get_results(project.id, id=result_id)
-    except IndexError: # pragma: no cover
+    except IndexError:  # pragma: no cover
         abort(404)
 
     if request.method == 'POST':
@@ -86,17 +85,17 @@ def reanalyse(short_name):
     """View for triggering reanalysis of all results."""
     try:
         project = pybossa_client.get_projects(short_name)[0]
-    except IndexError: # pragma: no cover
+    except IndexError:  # pragma: no cover
         abort(404)
 
     form = forms.ReanalysisForm(request.form)
     if request.method == 'POST' and form.validate():
         tasks = pybossa_client.get_tasks(project.id)
         for task in tasks:
-            match_percentage = current_app.config['MATCH_PERCENTAGE'];
-            exclude = current_app.config['EXCLUDED_KEYS'];
-            kwargs = {'project_id':project.id,
-                      'task_id':task.id,
+            match_percentage = current_app.config['MATCH_PERCENTAGE']
+            exclude = current_app.config['EXCLUDED_KEYS']
+            kwargs = {'project_id': project.id,
+                      'task_id': task.id,
                       'match_percentage': match_percentage,
                       'exclude': exclude}
             queue.enqueue_call(func=analysis.analyse,
@@ -114,7 +113,7 @@ def prepare_zip(short_name):
     """View to prepare a zip file for download."""
     try:
         project = pybossa_client.get_projects(short_name)[0]
-    except IndexError: # pragma: no cover
+    except IndexError:  # pragma: no cover
         abort(404)
 
     form = forms.DownloadForm(request.form)
@@ -158,13 +157,13 @@ def download_zip(short_name, filename):
     """View to download a zip file."""
     try:
         project = pybossa_client.get_projects(short_name)[0]
-    except IndexError: # pragma: no cover
+    except IndexError:  # pragma: no cover
         abort(404)
 
     if request.method == 'POST':
         try:
             file_ready = check_zip(filename)
-        except ValueError: # pragma: no cover
+        except ValueError:  # pragma: no cover
             abort(404)
 
         if file_ready:

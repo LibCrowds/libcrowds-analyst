@@ -68,8 +68,8 @@ class TestAnalysis(object):
         mock_client.update_result.assert_called_with(result)
         assert result.info == 'Unanalysed'
 
-    def test_result_when_some_matching_answers(self, create_task_run_df, mocker,
-                                              project, task, result):
+    def test_result_when_some_matching_answers(self, create_task_run_df,
+                                               mocker, project, task, result):
         """Test result info correct when match percentage partially met."""
         tr_info = [{'n': 1, 'comment': 'ok'}, {'n': 2, 'comment': 'ok'},
                    {'n': 3, 'comment': 'ok'}, {'n': 4, 'comment': 'ok'},
@@ -82,7 +82,8 @@ class TestAnalysis(object):
         mock_client.update_result.assert_called_with(result)
         assert result.info == 'Unanalysed'
 
-    def test_keys_excluded(self, create_task_run_df, mocker, project, task, result):
+    def test_keys_excluded(self, create_task_run_df, mocker, project, task,
+                           result):
         """Test that the specified keys are excluded from analysis."""
         tr_info = [{'n': 42, 'comment': 'ok'}, {'n': 42, 'comment': 'ok'}]
         df = create_task_run_df(tr_info)

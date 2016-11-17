@@ -100,7 +100,3 @@ class TestZipBuilder(object):
         with pytest.raises(ValueError) as excinfo:
             zb._build_flickr_zip([task], tmpzf.name)
         assert excinfo.value.message == 'Invalid Flickr task'
-
-
-
-

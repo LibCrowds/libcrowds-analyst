@@ -49,8 +49,6 @@ def setup_auth(app):
                 return auth.authenticate()
 
 
-
-
 def setup_csrf(app):
     """Setup csrf protection."""
     from libcrowds_analyst.view import index
