@@ -8,6 +8,19 @@
 
 A web application to help with real-time analysis of LibCrowds results.
 
+By default, we're looking for a 60% match rate for all contributions to a task. When a task is completed
+and the webhook payload directed to this server the following steps are followed:
+
+- Check that the info fields of each task run match n percent of the time or above, disregarding task runs
+where all of the info fields are blank.
+- For tasks where we have a sufficent number of matches the result will be set to a dictionary containing
+the task run info keys and the matched values.
+- For tasks where all info fields of all task runs are empty the result will be set to a dictionary containing
+the task run info keys and empty values.
+- For all other tasks the result will be set to the string 'Unanalysed' so that the different answers can be checked
+manually later.
+
+
 ## Requirements
 
 - [PyBossa](https://github.com/PyBossa/pybossa) >= 1.2.0.
@@ -30,7 +43,6 @@ cd libcrowds-analyst
 python setup.py install
 ```
 
-Install the [libcrowds-auth](https://github.com/LibCrowds/libcrowds-auth) plugin.
 
 ## Configuration
 
@@ -74,53 +86,28 @@ If the location of the server changes, the `LIBCROWDS_ANALYST_URL` variable
 should be updated in the main PyBossa configuration.
 
 
-## Usage
-
-All webhook payloads should be directed to the root url of this server. If an
-analyser has been set up for the related category, results will be analysed
-and updated automatically.
-
 ### Endpoints
 
-- To process the next unanalysed result visit:
+- Process the next unanalysed result:
 
 ```http
 GET /<project_short_name>
+```
 
-
-- To process a specific result visit:
+- Process a specific result:
 
 ```http
 GET /<project_short_name>/<result_id>
 ```
 
-- To directly edit a result visit:
-
-
-```http
-GET /<project_short_name>/<result_id>/edit
-```
-
-- To trigger reanalysis for all of a project's results visit:
+- Trigger reanalysis for all of a project's results:
 
 ```http
 GET /<project_short_name>/reanalyse
 ```
 
-
-- To download the original input (e.g. the images) associated with a list of tasks:
+- Download the original input (e.g. the images) associated with a list of tasks:
 
 ```http
 GET /<project_short_name>/download
 ```
-
-
-## Creating a new analyser
-
-To create an analyser for a new category you need to create:
-
-- A function in [analysis.py](libcrowds_analyst/analysis.py) called **category_\<category_id>**
-- A template in [templates](libcrowds_analyst/templates) called **category_\<category_id>.html**
-
-Of course, if the category IDs are ever changed then the function and template above will
-need to be updated.
