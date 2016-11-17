@@ -12,3 +12,5 @@ Z3950_DATABASES = {"loc": {"db": "Voyager", "host": "z3950.loc.gov",
                            "port": 7090}}
 Z3950_URL = "/z3950/search/loc/"
 ZIP_FOLDER = "/tmp/"
+MATCH_PERCENTAGE=60
+EXCLUDED_KEYS=['ip_address']
