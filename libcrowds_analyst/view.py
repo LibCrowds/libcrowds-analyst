@@ -72,8 +72,8 @@ def analyse_result(short_name, result_id):
         data.pop('csrf_token', None)
         result.info = data
         pybossa_client.update_result(result)
-        return redirect(url_for('.analyse_next_empty_result',
-                                short_name=short_name))
+        url = url_for('.analyse_next_empty_result', short_name=short_name)
+        return redirect(url)
 
     task = pybossa_client.get_tasks(e.project.id, result.task_id)[0]
     task_runs = pybossa_client.get_task_runs(e.project.id, result.task_id)
@@ -93,8 +93,14 @@ def reanalyse(short_name):
     if request.method == 'POST' and form.validate():
         tasks = pybossa_client.get_tasks(project.id)
         for task in tasks:
+            match_percentage = current_app.config['MATCH_PERCENTAGE'];
+            exclude = current_app.config['EXCLUDED_KEYS'];
+            kwargs = {'project_id':project.id,
+                      'task_id':task.id,
+                      'match_percentage': match_percentage,
+                      'exclude': exclude}
             queue.enqueue_call(func=analysis.analyse,
-                               args=(project.id, task.id),
+                               kwargs=kwargs,
                                timeout=10*MINUTE)
         flash('{0} tasks will be reanalysed.'.format(len(tasks)), 'success')
     elif request.method == 'POST':  # pragma: no cover
