@@ -35,7 +35,7 @@ def index():
 def analyse_next_empty_result(short_name):
     """View for analysing the next empty result."""
     try:
-        project = pybossa_client.get_projects(short_name)[0]
+        project = pybossa_client.get_projects(short_name=short_name)[0]
     except IndexError:  # pragma: no cover
         abort(404)
 
@@ -57,12 +57,12 @@ def analyse_next_empty_result(short_name):
 def analyse_result(short_name, result_id):
     """View for analysing a result."""
     try:
-        project = pybossa_client.get_projects(short_name)[0]
+        project = pybossa_client.get_projects(short_name=short_name)[0]
     except IndexError:  # pragma: no cover
         abort(404)
 
     try:
-        results = pybossa_client.get_results(project.id, id=result_id)
+        result = pybossa_client.get_results(project.id, id=result_id)[0]
     except IndexError:  # pragma: no cover
         abort(404)
 
@@ -74,17 +74,21 @@ def analyse_result(short_name, result_id):
         url = url_for('.analyse_next_empty_result', short_name=short_name)
         return redirect(url)
 
-    task = pybossa_client.get_tasks(e.project.id, result.task_id)[0]
-    task_runs = pybossa_client.get_task_runs(e.project.id, result.task_id)
-    return render_template('analyse.html', project=e.project, result=result,
-                           task=task, task_runs=task_runs, title=project.name)
+    task = pybossa_client.get_tasks(project.id, id=result.task_id)[0]
+    taskruns = pybossa_client.get_task_runs(project.id, task_id=result.task_id)
+    exclude = current_app.config['EXCLUDED_KEYS']
+    keys = set(k for tr in taskruns for k in tr.info.keys()
+               if k not in exclude)
+    return render_template('analyse.html', project=project, result=result,
+                           task=task, task_runs=taskruns,
+                           title=project.name, keys=keys)
 
 
 @blueprint.route('/<short_name>/reanalyse/', methods=['GET', 'POST'])
 def reanalyse(short_name):
     """View for triggering reanalysis of all results."""
     try:
-        project = pybossa_client.get_projects(short_name)[0]
+        project = pybossa_client.get_projects(short_name=short_name)[0]
     except IndexError:  # pragma: no cover
         abort(404)
 
@@ -112,7 +116,7 @@ def reanalyse(short_name):
 def prepare_zip(short_name):
     """View to prepare a zip file for download."""
     try:
-        project = pybossa_client.get_projects(short_name)[0]
+        project = pybossa_client.get_projects(short_name=short_name)[0]
     except IndexError:  # pragma: no cover
         abort(404)
 
@@ -147,8 +151,15 @@ def prepare_zip(short_name):
 @blueprint.route('/<short_name>/download/<path:filename>/check/')
 def check_zip(short_name, filename):
     """Check if a zip file is ready for download."""
-    download_ready = zip_builder.check_zip(filename)
-    return jsonify(download_ready=download_ready)
+    try:
+        download_ready = zip_builder.check_zip(filename)
+    except ValueError as e:
+        resp = jsonify(error.to_dict())
+        resp.status_code == 500
+        return resp
+    resp = jsonify(download_ready=download_ready)
+    resp.status_code == 200
+    return resp
 
 
 @blueprint.route('/<short_name>/download/<path:filename>/',
@@ -156,7 +167,7 @@ def check_zip(short_name, filename):
 def download_zip(short_name, filename):
     """View to download a zip file."""
     try:
-        project = pybossa_client.get_projects(short_name)[0]
+        project = pybossa_client.get_projects(short_name=short_name)[0]
     except IndexError:  # pragma: no cover
         abort(404)
 
