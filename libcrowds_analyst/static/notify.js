@@ -1,4 +1,4 @@
-function notify(msg){
+function notify(msg, category){
     let html = $(`<div class="alert alert-${category} fade">
                  <a class="close" data-dismiss="alert" href="#">&times;</a>${msg}
                  </div>`);
