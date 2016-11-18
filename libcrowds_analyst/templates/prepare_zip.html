@@ -3,7 +3,7 @@
 
 {% block content %}
 <p class="lead">Enter your task IDs below to download the original task input.</p>
-<form method="POST" role="form" action="{{ url_for('prepare_zip', short_name=project.short_name) }}">
+<form method="POST" role="form" action="{{ url_for('analyse.prepare_zip', short_name=project.short_name) }}">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
         {{ render_field(form.importer, class="form-control") }}
         {{ render_field(form.task_ids, class="form-control", rows="15", required="required") }}
