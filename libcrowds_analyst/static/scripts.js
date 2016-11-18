@@ -1,14 +1,3 @@
-/** Prettify JSON. */
-function prettifyJSON() {
-    $.each( $('.prettify-json'), function() {
-        var ugly = $(this).val();
-        var obj = JSON.parse(ugly);
-        var pretty = JSON.stringify(obj, undefined, 4);
-        $(this).val(pretty);
-    });
-}
-
-
 /** Populate value of radio buttons linked to text fields. */
 $('#answer-form').on('submit', function() {
     $('.radio-text-group').each(function() {
@@ -37,20 +26,51 @@ $('.radio-text-group input[type=text]').on('click', function(evt) {
 });
 
 
+/** Add a record to the form. */
+function addRecordToForm(recordElem) {
+    console.log(recordElem);
+    $(recordElem.children('div')[1]).remove();
+    var oclcNum = $(recordElem.children('div')[0]).context.id;
+    var baseUrl = 'https://www.worldcat.org/title/apis/oclc';
+    $(recordElem.find('.title')[0]).wrapInner(`<a href="${baseUrl}/${oclcNum}" target="_blank" />`);
+    var html = $(recordElem).html().replace('col-xs-8', '');
+    $('input[value="'+ oclcNum +'"]').each(function() {
+        $($(this).parents('.radio')[0]).append(html);
+    });
+}
+
+
+/** Handle the results of a Z3950 search. */
+function handleResults(results) {
+    let parser = new DOMParser(),
+        doc    = parser.parseFromString(`<html>${results}</html>`, "text/xml");
+    $(doc).find('.z3950-record').each(function() {
+        addRecordToForm($(this));
+    });
+}
+
+
 /** Perform a Z39.50 search. */
-function z3950Search(baseUrl, query, callback) {
-    var url = (baseUrl + '/html').replace('//', '/');
+function z3950Search(query) {
     if (query.length === 0) {
         return;
     }
     $.ajax({
         type: 'GET',
-        url: url,
+        url: '/z3950/search/oclc/html',
         data: {query: query},
         success: function(results) {
-            callback(results);
+            handleResults(results);
         }, error: function(err) {
-            alert('Z3950 ERROR: ' + err.status + " " + err.statusText);
+            alert(`Z3950 ERROR: ${err.status} ${err.statusText}`);
         }
     });
 }
+
+
+$(document).ready(function() {
+    let query = $('label input[name="oclc"]').map(function(){
+        return `(1,12)="${$(this).val()}"`;
+    }).get().join('or');
+    z3950Search(query);
+});
