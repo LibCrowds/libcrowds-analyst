@@ -154,12 +154,8 @@ def check_zip(short_name, filename):
     try:
         download_ready = zip_builder.check_zip(filename)
     except ValueError as err:
-        resp = jsonify(message=err.message)
-        resp.status_code == 404
-        return resp
-    resp = jsonify(download_ready=download_ready)
-    resp.status_code == 200
-    return resp
+        abort(404)
+    return jsonify(download_ready=download_ready)
 
 
 @blueprint.route('/<short_name>/download/<path:filename>/',

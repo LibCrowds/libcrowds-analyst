@@ -61,7 +61,7 @@ function z3950Search(query) {
         success: function(results) {
             handleResults(results);
         }, error: function(err) {
-            alert(`Z3950 ERROR: ${err.status} ${err.statusText}`);
+            notify(`Z3950 ERROR: ${err.status} ${err.statusText}`, 'danger');
         }
     });
 }
@@ -74,7 +74,7 @@ function checkDownload(short_name, filename) {
         url: url,
         dataType: "json",
         success: function(data) {
-            if (data['download_ready']) {
+            if (data.download_ready) {
                 $('#dl-btn').removeClass('btn-disabled');
                 $('#dl-btn').addClass('btn-success');
                 $('#dl-btn').removeProp('disabled');
@@ -85,6 +85,11 @@ function checkDownload(short_name, filename) {
                     checkDownload();
                 }, 2000);
             }
+        },
+        error: function(err) {
+            $('#loading-text').html('');
+            $('#loading-icon').hide();
+            notify(`DOWNLOAD ERROR: ${err.status} ${err.statusText}`, 'danger');
         }
     });
 }
