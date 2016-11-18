@@ -2,15 +2,15 @@
 {% from '_helpers.html' import render_field %}
 
 {% block content %}
-        <p class="lead">
-            <strong>WARNING: </strong>Clicking the button below will trigger reanalysis of all results and override all
-            current result data for the project.
-        </p>
-        <form method="POST" action="{{ url_for('analyse.reanalyse', short_name=project.short_name) }}">
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-            {{ render_field(form.sleep, class="form-control", type="number") }}
-            <div class="text-right">
-                <input class="btn btn-danger" type="submit" value="Continue"></input>
-            </div>
-        </form>
+<p class="lead">
+    <strong>WARNING: </strong>Clicking the button below will trigger reanalysis of all results and override all
+    current result data for the project.
+</p>
+<form method="POST" action="{{ url_for('analyse.reanalyse', short_name=project.short_name) }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+        {{ render_field(form.sleep, class="form-control", type="number") }}
+    <div class="text-right">
+        <input class="btn btn-danger" type="submit" value="Continue"></input>
+    </div>
+</form>
 {% endblock %}
