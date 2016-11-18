@@ -16,7 +16,6 @@
         <div class="container">
             <h1><a href="http://www.libcrowds.com"><span class="glyphicon glyphicon-home"></span></a> {{ title }}</h1>
             <hr>
-            {% include '_flash_messages.html' %}
             {% block content %}{% endblock %}
         </div>
         <script src="https://code.jquery.com/jquery-1.12.4.min.js"
@@ -28,5 +27,6 @@
         </script>
         <script src="{{url_for('static', filename='notify.js')}}?v0.1.0"></script>
         <script src="{{url_for('static', filename='scripts.js')}}?v1.0.1"></script>
+        {% include '_flash_messages.html' %}
     </body>
 </html>
