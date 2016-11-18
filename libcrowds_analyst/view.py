@@ -153,9 +153,9 @@ def check_zip(short_name, filename):
     """Check if a zip file is ready for download."""
     try:
         download_ready = zip_builder.check_zip(filename)
-    except ValueError as e:
-        resp = jsonify(error.to_dict())
-        resp.status_code == 500
+    except ValueError as err:
+        resp = jsonify(message=err.message)
+        resp.status_code == 404
         return resp
     resp = jsonify(download_ready=download_ready)
     resp.status_code == 200
