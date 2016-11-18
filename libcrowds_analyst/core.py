@@ -5,7 +5,7 @@ import os
 import pbclient
 from flask import Flask, request, g
 from libcrowds_analyst import default_settings
-from libcrowds_analyst.extensions import zip_builder, csrf, pybossa_client
+from libcrowds_analyst.extensions import *
 
 
 def create_app():
@@ -15,6 +15,7 @@ def create_app():
     setup_url_rules(app)
     setup_auth(app)
     setup_csrf(app)
+    setup_z3950_manager(app)
     zip_builder.init_app(app)
     pybossa_client.init_app(app)
     return app
@@ -54,3 +55,9 @@ def setup_csrf(app):
     from libcrowds_analyst.view import index
     csrf.init_app(app)
     csrf.exempt(index)
+
+
+def setup_z3950_manager(app):
+    """Setup Flask-Z3950."""
+    z3950_manager.init_app(app)
+    z3950_manager.register_blueprint(url_prefix='/z3950')
