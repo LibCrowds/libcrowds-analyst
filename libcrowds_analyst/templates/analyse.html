@@ -16,7 +16,7 @@
                 {{ render_tr_field(task_runs, result=result, key=key) }}
             {% endfor %}
             <div class="form-group text-right">
-                <button type="button" class="btn btn-info" data-toggle="modal" data-target="#analysisHelpModal">Help</button>
+                <button type="button" class="btn btn-info" data-toggle="modal" data-target="#helpModal">Help</button>
                 <a href="#" class="btn btn-danger reject-btn">Reject</a>
                 <input class="btn btn-success" type="submit" value="Accept"></input>
             </div>
@@ -24,4 +24,36 @@
     </div>
 </div>
 
+<div id="helpModal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">How to analyse results</h4>
+            </div>
+            <div class="modal-body">
+                <p>
+                    The purpose of this page is to select the answers that will be used to populate a task's final result.
+                </p>
+                <ol>
+                    <li>
+                        Use the radio buttons to select the correct answers for each field.
+                    </li>
+                    <li>
+                        Use the free text fields to specify an empty answer, or to enter any alternative text.
+                    </li>
+                    <li>
+                        Once an answer has been specified for each field click the accept button.
+                    </li>
+                    <li>
+                        To reject all answers click the reject button.
+                    </li>
+                </ol>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
