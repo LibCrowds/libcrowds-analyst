@@ -20,10 +20,10 @@ PORT = 5001
 # Debugging
 DEBUG = False
 
-# Flask-Z3950
+# Flask-Z3950 config (used to replace any 'oclc' keys with record summaries)
 Z3950_DATABASES = {"id": {'host': '', 'db': '', 'port': '', 'user': '',
                           'password': ''}}
-Z3950_URL = ""
+Z3950_URL = "/z3950/search/{z3950-database-id}"
 
 # Folder to store task input zip files
 ZIP_FOLDER = "/tmp/"
