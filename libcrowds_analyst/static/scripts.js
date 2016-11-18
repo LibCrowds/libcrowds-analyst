@@ -28,7 +28,6 @@ $('.radio-text-group input[type=text]').on('click', function(evt) {
 
 /** Add a record to the form. */
 function addRecordToForm(recordElem) {
-    console.log(recordElem);
     $(recordElem.children('div')[1]).remove();
     var oclcNum = $(recordElem.children('div')[0]).context.id;
     var baseUrl = 'https://www.worldcat.org/title/apis/oclc';
@@ -68,9 +67,39 @@ function z3950Search(query) {
 }
 
 
-$(document).ready(function() {
+/** Check if a file is ready to download. */
+function checkDownload(short_name, filename) {
+    let url = `/${short_name}/download/${filename}/check`;
+    $.ajax({
+        url: url,
+        dataType: "json",
+        success: function(data) {
+            if (data['download_ready']) {
+                $('#dl-btn').removeClass('btn-disabled');
+                $('#dl-btn').addClass('btn-success');
+                $('#dl-btn').removeProp('disabled');
+                $('#loading-icon').hide();
+                $('#loading-text').html('Download ready!');
+            } else {
+                setTimeout(function(){
+                    checkDownload();
+                }, 2000);
+            }
+        }
+    });
+}
+
+
+if ($('#dl-btn').length) {
+    let short_name = $('#dl-btn').data('short_name'),
+        filename   = $('#dl-btn').data('filename');
+    checkDownload(short_name, filename);
+}
+
+
+if ($('label input[name="oclc"]').length) {
     let query = $('label input[name="oclc"]').map(function(){
         return `(1,12)="${$(this).val()}"`;
     }).get().join('or');
     z3950Search(query);
-});
+}

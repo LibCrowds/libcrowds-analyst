@@ -7,27 +7,7 @@
 </p>
 <form action="" method="post" name="login" target="_blank">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-    <input id="dl-btn" type="submit" class="btn btn-disabled" value="Download" disabled>
+    <input id="dl-btn" type="submit" class="btn btn-disabled" value="Download"
+           data-short-name="{{ short_name }}" data-filename="{{ filename }}" disabled>
 </form>
-<script>
-    /** Check if the file is ready to download. */
-    function checkDownload() {
-        var url = "/{{ short_name }}/download/{{ filename }}";
-        $.ajax({ url: url + "/check", success: function(data){
-            if (data['download_ready']) {
-                $('#dl-btn').removeClass('btn-disabled');
-                $('#dl-btn').addClass('btn-success');
-                $('#dl-btn').removeProp('disabled');
-                $('#loading-icon').hide();
-                $('#loading-text').html('Download ready!');
-            } else {
-                setTimeout(function(){
-                    checkDownload();
-                }, 2000);
-            }
-        }, dataType: "json"});
-    }
-
-    checkDownload();
-</script>
 {% endblock %}
