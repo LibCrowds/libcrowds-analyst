@@ -2,8 +2,7 @@
 """Main module for libcrowds-analyst."""
 
 import os
-import pbclient
-from flask import Flask, request, g
+from flask import Flask, request
 from libcrowds_analyst import default_settings
 from libcrowds_analyst.extensions import *
 

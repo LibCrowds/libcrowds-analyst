@@ -1,7 +1,6 @@
 # -*- coding: utf8 -*-
 
 import os
-import shutil
 import pytest
 import tempfile
 from pytest_mock import mocker

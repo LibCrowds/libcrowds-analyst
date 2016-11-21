@@ -2,15 +2,14 @@
 """View module for libcrowds-analyst."""
 
 import os
-import json
 import time
 from redis import Redis
 from rq import Queue
 from flask import Blueprint
 from flask import render_template, request, abort, flash, redirect, url_for
-from flask import current_app, Response, send_file, jsonify
+from flask import current_app, send_file, jsonify
 from werkzeug.utils import secure_filename
-from libcrowds_analyst import analysis, auth, forms
+from libcrowds_analyst import analysis, forms
 from libcrowds_analyst.core import zip_builder, pybossa_client
 
 

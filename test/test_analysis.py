@@ -1,9 +1,6 @@
 # -*- coding: utf8 -*-
 
-import enki
-import pandas
 from pytest_mock import mocker
-from mock import MagicMock, PropertyMock, patch
 from libcrowds_analyst import analysis
 
 

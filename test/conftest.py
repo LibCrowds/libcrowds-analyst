@@ -3,7 +3,6 @@
 import os
 import json
 import enki
-import copy
 import pytest
 import base64
 from libcrowds_analyst.core import create_app

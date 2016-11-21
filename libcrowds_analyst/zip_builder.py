@@ -6,7 +6,6 @@ import requests
 import zipfile
 from redis import Redis
 from rq_scheduler import Scheduler
-from datetime import timedelta
 from flask import send_file
 
 

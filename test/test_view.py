@@ -1,9 +1,8 @@
 # -*- coding: utf8 -*-
 
 import json
-from mock import MagicMock, patch
 from pytest_mock import mocker
-from libcrowds_analyst import view, analysis
+from libcrowds_analyst import analysis
 from libcrowds_analyst.core import zip_builder
 
 
