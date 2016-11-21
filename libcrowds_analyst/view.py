@@ -62,8 +62,8 @@ def analyse_result(short_name, result_id):
         abort(404)
 
     try:
-        result = pybossa_client.get_results(project.id, id=result_id)[0]
-    except IndexError:  # pragma: no cover
+        result = pybossa_client.get_results(project.id, id=int(result_id))[0]
+    except (IndexError, ValueError):  # pragma: no cover
         abort(404)
 
     if request.method == 'POST':
@@ -125,11 +125,14 @@ def prepare_zip(short_name):
         importer = form.importer.data
         task_ids = form.task_ids.data.split()
         tasks = pybossa_client.get_tasks(project_id=project.id)
-        tasks_to_export = [t for t in e.tasks if str(t.id) in task_ids]
-        invalid_tasks = [t.id for t in tasks if str(t.id) not in task_ids]
-        if invalid_tasks:
-            flash('''The following task IDs are invalid:
-                  {0}'''.format(invalid_tasks), 'danger')
+        valid_task_ids = [str(t.id) for t in tasks]
+        tasks_to_export = [t for t in tasks if str(t.id) in task_ids
+                           and str(t.id) in valid_task_ids]
+        invalid_ids = ", ".join([t_id for t_id in task_ids
+                                 if t_id not in valid_task_ids])
+        if invalid_ids:
+            msg = 'The following task IDs are invalid: {0}'.format(invalid_ids)
+            flash(msg, 'danger')
             return render_template('prepare_zip.html', project=project,
                                    title="Download task input", form=form)
 
@@ -137,7 +140,7 @@ def prepare_zip(short_name):
         fn = '{0}_task_input_{1}.zip'.format(short_name, ts)
         fn = secure_filename(fn)
         queue.enqueue_call(func=zip_builder.build,
-                           args=(tasks, fn, importer),
+                           args=(tasks_to_export, fn, importer),
                            timeout=3600)
         return redirect(url_for('.download_zip', filename=fn,
                                 short_name=project.short_name))
@@ -153,7 +156,7 @@ def check_zip(short_name, filename):
     """Check if a zip file is ready for download."""
     try:
         download_ready = zip_builder.check_zip(filename)
-    except ValueError as err:
+    except ValueError:  # pragma: no cover
         abort(404)
     return jsonify(download_ready=download_ready)
 
@@ -169,11 +172,11 @@ def download_zip(short_name, filename):
 
     if request.method == 'POST':
         try:
-            file_ready = check_zip(filename)
+            file_ready = zip_builder.check_zip(filename)
         except ValueError:  # pragma: no cover
             abort(404)
 
         if file_ready:
             return zip_builder.response_zip(filename)
     return render_template('download_zip.html', title="Download task input",
-                           short_name=short_name, filename=filename)
+                           project=project, filename=filename)
