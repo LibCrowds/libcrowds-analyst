@@ -126,8 +126,8 @@ def prepare_zip(short_name):
         task_ids = form.task_ids.data.split()
         tasks = pybossa_client.get_tasks(project_id=project.id)
         valid_task_ids = [str(t.id) for t in tasks]
-        tasks_to_export = [t for t in tasks if str(t.id) in task_ids
-                           and str(t.id) in valid_task_ids]
+        tasks_to_export = [t for t in tasks if str(t.id) in task_ids and
+                           str(t.id) in valid_task_ids]
         invalid_ids = ", ".join([t_id for t_id in task_ids
                                  if t_id not in valid_task_ids])
         if invalid_ids:

@@ -151,7 +151,6 @@ class TestView(object):
         mock_flash.assert_called_with(msg, 'danger')
         assert not mock_queue.enqueue_call.called
 
-
     def test_zip_identified_as_ready(self, test_client, project, mocker,
                                      auth_headers):
         """Test zip identified as ready."""
@@ -189,7 +188,7 @@ class TestView(object):
         assert mock_render.call_args_list[0][1]['filename'] == fn
 
     def test_zip_file_response(self, test_client, project, mocker,
-                                auth_headers):
+                               auth_headers):
         """Test that a zip file response is returned when ready."""
         mock_zip_builder = mocker.patch('libcrowds_analyst.view.zip_builder')
         mock_zip_builder.check_zip.return_value = True
