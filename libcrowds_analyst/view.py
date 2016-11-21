@@ -2,167 +2,180 @@
 """View module for libcrowds-analyst."""
 
 import os
-import json
 import time
-import enki
 from redis import Redis
 from rq import Queue
+from flask import Blueprint
 from flask import render_template, request, abort, flash, redirect, url_for
-from flask import current_app, Response, send_file, jsonify
+from flask import current_app, send_file, jsonify
 from werkzeug.utils import secure_filename
-from libcrowds_analyst import analysis, auth, forms
-from libcrowds_analyst.core import zip_builder, api_client
+from libcrowds_analyst import analysis, forms
+from libcrowds_analyst.core import zip_builder, pybossa_client
 
+
+blueprint = Blueprint('analyse', __name__)
 
 queue = Queue('libcrowds_analyst', connection=Redis())
+MINUTE = 60
 
 
+@blueprint.route('/', methods=['GET', 'POST'])
 def index():
     """Index view."""
-    if request.method == 'GET':
-        return render_template('index.html', title="LibCrowds Analyst")
-    else:
-        project = api_client.get_project(request.json['project_short_name'])
-        if not project:  # pragma: no cover
-            abort(404)
-
-        analyst_func = analysis.get_analyst_func(project.category_id)
-        if analyst_func:
-            queue.enqueue(analyst_func, current_app.config['API_KEY'],
-                          current_app.config['ENDPOINT'],
-                          request.json['project_short_name'],
-                          request.json['task_id'], timeout=600)
-            return "OK"
-        else:
-            abort(404)
+    if request.method == 'POST':
+        queue.enqueue_call(func=analysis.analyse,
+                           kwargs=request.json,
+                           timeout=10*MINUTE)
+        return "OK"
+    return render_template('index.html', title="LibCrowds Analyst")
 
 
+@blueprint.route('/<short_name>/')
 def analyse_next_empty_result(short_name):
     """View for analysing the next empty result."""
-    project = api_client.get_project(short_name)
-    if not project:  # pragma: no cover
+    try:
+        project = pybossa_client.get_projects(short_name=short_name)[0]
+    except IndexError:  # pragma: no cover
         abort(404)
 
-    result = api_client.get_first_result(project.id, info='Unanalysed')
-    if not result:  # pragma: no cover
+    try:
+        results = pybossa_client.get_results(project.id, info='Unanalysed')
+    except IndexError:  # pragma: no cover
+        abort(404)
+
+    results = pybossa_client.get_results(project.id, info='Unanalysed')
+    if not results:  # pragma: no cover
         flash('There are no unanlysed results to process!', 'success')
         return redirect(url_for('.index'))
+    result = results[0]
     return redirect(url_for('.analyse_result', short_name=short_name,
                             result_id=result.id))
 
 
+@blueprint.route('/<short_name>/<result_id>/', methods=['GET', 'POST'])
 def analyse_result(short_name, result_id):
     """View for analysing a result."""
     try:
-        e = enki.Enki(current_app.config['API_KEY'],
-                      current_app.config['ENDPOINT'], short_name, all=1)
-    except enki.ProjectNotFound:  # pragma: no cover
+        project = pybossa_client.get_projects(short_name=short_name)[0]
+    except IndexError:  # pragma: no cover
         abort(404)
 
-    result = api_client.get_first_result(e.project.id, id=result_id)
-    if not result:  # pragma: no cover
+    try:
+        result = pybossa_client.get_results(project.id, id=int(result_id))[0]
+    except (IndexError, ValueError):  # pragma: no cover
         abort(404)
 
     if request.method == 'POST':
         data = request.form.to_dict()
         data.pop('csrf_token', None)
         result.info = data
-        api_client.update_result(result)
-        return redirect(url_for('.analyse_next_empty_result',
-                                short_name=short_name))
+        pybossa_client.update_result(result)
+        url = url_for('.analyse_next_empty_result', short_name=short_name)
+        return redirect(url)
 
-    e.get_tasks(task_id=result.task_id)
-    e.get_task_runs()
-    task = e.tasks[0]
-    task_runs = e.task_runs[task.id]
-    url = 'category_{0}.html'.format(e.project.category_id)
-    return render_template(url, project=e.project, result=result, task=task,
-                           task_runs=task_runs, title=e.project.name)
-
-
-def edit_result(short_name, result_id):
-    """View for directly editing a result."""
-    project = api_client.get_project(short_name)
-    if not project:  # pragma: no cover
-        abort(404)
-
-    result = api_client.get_first_result(project.id, id=result_id)
-    if not result:  # pragma: no cover
-        abort(404)
-
-    form = forms.EditResultForm(request.form)
-    if request.method == 'POST' and form.validate():
-        result.info = json.loads(form.info.data)
-        api_client.update_result(result)
-        flash('Result updated.', 'success')
-    elif request.method == 'POST' and not form.validate():  # pragma: no cover
-        flash('Please correct the errors.', 'danger')
-    form.info.data = json.dumps(result.info)
-    title = "Editing result {0}".format(result.id)
-    return render_template('edit_result.html', form=form, title=title)
+    task = pybossa_client.get_tasks(project.id, id=result.task_id)[0]
+    taskruns = pybossa_client.get_task_runs(project.id, task_id=result.task_id)
+    exclude = current_app.config['EXCLUDED_KEYS']
+    keys = set(k for tr in taskruns for k in tr.info.keys()
+               if k not in exclude)
+    return render_template('analyse.html', project=project, result=result,
+                           task=task, task_runs=taskruns,
+                           title=project.name, keys=keys)
 
 
+@blueprint.route('/<short_name>/reanalyse/', methods=['GET', 'POST'])
 def reanalyse(short_name):
     """View for triggering reanalysis of all results."""
     try:
-        e = enki.Enki(current_app.config['API_KEY'],
-                      current_app.config['ENDPOINT'], short_name, all=1)
-    except enki.ProjectNotFound:  # pragma: no cover
+        project = pybossa_client.get_projects(short_name=short_name)[0]
+    except IndexError:  # pragma: no cover
         abort(404)
 
     form = forms.ReanalysisForm(request.form)
-    analyst_func = analysis.get_analyst_func(e.project.category_id)
-    if not analyst_func:
-        flash('No analyst configured for this category of project.', 'danger')
-    elif request.method == 'POST' and form.validate():
-        e.get_tasks()
-        sleep = int(request.form.get('sleep', 2))  # To handle API rate limit
-        for t in e.tasks:
-            queue.enqueue(analyst_func, current_app.config['API_KEY'],
-                          current_app.config['ENDPOINT'], short_name, t.id,
-                          sleep=sleep, timeout=3600)
-        flash('''Results for {0} completed tasks will be reanalysed.
-              '''.format(len(e.tasks)), 'success')
-    elif request.method == 'POST' and not form.validate():  # pragma: no cover
+    if request.method == 'POST' and form.validate():
+        tasks = pybossa_client.get_tasks(project.id)
+        for task in tasks:
+            match_percentage = current_app.config['MATCH_PERCENTAGE']
+            exclude = current_app.config['EXCLUDED_KEYS']
+            kwargs = {'project_id': project.id,
+                      'task_id': task.id,
+                      'match_percentage': match_percentage,
+                      'exclude': exclude}
+            queue.enqueue_call(func=analysis.analyse,
+                               kwargs=kwargs,
+                               timeout=10*MINUTE)
+        flash('{0} tasks will be reanalysed.'.format(len(tasks)), 'success')
+    elif request.method == 'POST':  # pragma: no cover
         flash('Please correct the errors.', 'danger')
     return render_template('reanalyse.html', title="Reanalyse results",
-                           project=e.project, form=form)
+                           project=project, form=form)
 
 
+@blueprint.route('/<short_name>/download/', methods=['GET', 'POST'])
 def prepare_zip(short_name):
     """View to prepare a zip file for download."""
-    project = api_client.get_project(short_name)
-    if not project:  # pragma: no cover
+    try:
+        project = pybossa_client.get_projects(short_name=short_name)[0]
+    except IndexError:  # pragma: no cover
         abort(404)
 
     form = forms.DownloadForm(request.form)
     if request.method == 'POST' and form.validate():
         importer = form.importer.data
         task_ids = form.task_ids.data.split()
-        filename = '{0}_input_{1}.zip'.format(short_name, int(time.time()))
-        filename = secure_filename(filename)
-        queue.enqueue(zip_builder.build, short_name, task_ids, filename,
-                      importer, timeout=3600)
-        return redirect(url_for('.download_zip', filename=filename,
+        tasks = pybossa_client.get_tasks(project_id=project.id)
+        valid_task_ids = [str(t.id) for t in tasks]
+        tasks_to_export = [t for t in tasks if str(t.id) in task_ids and
+                           str(t.id) in valid_task_ids]
+        invalid_ids = ", ".join([t_id for t_id in task_ids
+                                 if t_id not in valid_task_ids])
+        if invalid_ids:
+            msg = 'The following task IDs are invalid: {0}'.format(invalid_ids)
+            flash(msg, 'danger')
+            return render_template('prepare_zip.html', project=project,
+                                   title="Download task input", form=form)
+
+        ts = int(time.time())
+        fn = '{0}_task_input_{1}.zip'.format(short_name, ts)
+        fn = secure_filename(fn)
+        queue.enqueue_call(func=zip_builder.build,
+                           args=(tasks_to_export, fn, importer),
+                           timeout=3600)
+        return redirect(url_for('.download_zip', filename=fn,
                                 short_name=project.short_name))
-    elif request.method == 'POST' and not form.validate():  # pragma: no cover
+    elif request.method == 'POST':  # pragma: no cover
         flash('Please correct the errors.', 'danger')
 
     return render_template('prepare_zip.html', title="Download task input",
                            project=project, form=form)
 
 
+@blueprint.route('/<short_name>/download/<path:filename>/check/')
 def check_zip(short_name, filename):
     """Check if a zip file is ready for download."""
-    download_ready = zip_builder.check_zip(filename)
+    try:
+        download_ready = zip_builder.check_zip(filename)
+    except ValueError:  # pragma: no cover
+        abort(404)
     return jsonify(download_ready=download_ready)
 
 
+@blueprint.route('/<short_name>/download/<path:filename>/',
+                 methods=['GET', 'POST'])
 def download_zip(short_name, filename):
     """View to download a zip file."""
+    try:
+        project = pybossa_client.get_projects(short_name=short_name)[0]
+    except IndexError:  # pragma: no cover
+        abort(404)
+
     if request.method == 'POST':
-        resp = zip_builder.response_zip(filename)
-        if resp is not None:
-            return resp
+        try:
+            file_ready = zip_builder.check_zip(filename)
+        except ValueError:  # pragma: no cover
+            abort(404)
+
+        if file_ready:
+            return zip_builder.response_zip(filename)
     return render_template('download_zip.html', title="Download task input",
-                           short_name=short_name, filename=filename)
+                           project=project, filename=filename)

@@ -4,13 +4,6 @@ record {
     padding: 20px 0px
 }
 
-.comment {
-    font-size: 1.2em
-    font-style: italic;
-    display: block;
-    margin-bottom: 20px;
-}
-
 .glyphicon-spin {
     -webkit-animation: spin 1000ms infinite linear;
     animation: spin 1000ms infinite linear;
@@ -18,6 +11,17 @@ record {
 
 .answer-group {
     margin-bottom: 50px;
+}
+
+#alert-messages {
+    width: 50%;
+    position: fixed;
+    top: 2em;
+    right: 2em;
+    padding: 2em;
+}
+#alert-messages p {
+    padding: 1em 0em;
 }
 
 @-webkit-keyframes spin {
