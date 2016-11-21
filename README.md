@@ -34,61 +34,34 @@ manually later.
 
 ## Installation
 
-Install the required development packages:
-
-```
-sudo apt-get install libxml2-dev libxslt-dev python-dev lib32z1-dev
-```
-
-Install pybossa-analyst:
+To install pybossa-analyst to a virtual environment:
 
 ```
 git clone https://github.com/alexandermendes/pybossa-analyst
 cd pybossa-analyst
+virtualenv env
+source env/bin/activate
 python setup.py install
 ```
 
 
 ## Configuration
 
-Copy the template settings file:
+Copy the template settings file and edit according to the comments contained within:
 
 ```
 cp settings.py.tmpl settings.py
-```
-
-Now edit this file according to the comments contained within.
-
-
-## Running
-
-Run the server:
-
-```
-python run.py
-```
-
-
-Run a background worker:
-
-```
-rqworker pybossa_analyst
+vim settings.py
 ```
 
 
 ## Deploying with nginx and uwsgi
 
-For deployment using nginx and uwsgi, the following template files are provided:
+For deployment using nginx, uwsgi and supervisor, the following template files are provided:
 
 - [contrib/uwsgi/pybossa-analyst.ini.tmpl](contrib/uwsgi/pybossa-analyst.ini.tmpl)
 - [contrib/nginx/pybossa-analyst](contrib/nginx/pybossa-analyst)
 - [contrib/supervisor/pybossa-analyst.conf.tmpl](contrib/supervisor/pybossa-analyst.conf.tmpl)
-
-
-## PyBossa Theme Integration
-
-If the location of the server changes, the `pybossa_analyst_URL` variable
-should be updated in the main PyBossa configuration.
 
 
 ### Endpoints
