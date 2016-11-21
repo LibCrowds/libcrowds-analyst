@@ -36,7 +36,11 @@ def auth_headers():
 
 @pytest.fixture
 def project():
-    return enki.pbclient.DomainObject({'short_name': 'short_name', 'id': 1})
+    return enki.pbclient.DomainObject({
+        "id": 1,
+        "short_name": "short_name",
+        "name": "Some Project"
+    })
 
 
 @pytest.fixture
