@@ -1,13 +1,13 @@
-# LibCrowds API key for an admin user
+# PyBossa API key for an admin user
 API_KEY = ''
 
-# URL of the LibCrowds server
-ENDPOINT = 'http://www.libcrowds.com'
+# URL of the PyBossa server
+ENDPOINT = 'http://{your-pybossa-server}'
 
-# Basic auth username for libcrowds-analyst
+# Basic auth username for pybossa-analyst
 USERNAME = 'admin'
 
-# Basic auth password for libcrowds-analyst
+# Basic auth password for pybossa-analyst
 PASSWORD = 'secret'
 
 # Key for cryptographically signing form data
@@ -23,8 +23,8 @@ DEBUG = False
 # Flask-Z3950 config
 # Add a database with id 'oclc' to replace any 'oclc' task run info keys with
 # their record summaries
-Z3950_DATABASES = {"id": {'host': '', 'db': '', 'port': '', 'user': '',
-                          'password': ''}}
+# Z3950_DATABASES = {"id": {'host': '', 'db': '', 'port': '', 'user': '',
+                            'password': ''}}
 
 # Folder to store task input zip files
 ZIP_FOLDER = "/tmp/"
@@ -33,5 +33,4 @@ ZIP_FOLDER = "/tmp/"
 MATCH_PERCENTAGE = 60
 
 # Task run info keys to be excluded from results processing
-# ip_address is excluded by default as it is used by libcrowds-data
-EXCLUDED_KEYS = ['ip_address']
+EXCLUDED_KEYS = []

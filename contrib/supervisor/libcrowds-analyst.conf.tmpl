@@ -1,10 +1,6 @@
-[program:libcrowds-analyst]
-command=/home/libcrowds-analyst/env/bin/uwsgi /home/libcrowds-analyst/libcrowds-analyst.ini
-directory=/home/libcrowds-analyst
+[program:pybossa-analyst]
+command=/home/pybossa-analyst/env/bin/uwsgi /home/pybossa-analyst/pybossa-analyst.ini
+directory=/home/pybossa-analyst
 autostart=true
 autorestart=true
-user=analyst
-log_stdout=/var/log/libcrowds-analyst.log
-log_stderr=/var/log/libcrowds-analyst.log
-logfile_maxbytes=10MB
-logfile_backups=2
+user=pybossa

@@ -1,5 +1,5 @@
 # -*- coding: utf8 -*-
-"""API client module for libcrowds-analyst."""
+"""API client module for pybossa-analyst."""
 
 import enki
 

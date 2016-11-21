@@ -3,7 +3,7 @@ language: python
 python:
   - "2.7"
 env:
-  - LIBCROWDS_ANALYST_SETTINGS='../settings_test.py'
+  - PYBOSSA_ANALYST_SETTINGS='../settings_test.py'
 services:
   - redis-server
 before_install:

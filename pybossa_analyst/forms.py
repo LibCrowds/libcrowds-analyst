@@ -1,5 +1,5 @@
 # -*- coding: utf8 -*-
-"""Forms module for libcrowds-analyst."""
+"""Forms module for pybossa-analyst."""
 
 from flask.ext.wtf import Form
 from wtforms import TextAreaField

@@ -1,5 +1,5 @@
 # -*- coding: utf8 -*-
-"""Basic auth module for libcrowds-analyst."""
+"""Basic auth module for pybossa-analyst."""
 
 from flask import current_app
 from flask import Response

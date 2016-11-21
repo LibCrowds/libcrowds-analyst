@@ -1,15 +1,20 @@
-# libcrowds-analyst
+# pybossa-analyst
 
-[![Build Status](https://travis-ci.org/LibCrowds/libcrowds-analyst.svg?branch=master)]
-(https://travis-ci.org/LibCrowds/libcrowds-analyst)
-[![Coverage Status](https://coveralls.io/repos/github/LibCrowds/libcrowds-analyst/badge.svg?branch=master)]
-(https://coveralls.io/github/LibCrowds/libcrowds-analyst?branch=master)
+[![Build Status](https://travis-ci.org/alexandermendes/pybossa-analyst.svg?branch=master)]
+(https://travis-ci.org/alexandermendes/pybossa-analyst)
+[![Coverage Status](https://coveralls.io/repos/github/alexandermendes/pybossa-analyst/badge.svg?branch=master)]
+(https://coveralls.io/github/alexandermendes/pybossa-analyst?branch=master)
 
 
-A web application to help with real-time analysis of LibCrowds results.
+A web application to help with real-time analysis of PyBossa results.
 
-By default, we're looking for a 60% match rate for all contributions to a task. When a task is completed
-and the webhook payload directed to this server the following steps are followed:
+When a webhook is recieved from your PyBossa server to indicate that a task has been completed the application
+analyses all of the task runs associated with that task, by default looking for a 60% match rate accross all
+answer keys (i.e. 2 out of 3, 5 out of 8, or 12 out of 20 people entered the same answer etc.). For tasks where
+a match could not be found the application provides templates to check each answer submitted for a task and select
+the correct one (if present).
+
+The basic process for analysis is as follows:
 
 - Check that the info fields of each task run match n percent of the time or above, disregarding task runs
 where all of the info fields are blank.
@@ -35,11 +40,11 @@ Install the required development packages:
 sudo apt-get install libxml2-dev libxslt-dev python-dev lib32z1-dev
 ```
 
-Install libcrowds-analyst:
+Install pybossa-analyst:
 
 ```
-git clone https://github.com/LibCrowds/libcrowds-analyst
-cd libcrowds-analyst
+git clone https://github.com/alexandermendes/pybossa-analyst
+cd pybossa-analyst
 python setup.py install
 ```
 
@@ -67,7 +72,7 @@ python run.py
 Run a background worker:
 
 ```
-rqworker libcrowds_analyst
+rqworker pybossa_analyst
 ```
 
 
@@ -75,18 +80,16 @@ rqworker libcrowds_analyst
 
 For deployment using nginx and uwsgi, the following template files are provided:
 
-- [contrib/uwsgi/libcrowds-analyst.ini.tmpl](contrib/uwsgi/libcrowds-analyst.ini.tmpl)
-- [contrib/nginx/libcrowds-analyst](contrib/nginx/libcrowds-analyst)
-- [contrib/supervisor/libcrowds-analyst.conf.tmpl](contrib/supervisor/libcrowds-analyst.conf.tmpl)
+- [contrib/uwsgi/pybossa-analyst.ini.tmpl](contrib/uwsgi/pybossa-analyst.ini.tmpl)
+- [contrib/nginx/pybossa-analyst](contrib/nginx/pybossa-analyst)
+- [contrib/supervisor/pybossa-analyst.conf.tmpl](contrib/supervisor/pybossa-analyst.conf.tmpl)
 
 
-## LibCrowds Theme Integration
+## PyBossa Theme Integration
 
-Add the following variable to the main PyBossa configuration file:
+If the location of the server changes, the `pybossa_analyst_URL` variable
+should be updated in the main PyBossa configuration.
 
-```Python
-LIBCROWDS_ANALYST_URL = 'http://{libcrowds-analyst-domain}' # (e.g. http://analyse.libcrowds.com)
-```
 
 ### Endpoints
 

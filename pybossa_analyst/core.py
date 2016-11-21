@@ -1,10 +1,10 @@
 # -*- coding: utf8 -*-
-"""Main module for libcrowds-analyst."""
+"""Main module for pybossa-analyst."""
 
 import os
 from flask import Flask, request
-from libcrowds_analyst import default_settings
-from libcrowds_analyst.extensions import *
+from pybossa_analyst import default_settings
+from pybossa_analyst.extensions import *
 
 
 def create_app():
@@ -23,8 +23,8 @@ def create_app():
 def configure_app(app):
     """Configure the app."""
     app.config.from_object(default_settings)
-    app.config.from_envvar('LIBCROWDS_ANALYST_SETTINGS', silent=True)
-    if not os.environ.get('LIBCROWDS_ANALYST_SETTINGS'):  # pragma: no cover
+    app.config.from_envvar('PYBOSSA_ANALYST_SETTINGS', silent=True)
+    if not os.environ.get('PYBOSSA_ANALYST_SETTINGS'):  # pragma: no cover
         here = os.path.dirname(os.path.abspath(__file__))
         config_path = os.path.join(os.path.dirname(here), 'settings.py')
         if os.path.exists(config_path):
@@ -33,13 +33,13 @@ def configure_app(app):
 
 def setup_url_rules(app):
     """Setup URL rules."""
-    from libcrowds_analyst.view import blueprint as bp
+    from pybossa_analyst.view import blueprint as bp
     app.register_blueprint(bp, url_prefix='')
 
 
 def setup_auth(app):
     """Setup basic auth for all requests."""
-    from libcrowds_analyst import auth
+    from pybossa_analyst import auth
 
     @app.before_request
     def requires_auth():
@@ -51,7 +51,7 @@ def setup_auth(app):
 
 def setup_csrf(app):
     """Setup csrf protection."""
-    from libcrowds_analyst.view import index
+    from pybossa_analyst.view import index
     csrf.init_app(app)
     csrf.exempt(index)
 
