@@ -1,5 +1,5 @@
 # -*- coding: utf8 -*-
-"""Zip builder module for libcrowds-analyst."""
+"""Zip builder module for pybossa-analyst."""
 
 import os
 import requests
@@ -9,7 +9,7 @@ from rq_scheduler import Scheduler
 from flask import send_file
 
 
-scheduler = Scheduler('libcrowds_analyst_scheduled', connection=Redis())
+scheduler = Scheduler('pybossa_analyst', connection=Redis())
 
 
 class ZipBuilder(object):

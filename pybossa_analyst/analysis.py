@@ -1,9 +1,9 @@
 # -*- coding: utf8 -*-
-"""Analysis module for libcrowds-analyst."""
+"""Analysis module for pybossa-analyst."""
 
 import time
 import numpy as np
-from libcrowds_analyst.core import pybossa_client
+from pybossa_analyst.core import pybossa_client
 
 
 def _extract_keys(df):
@@ -23,7 +23,7 @@ def _drop_empty_rows(df):
 
 
 def analyse(project_id, task_id, match_percentage, exclude=[], sleep=2):
-    """Analyser for all LibCrowds projects.
+    """Analyser for all projects.
 
     Check that the info fields of each task run match n percent of the time
     or above, disregarding task runs where all of the info fields are blank.

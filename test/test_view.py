@@ -2,8 +2,8 @@
 
 import json
 from pytest_mock import mocker
-from libcrowds_analyst import analysis
-from libcrowds_analyst.core import zip_builder
+from pybossa_analyst import analysis
+from pybossa_analyst.core import zip_builder
 
 
 class TestView(object):
@@ -11,7 +11,7 @@ class TestView(object):
 
     def test_result_analysis_queued(self, test_client, payload, mocker):
         """Test result analysis is queued when a payload is recieved."""
-        mock_queue = mocker.patch('libcrowds_analyst.view.queue')
+        mock_queue = mocker.patch('pybossa_analyst.view.queue')
         res = test_client.post('/', data=payload, follow_redirects=True,
                                headers={'Content-type': 'application/json'})
         payload_dict = json.loads(payload)
@@ -22,9 +22,9 @@ class TestView(object):
     def test_next_unanalysed_result_returned(self, test_client, auth_headers,
                                              mocker, project, result):
         """Test redirect to display next unanalysed result."""
-        mock_client = mocker.patch('libcrowds_analyst.view.pybossa_client')
+        mock_client = mocker.patch('pybossa_analyst.view.pybossa_client')
         mock_client.get_results.return_value = [result]
-        mock_redirect = mocker.patch('libcrowds_analyst.view.redirect')
+        mock_redirect = mocker.patch('pybossa_analyst.view.redirect')
         mock_redirect.return_value = "OK"
         url = '/{0}/'.format(project.short_name)
         redirect_url = '/{0}/{1}/'.format(project.short_name, result.id)
@@ -34,8 +34,8 @@ class TestView(object):
     def test_reanalysis_of_all_tasks_triggered(self, test_client, mocker, task,
                                                project, auth_headers, app):
         """Test that reanalysis of all tasks is triggered correctly."""
-        mock_queue = mocker.patch('libcrowds_analyst.view.queue')
-        mock_client = mocker.patch('libcrowds_analyst.view.pybossa_client')
+        mock_queue = mocker.patch('pybossa_analyst.view.queue')
+        mock_client = mocker.patch('pybossa_analyst.view.pybossa_client')
         mock_client.get_tasks.return_value = [task]
         mock_client.get_projects.return_value = [project]
         url = '/{0}/reanalyse/'.format(project.short_name)
@@ -51,7 +51,7 @@ class TestView(object):
     def test_result_updated_after_analysis(self, test_client, mocker, result,
                                            project, auth_headers):
         """Test that the result is updated correctly following analysis."""
-        mock_client = mocker.patch('libcrowds_analyst.view.pybossa_client')
+        mock_client = mocker.patch('pybossa_analyst.view.pybossa_client')
         mock_client.get_projects.return_value = [project]
         mock_client.get_results.return_value = [result]
         url = '/{0}/{1}/'.format(project.short_name, result.id)
@@ -63,7 +63,7 @@ class TestView(object):
     def test_csrf_token_removed_after_analysis(self, test_client, mocker,
                                                result, project, auth_headers):
         """Test that the CSRF token is not saved to the final result info."""
-        mock_client = mocker.patch('libcrowds_analyst.view.pybossa_client')
+        mock_client = mocker.patch('pybossa_analyst.view.pybossa_client')
         mock_client.get_projects.return_value = [project]
         mock_client.get_results.return_value = [result]
         url = '/{0}/{1}/'.format(project.short_name, result.id)
@@ -78,9 +78,9 @@ class TestView(object):
         """Test that the correct data is returned for analysis."""
         info = {'n': 42}
         task_run = create_task_run(1, info)
-        mock_render = mocker.patch('libcrowds_analyst.view.render_template')
+        mock_render = mocker.patch('pybossa_analyst.view.render_template')
         mock_render.return_value = "OK"
-        mock_client = mocker.patch('libcrowds_analyst.view.pybossa_client')
+        mock_client = mocker.patch('pybossa_analyst.view.pybossa_client')
         mock_client.get_projects.return_value = [project]
         mock_client.get_results.return_value = [result]
         mock_client.get_tasks.return_value = [task]
@@ -105,9 +105,9 @@ class TestView(object):
                                                           mocker, project,
                                                           auth_headers):
         """Test that the correct project is returned for zip preperation."""
-        mock_render = mocker.patch('libcrowds_analyst.view.render_template')
+        mock_render = mocker.patch('pybossa_analyst.view.render_template')
         mock_render.return_value = "OK"
-        mock_client = mocker.patch('libcrowds_analyst.view.pybossa_client')
+        mock_client = mocker.patch('pybossa_analyst.view.pybossa_client')
         mock_client.get_projects.return_value = [project]
         url = '/{0}/download/'.format(project.short_name)
         test_client.get(url, headers=auth_headers)
@@ -118,12 +118,12 @@ class TestView(object):
     def test_zip_preperation_is_queued(self, test_client, mocker, project,
                                        task, auth_headers):
         """Test that zip preperation is queued using the correct data."""
-        mock_queue = mocker.patch('libcrowds_analyst.view.queue')
-        mock_render = mocker.patch('libcrowds_analyst.view.render_template')
+        mock_queue = mocker.patch('pybossa_analyst.view.queue')
+        mock_render = mocker.patch('pybossa_analyst.view.render_template')
         mock_render.return_value = "OK"
-        mock_client = mocker.patch('libcrowds_analyst.view.pybossa_client')
+        mock_client = mocker.patch('pybossa_analyst.view.pybossa_client')
         mock_client.get_tasks.return_value = [task]
-        mock_fn = mocker.patch('libcrowds_analyst.view.secure_filename')
+        mock_fn = mocker.patch('pybossa_analyst.view.secure_filename')
         mock_fn.return_value = "fn.zip"
         url = '/{0}/download/'.format(project.short_name)
         data = {'task_ids': task.id, 'importer': 'flickr'}
@@ -137,11 +137,11 @@ class TestView(object):
     def test_invalid_task_ids_identified(self, test_client, mocker, project,
                                          auth_headers):
         """Test invalid task IDs are identified when preparing a zip file."""
-        mock_queue = mocker.patch('libcrowds_analyst.view.queue')
-        mock_render = mocker.patch('libcrowds_analyst.view.render_template')
+        mock_queue = mocker.patch('pybossa_analyst.view.queue')
+        mock_render = mocker.patch('pybossa_analyst.view.render_template')
         mock_render.return_value = "OK"
-        mock_flash = mocker.patch('libcrowds_analyst.view.flash')
-        mock_client = mocker.patch('libcrowds_analyst.view.pybossa_client')
+        mock_flash = mocker.patch('pybossa_analyst.view.flash')
+        mock_client = mocker.patch('pybossa_analyst.view.pybossa_client')
         mock_client.get_tasks.return_value = []
         url = '/{0}/download/'.format(project.short_name)
         data = {'task_ids': '1 2 3', 'importer': 'flickr'}
@@ -153,7 +153,7 @@ class TestView(object):
     def test_zip_identified_as_ready(self, test_client, project, mocker,
                                      auth_headers):
         """Test zip identified as ready."""
-        mock_zip_builder = mocker.patch('libcrowds_analyst.view.zip_builder')
+        mock_zip_builder = mocker.patch('pybossa_analyst.view.zip_builder')
         mock_zip_builder.check_zip.return_value = True
         url = '/{0}/download/some_filename/check/'.format(project.short_name)
         resp = test_client.get(url, headers=auth_headers)
@@ -163,7 +163,7 @@ class TestView(object):
     def test_zip_identified_as_not_ready(self, test_client, project, mocker,
                                          auth_headers):
         """Test zip identified as not ready."""
-        mock_zip_builder = mocker.patch('libcrowds_analyst.view.zip_builder')
+        mock_zip_builder = mocker.patch('pybossa_analyst.view.zip_builder')
         mock_zip_builder.check_zip.return_value = False
         url = '/{0}/download/some_filename/check/'.format(project.short_name)
         resp = test_client.get(url, headers=auth_headers)
@@ -174,9 +174,9 @@ class TestView(object):
                                                          project, mocker,
                                                          auth_headers):
         """Test that the correct data is returned when downloading zip."""
-        mock_render = mocker.patch('libcrowds_analyst.view.render_template')
+        mock_render = mocker.patch('pybossa_analyst.view.render_template')
         mock_render.return_value = "OK"
-        mock_client = mocker.patch('libcrowds_analyst.view.pybossa_client')
+        mock_client = mocker.patch('pybossa_analyst.view.pybossa_client')
         mock_client.get_projects.return_value = [project]
         fn = 'some_filename.zip'
         url = '/{0}/download/{1}/'.format(project.short_name, fn)
@@ -189,10 +189,10 @@ class TestView(object):
     def test_zip_file_response(self, test_client, project, mocker,
                                auth_headers):
         """Test that a zip file response is returned when ready."""
-        mock_zip_builder = mocker.patch('libcrowds_analyst.view.zip_builder')
+        mock_zip_builder = mocker.patch('pybossa_analyst.view.zip_builder')
         mock_zip_builder.check_zip.return_value = True
         mock_zip_builder.response_zip.return_value = "OK"
-        mock_client = mocker.patch('libcrowds_analyst.view.pybossa_client')
+        mock_client = mocker.patch('pybossa_analyst.view.pybossa_client')
         mock_client.get_projects.return_value = [project]
         fn = 'some_filename.zip'
         url = '/{0}/download/{1}/'.format(project.short_name, fn)

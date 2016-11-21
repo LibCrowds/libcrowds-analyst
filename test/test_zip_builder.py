@@ -4,7 +4,7 @@ import os
 import pytest
 import tempfile
 from pytest_mock import mocker
-from libcrowds_analyst.zip_builder import ZipBuilder
+from pybossa_analyst.zip_builder import ZipBuilder
 
 
 class TestZipBuilder(object):
@@ -43,7 +43,7 @@ class TestZipBuilder(object):
 
     def test_zipfile_download_response_valid(self, app, mocker):
         """Test that a valid response to download a zipfile is returned."""
-        mock_send = mocker.patch('libcrowds_analyst.zip_builder.send_file')
+        mock_send = mocker.patch('pybossa_analyst.zip_builder.send_file')
         zb = ZipBuilder(app)
         tmpzf = tempfile.NamedTemporaryFile(dir=zb.completed_folder)
         fn = os.path.basename(tmpzf.name)
@@ -62,8 +62,8 @@ class TestZipBuilder(object):
 
     def test_correct_images_downloaded_from_flickr(self, app, task, mocker):
         """Test filckr zip file is build with the correct tasks."""
-        mocker.patch('libcrowds_analyst.zip_builder.zipfile.ZipFile')
-        mock_requests = mocker.patch('libcrowds_analyst.zip_builder.requests')
+        mocker.patch('pybossa_analyst.zip_builder.zipfile.ZipFile')
+        mock_requests = mocker.patch('pybossa_analyst.zip_builder.requests')
         zb = ZipBuilder(app)
         tmpzf = tempfile.NamedTemporaryFile(dir=zb.build_folder)
         zb._build_flickr_zip([task], tmpzf.name)
@@ -71,8 +71,8 @@ class TestZipBuilder(object):
 
     def test_completed_zip_moved_to_completed_folder(self, app, task, mocker):
         """Test filckr zip file is build with the correct tasks."""
-        mocker.patch('libcrowds_analyst.zip_builder.zipfile.ZipFile')
-        mock_requests = mocker.patch('libcrowds_analyst.zip_builder.requests')
+        mocker.patch('pybossa_analyst.zip_builder.zipfile.ZipFile')
+        mock_requests = mocker.patch('pybossa_analyst.zip_builder.requests')
         zb = ZipBuilder(app)
         tmpzf = tempfile.NamedTemporaryFile(dir=zb.build_folder)
         fn = os.path.basename(tmpzf.name)
@@ -83,7 +83,7 @@ class TestZipBuilder(object):
     def test_error_when_flickr_url_not_in_task_info(self, app, task, mocker):
         """Test error raised when url not in task info."""
         task.info.pop("url")
-        mock_requests = mocker.patch('libcrowds_analyst.zip_builder.requests')
+        mock_requests = mocker.patch('pybossa_analyst.zip_builder.requests')
         zb = ZipBuilder(app)
         tmpzf = tempfile.NamedTemporaryFile(dir=zb.build_folder)
         with pytest.raises(ValueError) as excinfo:
@@ -93,7 +93,7 @@ class TestZipBuilder(object):
     def test_error_when_title_not_in_task_info(self, app, task, mocker):
         """Test error raised when title not in task info."""
         task.info.pop("title")
-        mock_requests = mocker.patch('libcrowds_analyst.zip_builder.requests')
+        mock_requests = mocker.patch('pybossa_analyst.zip_builder.requests')
         zb = ZipBuilder(app)
         tmpzf = tempfile.NamedTemporaryFile(dir=zb.build_folder)
         with pytest.raises(ValueError) as excinfo:

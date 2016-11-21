@@ -23,17 +23,17 @@ test_requirements = [
 ]
 
 version = re.search('^__version__\s*=\s*"(.*)"',
-                    open('libcrowds_analyst/__init__.py').read(),
+                    open('pybossa_analyst/__init__.py').read(),
                     re.M).group(1)
 
 setup(
-    name="libcrowds-analyst",
+    name="pybossa-analyst",
     version=version,
     author="Alexander Mendes",
     author_email="alexanderhmendes@gmail.com",
-    description="A web application to help analyse of LibCrowds results.",
+    description="A web application to help analyse of PyBossa results.",
     license="BSD",
-    url="https://github.com/LibCrowds/libcrowds-analyst",
+    url="https://github.com/alexandermendes/pybossa-analyst",
     zip_safe=False,
     install_requires=requirements,
     setup_requires=setup_requirements,

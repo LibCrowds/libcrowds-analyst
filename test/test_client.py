@@ -2,7 +2,7 @@
 
 import enki
 from pytest_mock import mocker
-from libcrowds_analyst.client import PyBossaClient
+from pybossa_analyst.client import PyBossaClient
 
 
 class TestClient(object):
@@ -10,8 +10,8 @@ class TestClient(object):
 
     def test_imported_task_run_df(self, task, project, mocker, app):
         """Test task run dataframe is created using the correct data."""
-        mock_client = mocker.patch('libcrowds_analyst.client.enki.pbclient')
-        mock_enki = mocker.patch('libcrowds_analyst.client.enki.Enki')
+        mock_client = mocker.patch('pybossa_analyst.client.enki.pbclient')
+        mock_enki = mocker.patch('pybossa_analyst.client.enki.Enki')
         mock_enki = enki.Enki(endpoint='endpoint', api_key='api_key',
                               project_short_name=project.short_name)
         client = PyBossaClient(app)

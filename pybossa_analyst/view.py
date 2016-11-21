@@ -1,5 +1,5 @@
 # -*- coding: utf8 -*-
-"""View module for libcrowds-analyst."""
+"""View module for pybossa-analyst."""
 
 import os
 import time
@@ -9,13 +9,13 @@ from flask import Blueprint
 from flask import render_template, request, abort, flash, redirect, url_for
 from flask import current_app, send_file, jsonify
 from werkzeug.utils import secure_filename
-from libcrowds_analyst import analysis, forms
-from libcrowds_analyst.core import zip_builder, pybossa_client
+from pybossa_analyst import analysis, forms
+from pybossa_analyst.core import zip_builder, pybossa_client
 
 
 blueprint = Blueprint('analyse', __name__)
 
-queue = Queue('libcrowds_analyst', connection=Redis())
+queue = Queue('pybossa_analyst', connection=Redis())
 MINUTE = 60
 
 
@@ -27,7 +27,7 @@ def index():
                            kwargs=request.json,
                            timeout=10*MINUTE)
         return "OK"
-    return render_template('index.html', title="LibCrowds Analyst")
+    return render_template('index.html', title="PyBossa Analyst")
 
 
 @blueprint.route('/<short_name>/')

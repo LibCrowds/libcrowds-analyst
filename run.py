@@ -1,6 +1,6 @@
 # -*- coding: utf8 -*-
 
-from libcrowds_analyst.core import create_app
+from pybossa_analyst.core import create_app
 
 
 if __name__ == "__main__":
