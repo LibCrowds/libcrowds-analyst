@@ -8,6 +8,6 @@
 <form action="" method="post" name="login" target="_blank">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
     <input id="dl-btn" type="submit" class="btn btn-disabled" value="Download"
-           data-short-name="{{ short_name }}" data-filename="{{ filename }}" disabled>
+           data-short-name="{{ project.short_name }}" data-filename="{{ filename }}" disabled>
 </form>
 {% endblock %}
