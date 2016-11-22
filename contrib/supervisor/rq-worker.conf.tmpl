@@ -1,0 +1,7 @@
+[program:rq-worker]
+command=/home/pybossa-analyst/env/bin/python app_context_rqworker.py pybossa-analyst
+directory=/home/pybossa-analyst
+autostart=true
+autorestart=true
+user=pybossa
+priority=997
