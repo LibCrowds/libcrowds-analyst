@@ -7,9 +7,6 @@ from pybossa_analyst import analysis
 class TestAnalysis(object):
     """Test analysis module."""
 
-    def setup(self):
-        super(TestAnalysis, self)
-
     def test_get_task_run_keys(self, create_task_run_df):
         """Test all task run keys are returned."""
         tr_info = [{'n': 42}, {'comment': 'hello'}]

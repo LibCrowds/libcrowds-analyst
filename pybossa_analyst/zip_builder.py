@@ -2,14 +2,13 @@
 """Zip builder module for pybossa-analyst."""
 
 import os
+import time
 import requests
 import zipfile
-from redis import Redis
-from rq_scheduler import Scheduler
 from flask import send_file
 
 
-scheduler = Scheduler('pybossa_analyst', connection=Redis())
+ONE_HOUR = 60*60
 
 
 class ZipBuilder(object):
@@ -58,7 +57,6 @@ class ZipBuilder(object):
         else:
             raise ValueError("Unknown importer type")
 
-        # Move to completed folder and schedule removal
         build_path = os.path.join(self.build_folder, filename)
         completed_path = os.path.join(self.completed_folder, filename)
         os.rename(build_path, completed_path)
@@ -80,3 +78,12 @@ class ZipBuilder(object):
                          mimetype='application/octet-stream',
                          as_attachment=True,
                          attachment_filename=filename)
+
+    def remove_old_zips(self):
+        """Remove zip files created over an hour ago."""
+        now = time.time()
+        for f in os.listdir(self.completed_folder):
+            path = os.path.join(self.completed_folder, f)
+            f_created = os.path.getmtime(path)
+            if (now - f_created) // ONE_HOUR >= 1:
+                os.remove(path)

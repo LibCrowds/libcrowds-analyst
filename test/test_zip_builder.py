@@ -1,6 +1,7 @@
 # -*- coding: utf8 -*-
 
 import os
+import time
 import pytest
 import tempfile
 from pytest_mock import mocker
@@ -99,3 +100,21 @@ class TestZipBuilder(object):
         with pytest.raises(ValueError) as excinfo:
             zb._build_flickr_zip([task], tmpzf.name)
         assert excinfo.value.message == 'Invalid Flickr task'
+
+    def test_new_zip_file_not_removed(self, app, mocker):
+        """Test new zip files are not removed."""
+        zb = ZipBuilder(app)
+        f = tempfile.NamedTemporaryFile(dir=zb.completed_folder)
+        fn = os.path.basename(f.name)
+        zb.remove_old_zips()
+        assert fn in os.listdir(zb.completed_folder)
+
+    def test_old_zip_file_removed(self, app, mocker):
+        """Test old zip files are removed."""
+        zb = ZipBuilder(app)
+        mock_time = mocker.patch('pybossa_analyst.zip_builder.time')
+        mock_time.time.return_value = time.time() + 3600
+        f = tempfile.NamedTemporaryFile(dir=zb.completed_folder)
+        fn = os.path.basename(f.name)
+        zb.remove_old_zips()
+        assert fn not in os.listdir(zb.completed_folder)
