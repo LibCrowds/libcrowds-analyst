@@ -85,6 +85,5 @@ class ZipBuilder(object):
         for f in os.listdir(self.completed_folder):
             path = os.path.join(self.completed_folder, f)
             f_created = os.path.getmtime(path)
-            print (now - f_created) // ONE_HOUR >= 1
             if (now - f_created) // ONE_HOUR >= 1:
                 os.remove(path)
