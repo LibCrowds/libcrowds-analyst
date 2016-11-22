@@ -34,6 +34,12 @@ manually later.
 
 ## Installation
 
+Install the required development packages:
+
+```
+sudo apt-get install libxml2-dev libxslt-dev python-dev lib32z1-dev
+```
+
 To install pybossa-analyst to a virtual environment:
 
 ```
@@ -59,9 +65,9 @@ vim settings.py
 
 For deployment using nginx, uwsgi and supervisor, the following template files are provided:
 
-- [contrib/uwsgi/pybossa-analyst.ini.tmpl](contrib/uwsgi/pybossa-analyst.ini.tmpl)
-- [contrib/nginx/pybossa-analyst](contrib/nginx/pybossa-analyst)
-- [contrib/supervisor/pybossa-analyst.conf.tmpl](contrib/supervisor/pybossa-analyst.conf.tmpl)
+- [contrib/uwsgi/pybossa-analyst.ini.tmpl](./contrib/uwsgi/pybossa-analyst.ini.tmpl)
+- [contrib/nginx/pybossa-analyst](./contrib/nginx/pybossa-analyst)
+- [contrib/supervisor/pybossa-analyst.conf.tmpl](./contrib/supervisor/pybossa-analyst.conf.tmpl)
 
 
 ### Endpoints
