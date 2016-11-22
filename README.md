@@ -63,11 +63,8 @@ vim settings.py
 
 ## Deploying with nginx and uwsgi
 
-For deployment using nginx, uwsgi and supervisor, the following template files are provided:
-
-- [contrib/uwsgi/pybossa-analyst.ini.tmpl](./contrib/uwsgi/pybossa-analyst.ini.tmpl)
-- [contrib/nginx/pybossa-analyst](./contrib/nginx/pybossa-analyst)
-- [contrib/supervisor/pybossa-analyst.conf.tmpl](./contrib/supervisor/pybossa-analyst.conf.tmpl)
+For deployment using nginx, uwsgi and supervisor a number of template files are
+provided in the [contrib](./contrib) folder.
 
 
 ### Endpoints
