@@ -8,7 +8,6 @@ requirements = [
     "Flask-WTF>=0.9.5, <1.0",
     "requests>=2.0.0, <3.0",
     "rq-scheduler>=0.7.0, <1.0",
-    "pandas>=0.18, <0.19",
     "enki>=1.1.0, <2.0"
 ]
 
