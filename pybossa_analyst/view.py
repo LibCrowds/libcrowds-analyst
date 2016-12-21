@@ -9,8 +9,8 @@ from flask import Blueprint
 from flask import render_template, request, abort, flash, redirect, url_for
 from flask import current_app, send_file, jsonify, Response
 from werkzeug.utils import secure_filename
-from pybossa_analyst import analysis, forms
-from pybossa_analyst.core import zip_builder, pybossa_client
+from pybossa_analyst import analysis, forms, zip_builder
+from pybossa_analyst.core import pybossa_client
 
 
 blueprint = Blueprint('analyse', __name__)

@@ -15,7 +15,6 @@ def create_app():
     setup_auth(app)
     setup_csrf(app)
     setup_z3950_manager(app)
-    zip_builder.init_app(app)
     pybossa_client.init_app(app)
     return app
 
