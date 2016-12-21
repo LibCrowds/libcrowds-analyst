@@ -7,7 +7,7 @@ from redis import Redis
 from rq import Queue
 from flask import Blueprint
 from flask import render_template, request, abort, flash, redirect, url_for
-from flask import current_app, send_file, jsonify
+from flask import current_app, send_file, jsonify, Response
 from werkzeug.utils import secure_filename
 from pybossa_analyst import analysis, forms
 from pybossa_analyst.core import zip_builder, pybossa_client
@@ -138,11 +138,12 @@ def prepare_zip(short_name):
         ts = int(time.time())
         fn = '{0}_task_input_{1}.zip'.format(short_name, ts)
         fn = secure_filename(fn)
-        queue.enqueue_call(func=zip_builder.build,
-                           args=(tasks_to_export, fn, importer),
-                           timeout=3600)
-        return redirect(url_for('.download_zip', filename=fn,
-                                short_name=project.short_name))
+        content_disposition = 'attachment; filename={}'.format(fn)
+        response = Response(zip_builder.generate(tasks_to_export, importer),
+                            mimetype='application/zip')
+        response.headers['Content-Disposition'] = content_disposition
+        return response
+
     elif request.method == 'POST':  # pragma: no cover
         flash('Please correct the errors.', 'danger')
 

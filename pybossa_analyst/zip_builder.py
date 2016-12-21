@@ -5,6 +5,7 @@ import os
 import time
 import requests
 import zipfile
+import zipstream
 from flask import send_file
 
 
@@ -37,29 +38,26 @@ class ZipBuilder(object):
         mkdir_if_not_exists(self.build_folder)
         mkdir_if_not_exists(self.completed_folder)
 
-    def _build_flickr_zip(self, tasks, zip_path):
+    def _generate_flickr_zip(self, tasks):
         """Build an image set containing images downloaded from Flickr."""
-        zip_dir = os.path.splitext(os.path.basename(zip_path))[0]
-        with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as archive:
-            for t in tasks:
-                if not t.info.get('url') or not t.info.get('title'):
-                    raise ValueError('Invalid Flickr task')
-                url = t.info['url']
-                img_path = os.path.join(zip_dir, t.info['title'] + ".jpg")
-                img = requests.get(url).content
-                archive.writestr(img_path, img)
+        z = zipstream.ZipFile()
+        for t in tasks:
+            if not t.info.get('url') or not t.info.get('title'):
+                raise ValueError('Invalid Flickr task')
+            url = t.info['url']
+            title = t.info['title']
+            z.write_iter(title, requests.get(url).content)
+        for chunk in z:
+            yield chunk
 
-    def build(self, tasks, filename, importer):
-        """Build a zip file containing original task input."""
-        zip_path = os.path.join(self.build_folder, filename)
+    def generate(self, tasks, importer):
+        """Generate a zip file containing original task input."""
         if importer == 'flickr':
-            self._build_flickr_zip(tasks, zip_path)
+            return self._generate_flickr_zip(tasks)
         else:
             raise ValueError("Unknown importer type")
 
-        build_path = os.path.join(self.build_folder, filename)
-        completed_path = os.path.join(self.completed_folder, filename)
-        os.rename(build_path, completed_path)
+
 
     def check_zip(self, filename):
         """Check if a zip file is ready for download."""

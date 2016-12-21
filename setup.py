@@ -7,7 +7,8 @@ requirements = [
     "rq>=0.6.0, <1.0",
     "Flask-WTF>=0.9.5, <1.0",
     "requests>=2.0.0, <3.0",
-    "enki>=1.1.0, <2.0"
+    "enki>=1.1.0, <2.0",
+    "zipstream>=1.1.4, <2.0"
 ]
 
 setup_requirements = [
