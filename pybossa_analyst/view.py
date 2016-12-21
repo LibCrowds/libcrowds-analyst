@@ -149,34 +149,3 @@ def prepare_zip(short_name):
 
     return render_template('prepare_zip.html', title="Download task input",
                            project=project, form=form)
-
-
-@blueprint.route('/<short_name>/download/<path:filename>/check/')
-def check_zip(short_name, filename):
-    """Check if a zip file is ready for download."""
-    try:
-        download_ready = zip_builder.check_zip(filename)
-    except ValueError:  # pragma: no cover
-        abort(404)
-    return jsonify(download_ready=download_ready)
-
-
-@blueprint.route('/<short_name>/download/<path:filename>/',
-                 methods=['GET', 'POST'])
-def download_zip(short_name, filename):
-    """View to download a zip file."""
-    try:
-        project = pybossa_client.get_projects(short_name=short_name)[0]
-    except IndexError:  # pragma: no cover
-        abort(404)
-
-    if request.method == 'POST':
-        try:
-            file_ready = zip_builder.check_zip(filename)
-        except ValueError:  # pragma: no cover
-            abort(404)
-
-        if file_ready:
-            return zip_builder.response_zip(filename)
-    return render_template('download_zip.html', title="Download task input",
-                           project=project, filename=filename)
