@@ -13,9 +13,11 @@ def _generate_flickr_zip(tasks):
             raise ValueError('Invalid Flickr task')
         url = t.info['url']
         title = t.info['title']
-        z.write_iter(title, requests.get(url).content)
+        img = requests.get(url).content
+        z.write_iter(title, img)
     for chunk in z:
         yield chunk
+
 
 def generate(tasks, importer):
     """Generate a zip file containing original task input."""
