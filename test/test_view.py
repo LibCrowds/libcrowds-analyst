@@ -3,7 +3,6 @@
 import json
 from pytest_mock import mocker
 from pybossa_analyst import analysis
-from pybossa_analyst.core import zip_builder
 
 
 class TestView(object):
@@ -115,25 +114,6 @@ class TestView(object):
         mock_client.get_projects.assert_called_with(short_name=short_name)
         assert mock_render.call_args_list[0][1]['project'] == project
 
-    def test_zip_preperation_is_queued(self, test_client, mocker, project,
-                                       task, auth_headers):
-        """Test that zip preperation is queued using the correct data."""
-        mock_queue = mocker.patch('pybossa_analyst.view.queue')
-        mock_render = mocker.patch('pybossa_analyst.view.render_template')
-        mock_render.return_value = "OK"
-        mock_client = mocker.patch('pybossa_analyst.view.pybossa_client')
-        mock_client.get_tasks.return_value = [task]
-        mock_fn = mocker.patch('pybossa_analyst.view.secure_filename')
-        mock_fn.return_value = "fn.zip"
-        url = '/{0}/download/'.format(project.short_name)
-        data = {'task_ids': task.id, 'importer': 'flickr'}
-        test_client.post(url, headers=auth_headers, data=data)
-        fn = '{0}_task_input_1.zip'.format(project.short_name)
-        args = ([task], 'fn.zip', data['importer'])
-        mock_queue.enqueue_call.assert_called_with(func=zip_builder.build,
-                                                   args=args,
-                                                   timeout=3600)
-
     def test_invalid_task_ids_identified(self, test_client, mocker, project,
                                          auth_headers):
         """Test invalid task IDs are identified when preparing a zip file."""
@@ -150,51 +130,13 @@ class TestView(object):
         mock_flash.assert_called_with(msg, 'danger')
         assert not mock_queue.enqueue_call.called
 
-    def test_zip_identified_as_ready(self, test_client, project, mocker,
-                                     auth_headers):
-        """Test zip identified as ready."""
-        mock_zip_builder = mocker.patch('pybossa_analyst.view.zip_builder')
-        mock_zip_builder.check_zip.return_value = True
-        url = '/{0}/download/some_filename/check/'.format(project.short_name)
-        resp = test_client.get(url, headers=auth_headers)
-        resp_json = json.loads(resp.data)
-        assert resp_json['download_ready']
-
-    def test_zip_identified_as_not_ready(self, test_client, project, mocker,
-                                         auth_headers):
-        """Test zip identified as not ready."""
-        mock_zip_builder = mocker.patch('pybossa_analyst.view.zip_builder')
-        mock_zip_builder.check_zip.return_value = False
-        url = '/{0}/download/some_filename/check/'.format(project.short_name)
-        resp = test_client.get(url, headers=auth_headers)
-        resp_json = json.loads(resp.data)
-        assert not resp_json['download_ready']
-
-    def test_correct_data_returned_for_zip_file_download(self, test_client,
-                                                         project, mocker,
-                                                         auth_headers):
-        """Test that the correct data is returned when downloading zip."""
-        mock_render = mocker.patch('pybossa_analyst.view.render_template')
-        mock_render.return_value = "OK"
-        mock_client = mocker.patch('pybossa_analyst.view.pybossa_client')
-        mock_client.get_projects.return_value = [project]
-        fn = 'some_filename.zip'
-        url = '/{0}/download/{1}/'.format(project.short_name, fn)
-        test_client.get(url, headers=auth_headers)
-        short_name = project.short_name
-        mock_client.get_projects.assert_called_with(short_name=short_name)
-        assert mock_render.call_args_list[0][1]['project'] == project
-        assert mock_render.call_args_list[0][1]['filename'] == fn
-
-    def test_zip_file_response(self, test_client, project, mocker,
+    def test_zip_file_response(self, test_client, project, mocker, task,
                                auth_headers):
-        """Test that a zip file response is returned when ready."""
-        mock_zip_builder = mocker.patch('pybossa_analyst.view.zip_builder')
-        mock_zip_builder.check_zip.return_value = True
-        mock_zip_builder.response_zip.return_value = "OK"
+        """Test that a zip file generator is returned."""
         mock_client = mocker.patch('pybossa_analyst.view.pybossa_client')
         mock_client.get_projects.return_value = [project]
-        fn = 'some_filename.zip'
-        url = '/{0}/download/{1}/'.format(project.short_name, fn)
-        test_client.post(url, headers=auth_headers)
-        mock_zip_builder.response_zip.assert_called_with(fn)
+        mock_client.get_tasks.return_value = [task]
+        url = '/{0}/download/'.format(project.short_name)
+        data = {'task_ids': '1', 'importer': 'flickr'}
+        resp = test_client.post(url, headers=auth_headers, data=data)
+        assert resp.headers['Content-Type'] == 'application/zip'

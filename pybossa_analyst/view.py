@@ -7,10 +7,10 @@ from redis import Redis
 from rq import Queue
 from flask import Blueprint
 from flask import render_template, request, abort, flash, redirect, url_for
-from flask import current_app, send_file, jsonify
+from flask import current_app, send_file, jsonify, Response
 from werkzeug.utils import secure_filename
-from pybossa_analyst import analysis, forms
-from pybossa_analyst.core import zip_builder, pybossa_client
+from pybossa_analyst import analysis, forms, zip_builder
+from pybossa_analyst.core import pybossa_client
 
 
 blueprint = Blueprint('analyse', __name__)
@@ -138,44 +138,14 @@ def prepare_zip(short_name):
         ts = int(time.time())
         fn = '{0}_task_input_{1}.zip'.format(short_name, ts)
         fn = secure_filename(fn)
-        queue.enqueue_call(func=zip_builder.build,
-                           args=(tasks_to_export, fn, importer),
-                           timeout=3600)
-        return redirect(url_for('.download_zip', filename=fn,
-                                short_name=project.short_name))
+        content_disposition = 'attachment; filename={}'.format(fn)
+        response = Response(zip_builder.generate(tasks_to_export, importer),
+                            mimetype='application/zip')
+        response.headers['Content-Disposition'] = content_disposition
+        return response
+
     elif request.method == 'POST':  # pragma: no cover
         flash('Please correct the errors.', 'danger')
 
     return render_template('prepare_zip.html', title="Download task input",
                            project=project, form=form)
-
-
-@blueprint.route('/<short_name>/download/<path:filename>/check/')
-def check_zip(short_name, filename):
-    """Check if a zip file is ready for download."""
-    try:
-        download_ready = zip_builder.check_zip(filename)
-    except ValueError:  # pragma: no cover
-        abort(404)
-    return jsonify(download_ready=download_ready)
-
-
-@blueprint.route('/<short_name>/download/<path:filename>/',
-                 methods=['GET', 'POST'])
-def download_zip(short_name, filename):
-    """View to download a zip file."""
-    try:
-        project = pybossa_client.get_projects(short_name=short_name)[0]
-    except IndexError:  # pragma: no cover
-        abort(404)
-
-    if request.method == 'POST':
-        try:
-            file_ready = zip_builder.check_zip(filename)
-        except ValueError:  # pragma: no cover
-            abort(404)
-
-        if file_ready:
-            return zip_builder.response_zip(filename)
-    return render_template('download_zip.html', title="Download task input",
-                           project=project, filename=filename)

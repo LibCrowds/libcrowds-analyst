@@ -15,8 +15,6 @@ def create_app():
     setup_auth(app)
     setup_csrf(app)
     setup_z3950_manager(app)
-    setup_scheduled_tasks(app)
-    zip_builder.init_app(app)
     pybossa_client.init_app(app)
     return app
 
@@ -61,10 +59,3 @@ def setup_z3950_manager(app):
     """Setup Flask-Z3950."""
     z3950_manager.init_app(app)
     z3950_manager.register_blueprint(url_prefix='/z3950')
-
-
-def setup_scheduled_tasks(app):
-    """Setup scheduled tasks."""
-    from pybossa_analyst.jobs import remove_old_zips
-    if not app.config['TESTING']:  # pragma: no cover
-        remove_old_zips()

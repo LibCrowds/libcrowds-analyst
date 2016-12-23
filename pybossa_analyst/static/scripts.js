@@ -96,7 +96,7 @@ function checkDownload(short_name, filename) {
 
 
 if ($('#dl-btn').length) {
-    let short_name = $('#dl-btn').data('short_name'),
+    let short_name = $('#dl-btn').data('short-name'),
         filename   = $('#dl-btn').data('filename');
     checkDownload(short_name, filename);
 }
