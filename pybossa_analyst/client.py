@@ -16,6 +16,8 @@ class PyBossaClient(object):
     def init_app(self, app):
         self.api_key = app.config['API_KEY']
         self.endpoint = app.config['ENDPOINT']
+
+    def _configure_client(self):
         enki.pbclient.set('api_key', self.api_key)
         enki.pbclient.set('endpoint', self.endpoint)
 
@@ -34,30 +36,37 @@ class PyBossaClient(object):
 
     def get_results(self, project_id, **kwargs):
         """Return results."""
+        self._configure_client()
         return enki.pbclient.find_results(project_id, all=1, **kwargs)
 
     def get_all_results(self, project_id):
         """Return all results."""
+        self._configure_client()
         return self._load(enki.pbclient.find_results, project_id)
 
     def get_tasks(self, project_id, **kwargs):
         """Return tasks."""
+        self._configure_client()
         return enki.pbclient.find_tasks(project_id, all=1, **kwargs)
 
     def get_task_runs(self, project_id, **kwargs):
         """Return task runs."""
+        self._configure_client()
         return enki.pbclient.find_taskruns(project_id, all=1, **kwargs)
 
     def get_projects(self, **kwargs):
         """Return projects."""
+        self._configure_client()
         return enki.pbclient.find_project(all=1, **kwargs)
 
     def update_result(self, result):
         """Update a result."""
+        self._configure_client()
         return enki.pbclient.update_result(result)
 
     def get_task_run_dataframe(self, project_id, task_id):
         """Return a dataframe containing all task run info for a task."""
+        self._configure_client()
         p = self.get_projects(id=project_id, limit=1)[0]
         e = enki.Enki(self.api_key, self.endpoint, p.short_name, all=1)
         e.get_tasks(task_id=task_id)
