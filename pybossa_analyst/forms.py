@@ -3,13 +3,15 @@
 
 from flask.ext.wtf import Form
 from wtforms import TextAreaField
-from wtforms.fields import IntegerField, SelectField
+from wtforms.fields import SelectField
 from wtforms.validators import required
 
 
 class ReanalysisForm(Form):
     """Form for triggering result reanalysis."""
-    sleep = IntegerField('Sleep:', default=2)
+    result_filter = SelectField('Filter:',
+                                choices=[('all', 'All'), ('None', 'New'),
+                                         ('Unanalysed', 'Unanalysed')])
 
 
 class DownloadForm(Form):

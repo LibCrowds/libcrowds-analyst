@@ -3,12 +3,12 @@
 
 {% block content %}
 <p class="lead">
-    <strong>WARNING: </strong>Clicking the button below will trigger reanalysis of all results and override all
-    current result data for the project.
+    <strong>WARNING: </strong>Clicking the button below will trigger reanalysis of results and override
+    current result data.
 </p>
 <form method="POST" action="{{ url_for('analyse.reanalyse', short_name=project.short_name) }}">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-        {{ render_field(form.sleep, class="form-control", type="number") }}
+    {{ render_field(form.result_filter, class="form-control") }}
     <div class="text-right">
         <input class="btn btn-danger" type="submit" value="Continue"></input>
     </div>
