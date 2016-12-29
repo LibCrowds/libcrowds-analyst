@@ -22,7 +22,7 @@ def _drop_empty_rows(df):
     return df
 
 
-def analyse(project_id, task_id, match_percentage, exclude=[], sleep=2):
+def analyse(project_id, task_id, match_percent, exclude=[], sleep=2, **kwargs):
     """Analyser for all projects.
 
     Check that the info fields of each task run match n percent of the time
@@ -47,7 +47,7 @@ def analyse(project_id, task_id, match_percentage, exclude=[], sleep=2):
         return
 
     # Check for n percent of matches
-    required_matches = int(round(len(df.index)*(match_percentage / 100.0)))
+    required_matches = int(round(len(df.index)*(match_percent / 100.0)))
     info = {}
     for k in keys:
         if df[k].value_counts().max() < required_matches:
