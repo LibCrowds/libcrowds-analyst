@@ -19,7 +19,8 @@ class PyBossaClient(object):
         enki.pbclient.set('api_key', self.api_key)
         enki.pbclient.set('endpoint', self.endpoint)
 
-    def _load(self, func, query):
+    def _load(self, func, project_id):
+        query = dict(project_id=project_id, all=1, limit=100)
         items = func(**query)
         last_fetched = items
         while self._not_exhausted(last_fetched, query):
@@ -35,31 +36,23 @@ class PyBossaClient(object):
 
     def get_results(self, project_id, **kwargs):
         """Return results."""
-        query = dict(project_id=project_id, all='1', limit=100, **kwargs)
-        if kwargs.get('limit'):
-            return enki.pbclient.find_results(**query)
-        return self._load(enki.pbclient.find_results, query)
+        return enki.pbclient.find_results(project_id, all=1, **kwargs)
+
+    def get_all_results(self, project_id):
+        """Return all results."""
+        return self._load(enki.pbclient.find_results, project_id)
 
     def get_tasks(self, project_id, **kwargs):
         """Return tasks."""
-        query = dict(project_id=project_id, all='1', limit=100, **kwargs)
-        if kwargs.get('limit'):
-            return enki.pbclient.find_tasks(**query)
-        return self._load(enki.pbclient.find_tasks, query)
+        return enki.pbclient.find_tasks(project_id, all=1, **kwargs)
 
     def get_task_runs(self, project_id, **kwargs):
         """Return task runs."""
-        query = dict(project_id=project_id, all='1', limit=100, **kwargs)
-        if kwargs.get('limit'):
-            return enki.pbclient.find_taskruns(**query)
-        return self._load(enki.pbclient.find_taskruns, query)
+        return enki.pbclient.find_taskruns(project_id, all=1, **kwargs)
 
     def get_projects(self, **kwargs):
         """Return projects."""
-        query = dict(all='1', limit=100, **kwargs)
-        if kwargs.get('limit'):
-            return enki.pbclient.find_project(**query)
-        return self._load(enki.pbclient.find_project, query)
+        return enki.pbclient.find_project(all=1, **kwargs)
 
     def update_result(self, result):
         """Update a result."""

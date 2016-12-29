@@ -34,16 +34,12 @@ def index():
 def analyse_next_empty_result(short_name):
     """View for analysing the next empty result."""
     try:
-        project = pybossa_client.get_projects(short_name=short_name)[0]
+        project = pybossa_client.get_projects(short_name=short_name, limit=1)[0]
     except IndexError:  # pragma: no cover
         abort(404)
 
-    try:
-        results = pybossa_client.get_results(project.id, info='Unanalysed')
-    except IndexError:  # pragma: no cover
-        abort(404)
-
-    results = pybossa_client.get_results(project.id, info='Unanalysed')
+    results = pybossa_client.get_results(project.id, limit=1,
+                                         info='Unanalysed')
     if not results:  # pragma: no cover
         flash('There are no unanlysed results to process!', 'success')
         return redirect(url_for('.index'))
@@ -94,7 +90,7 @@ def reanalyse(short_name):
     form = forms.ReanalysisForm(request.form)
     if request.method == 'POST' and form.validate():
         _filter = form.result_filter.data
-        results = pybossa_client.get_results(project.id)
+        results = pybossa_client.get_all_results(project.id)
         results = filter(lambda x: str(x.info) == _filter if _filter != 'all'
                          else True, results)
         for r in results:
