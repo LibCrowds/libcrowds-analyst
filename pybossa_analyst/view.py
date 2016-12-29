@@ -38,8 +38,7 @@ def analyse_next_empty_result(short_name):
     except IndexError:  # pragma: no cover
         abort(404)
 
-    results = pybossa_client.get_results(p.id, limit=1,
-                                         info='Unanalysed')
+    results = pybossa_client.get_results(p.id, limit=1, info='Unanalysed')
     if not results:  # pragma: no cover
         flash('There are no unanlysed results to process!', 'success')
         return redirect(url_for('.index'))
