@@ -34,11 +34,11 @@ def index():
 def analyse_next_empty_result(short_name):
     """View for analysing the next empty result."""
     try:
-        project = pybossa_client.get_projects(short_name=short_name, limit=1)[0]
+        p = pybossa_client.get_projects(short_name=short_name, limit=1)[0]
     except IndexError:  # pragma: no cover
         abort(404)
 
-    results = pybossa_client.get_results(project.id, limit=1,
+    results = pybossa_client.get_results(p.id, limit=1,
                                          info='Unanalysed')
     if not results:  # pragma: no cover
         flash('There are no unanlysed results to process!', 'success')
