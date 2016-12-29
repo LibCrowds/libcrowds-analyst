@@ -7,7 +7,7 @@ from redis import Redis
 from rq import Queue
 from flask import Blueprint
 from flask import render_template, request, abort, flash, redirect, url_for
-from flask import current_app, send_file, jsonify, Response
+from flask import current_app, send_file, Response
 from werkzeug.utils import secure_filename
 from pybossa_analyst import analysis, forms, zip_builder
 from pybossa_analyst.core import pybossa_client
