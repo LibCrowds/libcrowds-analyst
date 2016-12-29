@@ -30,9 +30,7 @@ class PyBossaClient(object):
         return items
 
     def _not_exhausted(self, last_fetched, query):
-        return (len(last_fetched) != 0
-                and len(last_fetched) == query['limit']
-                and query.get('id') is None)
+        return (len(last_fetched) != 0 and len(last_fetched) == query['limit'])
 
     def get_results(self, project_id, **kwargs):
         """Return results."""
