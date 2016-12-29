@@ -93,7 +93,7 @@ def reanalyse(short_name):
 
     form = forms.ReanalysisForm(request.form)
     if request.method == 'POST' and form.validate():
-        _filter = form._filter.data
+        _filter = form.result_filter.data
         tasks = pybossa_client.get_tasks(project.id)
         tasks = filter(lambda x: x.info == _filter if _filter != 'all'
                        else True, tasks)

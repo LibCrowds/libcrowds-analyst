@@ -9,9 +9,9 @@ from wtforms.validators import required
 
 class ReanalysisForm(Form):
     """Form for triggering result reanalysis."""
-    _filter = SelectField('Filter:', choices=[('all', 'All'),
-                                              (None, 'New'),
-                                              ('Unanalysed', 'Unanalysed')])
+    result_filter = SelectField('Filter:',
+                                choices=[('all', 'All'), (None, 'New'),
+                                         ('Unanalysed', 'Unanalysed')])
 
 
 class DownloadForm(Form):
