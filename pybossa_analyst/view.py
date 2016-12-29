@@ -94,20 +94,21 @@ def reanalyse(short_name):
     form = forms.ReanalysisForm(request.form)
     if request.method == 'POST' and form.validate():
         _filter = form.result_filter.data
-        tasks = pybossa_client.get_tasks(project.id)
-        tasks = filter(lambda x: str(x.info) == _filter if _filter != 'all'
-                       else True, tasks)
-        for task in tasks:
+        results = pybossa_client.get_results(project.id)
+        results = filter(lambda x: str(x.info) == _filter if _filter != 'all'
+                         else True, results)
+        for r in results:
             match_percentage = current_app.config['MATCH_PERCENTAGE']
             exclude = current_app.config['EXCLUDED_KEYS']
             kwargs = {'project_id': project.id,
-                      'task_id': task.id,
+                      'result_id': r.id,
                       'match_percentage': match_percentage,
                       'exclude': exclude}
             queue.enqueue_call(func=analysis.analyse,
                                kwargs=kwargs,
                                timeout=10*MINUTE)
-        flash('{0} tasks will be reanalysed.'.format(len(tasks)), 'success')
+        flash('''{0} results will be reanalysed.
+              '''.format(len(results)), 'success')
     elif request.method == 'POST':  # pragma: no cover
         flash('Please correct the errors.', 'danger')
     return render_template('reanalyse.html', title="Reanalyse results",

@@ -22,7 +22,7 @@ def _drop_empty_rows(df):
     return df
 
 
-def analyse(project_id, task_id, match_percent, exclude=[], sleep=2, **kwargs):
+def analyse(project_id, result_id, match_percent, exclude=[], sleep=2, **kwargs):
     """Analyser for all projects.
 
     Check that the info fields of each task run match n percent of the time
@@ -35,11 +35,11 @@ def analyse(project_id, task_id, match_percent, exclude=[], sleep=2, **kwargs):
     'Unanalysed' so that the different answers can be checked manually later.
     """
     time.sleep(sleep)  # To handle API rate limit when analysing many results
-    df = pybossa_client.get_task_run_dataframe(project_id, task_id)
+    r = pybossa_client.get_results(project_id, id=result_id, limit=1)[0]
+    df = pybossa_client.get_task_run_dataframe(project_id, r.task_id)
     keys = [k for k in _extract_keys(df) if k not in exclude]
     df = df[keys]
     df = _drop_empty_rows(df)
-    r = pybossa_client.get_results(project_id, task_id=task_id, limit=1)[0]
 
     if df.empty:
         r.info = {k: "" for k in keys}
