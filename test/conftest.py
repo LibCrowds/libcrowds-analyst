@@ -45,7 +45,7 @@ def project():
 @pytest.fixture
 def task(project):
     return enki.pbclient.DomainObject({
-        "id": 1,
+        "id": 42,
         "project_id": project.id,
         "info": {"url": "example.com", "title": "img"},
         "n_answers": 10,
@@ -59,7 +59,7 @@ def task(project):
 @pytest.fixture
 def result(task):
     return enki.pbclient.DomainObject({
-        "id": 1,
+        "id": 123,
         "task_id": task.id,
         "info": {"n": 42}
     })

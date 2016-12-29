@@ -30,68 +30,68 @@ class TestView(object):
         test_client.get(url, headers=auth_headers)
         mock_redirect.assert_called_once_with(redirect_url)
 
-    def test_reanalysis_of_all_tasks(self, test_client, mocker, task, project,
-                                     auth_headers, app):
+    def test_reanalysis_of_all_tasks(self, test_client, mocker, result,
+                                     project, auth_headers, app):
         """Test that reanalysis of all tasks is triggered correctly."""
         mock_queue = mocker.patch('pybossa_analyst.view.queue')
         mock_client = mocker.patch('pybossa_analyst.view.pybossa_client')
-        mock_client.get_tasks.return_value = [task]
+        mock_client.get_results.return_value = [result]
         mock_client.get_projects.return_value = [project]
         url = '/{0}/reanalyse/'.format(project.short_name)
         data = {'result_filter': 'all'}
         test_client.post(url, headers=auth_headers, data=data)
         kwargs = {'project_id': project.id,
-                  'task_id': task.id,
+                  'result_id': result.id,
                   'match_percentage': app.config['MATCH_PERCENTAGE'],
                   'exclude': app.config['EXCLUDED_KEYS']}
         mock_queue.enqueue_call.assert_called_with(func=analysis.analyse,
                                                    kwargs=kwargs,
                                                    timeout=600)
 
-    def test_reanalysis_of_new_tasks(self, test_client, mocker, task,
+    def test_reanalysis_of_new_tasks(self, test_client, mocker, result,
                                      project, auth_headers, app):
         """Test that reanalysis of new tasks is triggered correctly."""
         mock_queue = mocker.patch('pybossa_analyst.view.queue')
         mock_client = mocker.patch('pybossa_analyst.view.pybossa_client')
-        task.info = None
-        mock_client.get_tasks.return_value = [task]
+        result.info = None
+        mock_client.get_results.return_value = [result]
         mock_client.get_projects.return_value = [project]
         url = '/{0}/reanalyse/'.format(project.short_name)
         data = {'result_filter': 'None'}
         test_client.post(url, headers=auth_headers, data=data)
         kwargs = {'project_id': project.id,
-                  'task_id': task.id,
+                  'result_id': result.id,
                   'match_percentage': app.config['MATCH_PERCENTAGE'],
                   'exclude': app.config['EXCLUDED_KEYS']}
         mock_queue.enqueue_call.assert_called_with(func=analysis.analyse,
                                                    kwargs=kwargs,
                                                    timeout=600)
 
-    def test_reanalysis_of_unanalysed_tasks(self, test_client, mocker, task,
+    def test_reanalysis_of_unanalysed_tasks(self, test_client, mocker, result,
                                             project, auth_headers, app):
         """Test that reanalysis of Unanalysed tasks is triggered correctly."""
         mock_queue = mocker.patch('pybossa_analyst.view.queue')
         mock_client = mocker.patch('pybossa_analyst.view.pybossa_client')
-        task.info = 'Unanalysed'
-        mock_client.get_tasks.return_value = [task]
+        result.info = 'Unanalysed'
+        mock_client.get_results.return_value = [result]
         mock_client.get_projects.return_value = [project]
         url = '/{0}/reanalyse/'.format(project.short_name)
         data = {'result_filter': 'Unanalysed'}
         test_client.post(url, headers=auth_headers, data=data)
         kwargs = {'project_id': project.id,
-                  'task_id': task.id,
+                  'result_id': result.id,
                   'match_percentage': app.config['MATCH_PERCENTAGE'],
                   'exclude': app.config['EXCLUDED_KEYS']}
         mock_queue.enqueue_call.assert_called_with(func=analysis.analyse,
                                                    kwargs=kwargs,
                                                    timeout=600)
 
-    def test_reanalysis_of_no_tasks(self, test_client, mocker, task,
+    def test_reanalysis_of_no_tasks(self, test_client, mocker, task, result,
                                     project, auth_headers, app):
         """Test reanalysis of tasks filter works when no tasks selected."""
         mock_queue = mocker.patch('pybossa_analyst.view.queue')
         mock_client = mocker.patch('pybossa_analyst.view.pybossa_client')
-        mock_client.get_tasks.return_value = [task]
+        mock_client.get_results.return_value = [result]
         mock_client.get_projects.return_value = [project]
         url = '/{0}/reanalyse/'.format(project.short_name)
         data = {'result_filter': None}
@@ -188,6 +188,6 @@ class TestView(object):
         mock_client.get_projects.return_value = [project]
         mock_client.get_tasks.return_value = [task]
         url = '/{0}/download/'.format(project.short_name)
-        data = {'task_ids': '1', 'importer': 'flickr'}
+        data = {'task_ids': task.id, 'importer': 'flickr'}
         resp = test_client.post(url, headers=auth_headers, data=data)
         assert resp.headers['Content-Type'] == 'application/zip'
