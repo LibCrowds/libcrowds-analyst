@@ -35,7 +35,7 @@ class TestView(object):
         """Test that reanalysis of all tasks is triggered correctly."""
         mock_queue = mocker.patch('pybossa_analyst.view.queue')
         mock_client = mocker.patch('pybossa_analyst.view.pybossa_client')
-        mock_client.get_results.return_value = [result]
+        mock_client.get_all_results.return_value = [result]
         mock_client.get_projects.return_value = [project]
         url = '/{0}/reanalyse/'.format(project.short_name)
         data = {'result_filter': 'all'}
@@ -54,7 +54,7 @@ class TestView(object):
         mock_queue = mocker.patch('pybossa_analyst.view.queue')
         mock_client = mocker.patch('pybossa_analyst.view.pybossa_client')
         result.info = None
-        mock_client.get_results.return_value = [result]
+        mock_client.get_all_results.return_value = [result]
         mock_client.get_projects.return_value = [project]
         url = '/{0}/reanalyse/'.format(project.short_name)
         data = {'result_filter': 'None'}
@@ -73,7 +73,7 @@ class TestView(object):
         mock_queue = mocker.patch('pybossa_analyst.view.queue')
         mock_client = mocker.patch('pybossa_analyst.view.pybossa_client')
         result.info = 'Unanalysed'
-        mock_client.get_results.return_value = [result]
+        mock_client.get_all_results.return_value = [result]
         mock_client.get_projects.return_value = [project]
         url = '/{0}/reanalyse/'.format(project.short_name)
         data = {'result_filter': 'Unanalysed'}
@@ -91,7 +91,7 @@ class TestView(object):
         """Test reanalysis of tasks filter works when no tasks selected."""
         mock_queue = mocker.patch('pybossa_analyst.view.queue')
         mock_client = mocker.patch('pybossa_analyst.view.pybossa_client')
-        mock_client.get_results.return_value = [result]
+        mock_client.get_all_results.return_value = [result]
         mock_client.get_projects.return_value = [project]
         url = '/{0}/reanalyse/'.format(project.short_name)
         data = {'result_filter': None}
