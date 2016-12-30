@@ -32,7 +32,8 @@ def login():
     """Login view."""
     form = forms.LoginForm(request.form)
     if request.method == "POST" and form.validate():
-        pass
+        session['api_key'] = form.api_key.data
+        return redirect(url_for('analysis.index'))
     elif request.method == "POST":
         flash('Please correct the errors.', 'danger')
     return render_template('login.html', title="Sign in", form=form,
