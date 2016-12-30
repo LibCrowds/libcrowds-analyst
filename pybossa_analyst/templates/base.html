@@ -11,11 +11,8 @@
     </script>
     </head>
     <body>
-        <div class="container">
-            <h1><a href="{{ config['ENDPOINT'] }}"><span class="fa fa-home"></span></a> {{ title }}</h1>
-            <hr>
-            {% block content %}{% endblock %}
-        </div>
+        {% block content %}
+        {% endblock %}
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.js"></script>
         <script src="{{url_for('static', filename='notify.js')}}?v0.1.0"></script>

@@ -2,7 +2,8 @@
 """Main module for pybossa-analyst."""
 
 import os
-from flask import Flask, request
+from flask import Flask, request, render_template
+from werkzeug.exceptions import HTTPException, InternalServerError
 from pybossa_analyst import default_settings
 from pybossa_analyst.extensions import *
 
@@ -13,6 +14,7 @@ def create_app():
     configure_app(app)
     setup_url_rules(app)
     setup_csrf(app)
+    setup_error_handler(app)
     setup_z3950_manager(app)
     return app
 
@@ -30,15 +32,26 @@ def configure_app(app):
 
 def setup_url_rules(app):
     """Setup URL rules."""
-    from pybossa_analyst.view import blueprint as bp
-    app.register_blueprint(bp, url_prefix='')
+    from pybossa_analyst.view.home import blueprint as home
+    from pybossa_analyst.view.analysis import blueprint as analyse
+    app.register_blueprint(home, url_prefix='/')
+    app.register_blueprint(analyse, url_prefix='/analysis')
 
 
 def setup_csrf(app):
     """Setup csrf protection."""
-    from pybossa_analyst.view import index
+    from pybossa_analyst.view.home import index
     csrf.init_app(app)
     csrf.exempt(index)
+
+
+def setup_error_handler(app):
+    """Setup error handler."""
+    @app.errorhandler(Exception)
+    def _handle_error(e):
+        if not isinstance(e, HTTPException):
+            e = InternalServerError()
+        return render_template('error.html', exception=e), e.code
 
 
 def setup_z3950_manager(app):
