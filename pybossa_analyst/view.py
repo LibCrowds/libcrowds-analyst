@@ -9,8 +9,7 @@ from flask import Blueprint
 from flask import render_template, request, abort, flash, redirect, url_for
 from flask import current_app, send_file, Response
 from werkzeug.utils import secure_filename
-from pybossa_analyst import analysis, forms, zip_builder
-from pybossa_analyst.core import pybossa_client
+from pybossa_analyst import analysis, forms, zip_builder, client
 
 
 blueprint = Blueprint('analyse', __name__)
@@ -22,6 +21,8 @@ MINUTE = 60
 @blueprint.route('/', methods=['GET', 'POST'])
 def index():
     """Index view."""
+    api_key = current_app.config['API_KEY']
+    endpoint = current_app.config['ENDPOINT']
     if request.method == 'POST':
         queue.enqueue_call(func=analysis.analyse,
                            kwargs=request.json,
@@ -33,12 +34,16 @@ def index():
 @blueprint.route('/<short_name>/')
 def analyse_next_empty_result(short_name):
     """View for analysing the next empty result."""
+    api_key = current_app.config['API_KEY']
+    endpoint = current_app.config['ENDPOINT']
     try:
-        p = pybossa_client.get_projects(short_name=short_name, limit=1)[0]
+        p = client.get_projects(api_key, endpoint,
+                                        short_name=short_name, limit=1)[0]
     except IndexError:  # pragma: no cover
         abort(404)
 
-    results = pybossa_client.get_results(p.id, limit=1, info='Unanalysed')
+    results = client.get_results(api_key, endpoint, p.id, limit=1,
+                                         info='Unanalysed')
     if not results:  # pragma: no cover
         flash('There are no unanlysed results to process!', 'success')
         return redirect(url_for('.index'))
@@ -50,13 +55,15 @@ def analyse_next_empty_result(short_name):
 @blueprint.route('/<short_name>/<result_id>/', methods=['GET', 'POST'])
 def analyse_result(short_name, result_id):
     """View for analysing a result."""
+    api_key = current_app.config['API_KEY']
+    endpoint = current_app.config['ENDPOINT']
     try:
-        project = pybossa_client.get_projects(short_name=short_name)[0]
+        project = client.get_projects(api_key, endpoint, short_name=short_name)[0]
     except IndexError:  # pragma: no cover
         abort(404)
 
     try:
-        result = pybossa_client.get_results(project.id, id=int(result_id))[0]
+        result = client.get_results(api_key, endpoint, project.id, id=int(result_id))[0]
     except (IndexError, ValueError):  # pragma: no cover
         abort(404)
 
@@ -64,12 +71,12 @@ def analyse_result(short_name, result_id):
         data = request.form.to_dict()
         data.pop('csrf_token', None)
         result.info = data
-        pybossa_client.update_result(result)
+        client.update_result(api_key, endpoint, result)
         url = url_for('.analyse_next_empty_result', short_name=short_name)
         return redirect(url)
 
-    task = pybossa_client.get_tasks(project.id, id=result.task_id)[0]
-    taskruns = pybossa_client.get_task_runs(project.id, task_id=result.task_id)
+    task = client.get_tasks(api_key, endpoint, project.id, id=result.task_id)[0]
+    taskruns = client.get_task_runs(api_key, endpoint, project.id, task_id=result.task_id)
     exclude = current_app.config['EXCLUDED_KEYS']
     keys = set(k for tr in taskruns for k in tr.info.keys()
                if k not in exclude)
@@ -81,15 +88,17 @@ def analyse_result(short_name, result_id):
 @blueprint.route('/<short_name>/reanalyse/', methods=['GET', 'POST'])
 def reanalyse(short_name):
     """View for triggering reanalysis of all results."""
+    api_key = current_app.config['API_KEY']
+    endpoint = current_app.config['ENDPOINT']
     try:
-        project = pybossa_client.get_projects(short_name=short_name)[0]
+        project = client.get_projects(api_key, endpoint, short_name=short_name)[0]
     except IndexError:  # pragma: no cover
         abort(404)
 
     form = forms.ReanalysisForm(request.form)
     if request.method == 'POST' and form.validate():
         _filter = form.result_filter.data
-        results = pybossa_client.get_all_results(project.id)
+        results = client.get_all_results(api_key, endpoint, project.id)
         results = filter(lambda x: str(x.info) == _filter if _filter != 'all'
                          else True, results)
         for r in results:
@@ -113,8 +122,10 @@ def reanalyse(short_name):
 @blueprint.route('/<short_name>/download/', methods=['GET', 'POST'])
 def prepare_zip(short_name):
     """View to prepare a zip file for download."""
+    api_key = current_app.config['API_KEY']
+    endpoint = current_app.config['ENDPOINT']
     try:
-        project = pybossa_client.get_projects(short_name=short_name)[0]
+        project = client.get_projects(api_key, endpoint, short_name=short_name)[0]
     except IndexError:  # pragma: no cover
         abort(404)
 
@@ -122,7 +133,7 @@ def prepare_zip(short_name):
     if request.method == 'POST' and form.validate():
         importer = form.importer.data
         task_ids = form.task_ids.data.split()
-        tasks = pybossa_client.get_tasks(project_id=project.id)
+        tasks = client.get_tasks(api_key, endpoint, project_id=project.id)
         valid_task_ids = [str(t.id) for t in tasks]
         tasks_to_export = [t for t in tasks if str(t.id) in task_ids and
                            str(t.id) in valid_task_ids]

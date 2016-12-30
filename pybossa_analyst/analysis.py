@@ -3,7 +3,7 @@
 
 import time
 import numpy as np
-from pybossa_analyst.core import pybossa_client
+from pybossa_analyst import client
 
 
 def _extract_keys(df):
@@ -22,8 +22,8 @@ def _drop_empty_rows(df):
     return df
 
 
-def analyse(project_id, result_id, match_percentage, exclude=[], sleep=2,
-            **kwargs):
+def analyse(api_key, endpoint, project_id, result_id, match_percentage,
+            exclude=[], sleep=2, **kwargs):
     """Analyser for all projects.
 
     Check that the info fields of each task run match n percent of the time
@@ -36,15 +36,15 @@ def analyse(project_id, result_id, match_percentage, exclude=[], sleep=2,
     'Unanalysed' so that the different answers can be checked manually later.
     """
     time.sleep(sleep)  # To handle API rate limit when analysing many results
-    r = pybossa_client.get_results(project_id, id=result_id, limit=1)[0]
-    df = pybossa_client.get_task_run_dataframe(project_id, r.task_id)
+    r = client.get_results(api_key, endpoint, project_id, id=result_id, limit=1)[0]
+    df = client.get_task_run_dataframe(api_key, endpoint, project_id, r.task_id)
     keys = [k for k in _extract_keys(df) if k not in exclude]
     df = df[keys]
     df = _drop_empty_rows(df)
 
     if df.empty:
         r.info = {k: "" for k in keys}
-        pybossa_client.update_result(r)
+        client.update_result(r)
         return
 
     # Check for n percent of matches
@@ -56,4 +56,4 @@ def analyse(project_id, result_id, match_percentage, exclude=[], sleep=2,
             continue
         info[k] = df[k].value_counts().idxmax()
     r.info = info
-    pybossa_client.update_result(r)
+    client.update_result(api_key, endpoint, r)
