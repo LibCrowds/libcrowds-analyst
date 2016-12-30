@@ -49,6 +49,8 @@ def setup_error_handler(app):
     """Setup error handler."""
     @app.errorhandler(Exception)
     def _handle_error(e):
+        if app.debug:
+            raise
         if not isinstance(e, HTTPException):
             e = InternalServerError()
         return render_template('error.html', exception=e), e.code
