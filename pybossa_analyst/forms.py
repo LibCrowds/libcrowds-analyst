@@ -3,7 +3,7 @@
 
 from flask.ext.wtf import Form
 from wtforms import TextAreaField
-from wtforms.fields import SelectField
+from wtforms.fields import SelectField, TextField
 from wtforms.validators import required
 
 
@@ -18,3 +18,10 @@ class DownloadForm(Form):
     """Form for downloading original task input."""
     task_ids = TextAreaField('Task IDs:', validators=[required()])
     importer = SelectField('Importer Type:', choices=[('flickr', 'Flickr')])
+
+
+
+class LoginForm(Form):
+    """Form for logging in user's using their PyBossa API key."""
+    err_msg = "The API key is required"
+    api_key = TextField('API Key:', validators=[required(err_msg)])
