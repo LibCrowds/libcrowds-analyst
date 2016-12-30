@@ -10,29 +10,24 @@ from flask import render_template, request, abort, flash, redirect, url_for
 from flask import current_app, send_file, Response
 from werkzeug.utils import secure_filename
 from pybossa_analyst import analysis, forms, zip_builder, client
+from pybossa_analyst.login import login_required
 
 
-blueprint = Blueprint('analyse', __name__)
+blueprint = Blueprint('analysis', __name__)
 
 queue = Queue('pybossa_analyst', connection=Redis())
 MINUTE = 60
 
 
-@blueprint.route('/', methods=['GET', 'POST'])
+@blueprint.route('/')
+@login_required
 def index():
-    """Index view."""
-    payload = request.json
-    payload['api_key'] == current_app.config['API_KEY']
-    payload['endpoint'] == current_app.config['ENDPOINT']
-    if request.method == 'POST' and payload['event'] == 'task_completed':
-        queue.enqueue_call(func=analysis.analyse,
-                           kwargs=payload,
-                           timeout=10*MINUTE)
-        return "OK"
-    return render_template('index.html', title="PyBossa Analyst")
+    """Projects view."""
+    return "projects"
 
 
 @blueprint.route('/<short_name>/')
+@login_required
 def analyse_next_empty_result(short_name):
     """View for analysing the next empty result."""
     api_key = current_app.config['API_KEY']
@@ -54,6 +49,7 @@ def analyse_next_empty_result(short_name):
 
 
 @blueprint.route('/<short_name>/<result_id>/', methods=['GET', 'POST'])
+@login_required
 def analyse_result(short_name, result_id):
     """View for analysing a result."""
     api_key = current_app.config['API_KEY']
@@ -91,6 +87,7 @@ def analyse_result(short_name, result_id):
 
 
 @blueprint.route('/<short_name>/reanalyse/', methods=['GET', 'POST'])
+@login_required
 def reanalyse(short_name):
     """View for triggering reanalysis of all results."""
     api_key = current_app.config['API_KEY']
@@ -126,6 +123,7 @@ def reanalyse(short_name):
 
 
 @blueprint.route('/<short_name>/download/', methods=['GET', 'POST'])
+@login_required
 def prepare_zip(short_name):
     """View to prepare a zip file for download."""
     api_key = current_app.config['API_KEY']
