@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% from "_helpers.html" import render_field %}
+
+{% block content %}
+<div class="flexbox-center">
+    <div class="col-md-6 text-center">
+        <h1>PyBossa Analyst</h1>
+        <p class="lead">Please login using your PyBossa API key</p>
+        <form method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+            {{ render_field(form.api_key, class="form-control", show_label=False, placeholder="Enter your PyBossa API key") }}
+            <button class="btn btn-lg btn-primary" type="submit" value="Submit">Submit</button>
+        </form>
+    </div>
+ </div>
+{% endblock %}
