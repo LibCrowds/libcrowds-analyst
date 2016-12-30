@@ -12,7 +12,6 @@ def create_app():
     app = Flask(__name__)
     configure_app(app)
     setup_url_rules(app)
-    setup_auth(app)
     setup_csrf(app)
     setup_z3950_manager(app)
     return app
@@ -33,18 +32,6 @@ def setup_url_rules(app):
     """Setup URL rules."""
     from pybossa_analyst.view import blueprint as bp
     app.register_blueprint(bp, url_prefix='')
-
-
-def setup_auth(app):
-    """Setup basic auth for all requests."""
-    from pybossa_analyst import auth
-
-    @app.before_request
-    def requires_auth():
-        if request.endpoint != 'analyse.index':
-            cred = request.authorization
-            if not cred or not auth.check_auth(cred.username, cred.password):
-                return auth.authenticate()
 
 
 def setup_csrf(app):
