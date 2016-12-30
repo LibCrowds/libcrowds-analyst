@@ -4,6 +4,7 @@
 import os
 from flask import Flask, request, render_template
 from werkzeug.exceptions import HTTPException, InternalServerError
+from requests.exceptions import RequestException
 from pybossa_analyst import default_settings
 from pybossa_analyst.extensions import *
 
@@ -51,7 +52,11 @@ def setup_error_handler(app):
     def _handle_error(e):
         if app.debug:
             raise
-        if not isinstance(e, HTTPException):
+        if isinstance(e, RequestException):
+            endpoint = app.config['ENDPOINT']
+            e.code = 500
+            e.description = "Could not connect to {0}.".format(endpoint)
+        elif not isinstance(e, HTTPException):
             e = InternalServerError()
         return render_template('error.html', exception=e), e.code
 
