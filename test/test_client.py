@@ -2,7 +2,7 @@
 
 import enki
 from pytest_mock import mocker
-from pybossa_analyst.client import PyBossaClient
+from pybossa_analyst import client
 
 
 class TestClient(object):
@@ -14,7 +14,6 @@ class TestClient(object):
         mock_enki = mocker.patch('pybossa_analyst.client.enki.Enki')
         mock_enki = enki.Enki(endpoint='endpoint', api_key='api_key',
                               project_short_name=project.short_name)
-        client = PyBossaClient(app)
         expected_df = mock_enki.task_runs_df[task.id]
         df = client.get_task_run_dataframe(project.id, task.id)
 

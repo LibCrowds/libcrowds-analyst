@@ -23,7 +23,7 @@ def _drop_empty_rows(df):
 
 
 def analyse(api_key, endpoint, project_id, result_id, match_percentage,
-            exclude=[], sleep=2, **kwargs):
+            excluded_keys=[], sleep=2, **kwargs):
     """Analyser for all projects.
 
     Check that the info fields of each task run match n percent of the time
@@ -36,9 +36,11 @@ def analyse(api_key, endpoint, project_id, result_id, match_percentage,
     'Unanalysed' so that the different answers can be checked manually later.
     """
     time.sleep(sleep)  # To handle API rate limit when analysing many results
-    r = client.get_results(api_key, endpoint, project_id, id=result_id, limit=1)[0]
-    df = client.get_task_run_dataframe(api_key, endpoint, project_id, r.task_id)
-    keys = [k for k in _extract_keys(df) if k not in exclude]
+    r = client.get_results(api_key, endpoint, project_id,
+                           id=result_id, limit=1)[0]
+    df = client.get_task_run_dataframe(api_key, endpoint, project_id,
+                                       r.task_id)
+    keys = [k for k in _extract_keys(df) if k not in excluded_keys]
     df = df[keys]
     df = _drop_empty_rows(df)
 

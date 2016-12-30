@@ -21,11 +21,12 @@ MINUTE = 60
 @blueprint.route('/', methods=['GET', 'POST'])
 def index():
     """Index view."""
-    api_key = current_app.config['API_KEY']
-    endpoint = current_app.config['ENDPOINT']
-    if request.method == 'POST':
+    payload = request.json
+    payload['api_key'] == current_app.config['API_KEY']
+    payload['endpoint'] == current_app.config['ENDPOINT']
+    if request.method == 'POST' and payload['event'] == 'task_completed':
         queue.enqueue_call(func=analysis.analyse,
-                           kwargs=request.json,
+                           kwargs=payload,
                            timeout=10*MINUTE)
         return "OK"
     return render_template('index.html', title="PyBossa Analyst")
@@ -37,13 +38,13 @@ def analyse_next_empty_result(short_name):
     api_key = current_app.config['API_KEY']
     endpoint = current_app.config['ENDPOINT']
     try:
-        p = client.get_projects(api_key, endpoint,
-                                        short_name=short_name, limit=1)[0]
+        p = client.get_projects(api_key, endpoint, short_name=short_name,
+                                limit=1)[0]
     except IndexError:  # pragma: no cover
         abort(404)
 
     results = client.get_results(api_key, endpoint, p.id, limit=1,
-                                         info='Unanalysed')
+                                 info='Unanalysed')
     if not results:  # pragma: no cover
         flash('There are no unanlysed results to process!', 'success')
         return redirect(url_for('.index'))
@@ -58,12 +59,14 @@ def analyse_result(short_name, result_id):
     api_key = current_app.config['API_KEY']
     endpoint = current_app.config['ENDPOINT']
     try:
-        project = client.get_projects(api_key, endpoint, short_name=short_name)[0]
+        project = client.get_projects(api_key, endpoint,
+                                      short_name=short_name)[0]
     except IndexError:  # pragma: no cover
         abort(404)
 
     try:
-        result = client.get_results(api_key, endpoint, project.id, id=int(result_id))[0]
+        result = client.get_results(api_key, endpoint, project.id,
+                                    id=result_id)[0]
     except (IndexError, ValueError):  # pragma: no cover
         abort(404)
 
@@ -75,8 +78,10 @@ def analyse_result(short_name, result_id):
         url = url_for('.analyse_next_empty_result', short_name=short_name)
         return redirect(url)
 
-    task = client.get_tasks(api_key, endpoint, project.id, id=result.task_id)[0]
-    taskruns = client.get_task_runs(api_key, endpoint, project.id, task_id=result.task_id)
+    task = client.get_tasks(api_key, endpoint, project.id,
+                            id=result.task_id)[0]
+    taskruns = client.get_task_runs(api_key, endpoint, project.id,
+                                    task_id=task.id)
     exclude = current_app.config['EXCLUDED_KEYS']
     keys = set(k for tr in taskruns for k in tr.info.keys()
                if k not in exclude)
@@ -91,7 +96,8 @@ def reanalyse(short_name):
     api_key = current_app.config['API_KEY']
     endpoint = current_app.config['ENDPOINT']
     try:
-        project = client.get_projects(api_key, endpoint, short_name=short_name)[0]
+        project = client.get_projects(api_key, endpoint,
+                                      short_name=short_name)[0]
     except IndexError:  # pragma: no cover
         abort(404)
 
@@ -125,7 +131,8 @@ def prepare_zip(short_name):
     api_key = current_app.config['API_KEY']
     endpoint = current_app.config['ENDPOINT']
     try:
-        project = client.get_projects(api_key, endpoint, short_name=short_name)[0]
+        project = client.get_projects(api_key, endpoint,
+                                      short_name=short_name)[0]
     except IndexError:  # pragma: no cover
         abort(404)
 
