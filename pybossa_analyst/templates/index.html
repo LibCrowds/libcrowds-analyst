@@ -22,8 +22,6 @@
                     <td>{{ p.name }}</td>
                     <td class="text-center">{% if p.webhook == request.url_root %}Yes{% else %}No{% endif %}</td>
                     <td class="text-center">
-                        <a href="#" class="btn btn-sm btn-info">Setup
-                        </a>
                         <a href="{{ url_for('analysis.analyse', short_name=p.short_name) }}"
                            class="btn btn-sm btn-info">Analyse
                         </a>
