@@ -19,33 +19,33 @@ queue = Queue('pybossa_analyst', connection=Redis())
 MINUTE = 60
 
 
+def _get_projects(**kwargs):
+    """Configure PyBossa client and retrieve projects"""
+    pbclient.set('api_key', session['api_key'])
+    pbclient.set('endpoint', current_app.config['ENDPOINT'])
+    projects = pbclient.find_project(**kwargs)
+    if not projects:
+        if pbclient.find_project(short_name=short_name, limit=1, all=1):
+            abort(403)
+        else:
+            abort(404)
+    return projects
+
+
 @blueprint.route('/')
 @login_required
 def index():
     """Projects view."""
-    pbclient.set('api_key', session['api_key'])
-    pbclient.set('endpoint', current_app.config['ENDPOINT'])
-    projects = pbclient.find_project()
-    if not projects:
-        abort(404)
-    return render_template('index.html', projects=projects,
-                           api_key=session['api_key'])
+    projects = _get_projects()
+    api_key = session['api_key']
+    return render_template('index.html', projects=projects, api_key=api_key)
 
 
 @blueprint.route('/<short_name>/')
 @login_required
 def analyse(short_name):
     """View for analysing the next empty result."""
-    pbclient.set('api_key', session['api_key'])
-    pbclient.set('endpoint', current_app.config['ENDPOINT'])
-    projects = pbclient.find_project(short_name=short_name, limit=1)
-    if not projects:
-        if pbclient.find_project(short_name=short_name, limit=1, all=1):
-            abort(403)
-        else:
-            abort(404)
-
-    project = projects[0]
+    project = _get_projects(short_name=short_name, limit=1)[0]
     results = pbclient.find_results(project.id, limit=1, info='Unanalysed')
     if not results:  # pragma: no cover
         flash('There are no unanlysed results to process!', 'success')
@@ -60,16 +60,7 @@ def analyse(short_name):
 @login_required
 def analyse_result(short_name, result_id):
     """View for analysing a result."""
-    pbclient.set('api_key', session['api_key'])
-    pbclient.set('endpoint', current_app.config['ENDPOINT'])
-    projects = pbclient.find_project(short_name=short_name, limit=1)
-    if not projects:
-        if pbclient.find_project(short_name=short_name, limit=1, all=1):
-            abort(403)
-        else:
-            abort(404)
-
-    project = projects[0]
+    project = _get_projects(short_name=short_name, limit=1)[0]
     results = pbclient.find_results(project.id, limit=1)
     if not results:  # pragma: no cover
         abort(404)
@@ -97,16 +88,7 @@ def analyse_result(short_name, result_id):
 @login_required
 def reanalyse(short_name):
     """View for triggering reanalysis of all results."""
-    pbclient.set('api_key', session['api_key'])
-    pbclient.set('endpoint', current_app.config['ENDPOINT'])
-    projects = pbclient.find_project(short_name=short_name, limit=1)
-    if not projects:
-        if pbclient.find_project(short_name=short_name, limit=1, all=1):
-            abort(403)
-        else:
-            abort(404)
-
-    project = projects[0]
+    project = _get_projects(short_name=short_name, limit=1)[0]
     form = forms.ReanalysisForm(request.form)
     if request.method == 'POST' and form.validate():
         _filter = form.result_filter.data
@@ -135,16 +117,7 @@ def reanalyse(short_name):
 @login_required
 def download_input(short_name):
     """View to prepare a zip file for download."""
-    pbclient.set('api_key', session['api_key'])
-    pbclient.set('endpoint', current_app.config['ENDPOINT'])
-    projects = pbclient.find_project(short_name=short_name, limit=1)
-    if not projects:
-        if pbclient.find_project(short_name=short_name, limit=1, all=1):
-            abort(403)
-        else:
-            abort(404)
-
-    project = projects[0]
+    project = _get_projects(short_name=short_name, limit=1)[0]
     form = forms.DownloadForm(request.form)
     if request.method == 'POST' and form.validate():
         importer = form.importer.data
