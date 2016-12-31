@@ -41,7 +41,7 @@ def index():
     return render_template('index.html', projects=projects, api_key=api_key)
 
 
-@blueprint.route('/<short_name>/')
+@blueprint.route('/<short_name>')
 @login_required
 def analyse(short_name):
     """View for analysing the next empty result."""
@@ -56,7 +56,7 @@ def analyse(short_name):
                             result_id=result.id))
 
 
-@blueprint.route('/<short_name>/<result_id>/', methods=['GET', 'POST'])
+@blueprint.route('/<short_name>/<result_id>', methods=['GET', 'POST'])
 @login_required
 def analyse_result(short_name, result_id):
     """View for analysing a result."""
@@ -84,7 +84,7 @@ def analyse_result(short_name, result_id):
                            title=project.name, keys=keys)
 
 
-@blueprint.route('/<short_name>/reanalyse/', methods=['GET', 'POST'])
+@blueprint.route('/<short_name>/reanalyse', methods=['GET', 'POST'])
 @login_required
 def reanalyse(short_name):
     """View for triggering reanalysis of all results."""
@@ -113,7 +113,7 @@ def reanalyse(short_name):
                            project=project, form=form)
 
 
-@blueprint.route('/<short_name>/download/', methods=['GET', 'POST'])
+@blueprint.route('/<short_name>/download', methods=['GET', 'POST'])
 @login_required
 def download_input(short_name):
     """View to prepare a zip file for download."""
