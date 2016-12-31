@@ -16,6 +16,7 @@ def create_app():
     setup_url_rules(app)
     setup_csrf(app)
     setup_error_handler(app)
+    setup_hooks(app)
     setup_z3950_manager(app)
     return app
 
@@ -59,6 +60,16 @@ def setup_error_handler(app):
         elif not isinstance(e, HTTPException):
             e = InternalServerError()
         return render_template('error.html', exception=e), e.code
+
+
+def setup_hooks(app):
+    """Setup hooks."""
+    @app.context_processor
+    def _global_template_context():
+        return dict(
+            brand=app.config['BRAND'],
+            github_url=app.config['GITHUB_URL']
+        )
 
 
 def setup_z3950_manager(app):
