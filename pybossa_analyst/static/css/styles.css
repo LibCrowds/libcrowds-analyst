@@ -4,3 +4,15 @@
     align-items: center;
     justify-content: center;
 }
+
+#alert-messages {
+    width: 50%;
+    position: fixed;
+    top: 2em;
+    right: 2em;
+    padding: 2em;
+}
+
+#alert-messages p {
+    padding: 1em 0em;
+}
