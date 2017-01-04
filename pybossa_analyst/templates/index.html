@@ -17,15 +17,18 @@
                     <th class="text-center">Receiving Webhooks</th>
                     <th class="text-center">Actions</th>
                 </tr>
-                {% for p in projects %}
+                {% for project in projects %}
                 <tr>
-                    <td>{{ p.name }}</td>
-                    <td class="text-center">{% if p.webhook == request.url_root %}Yes{% else %}No{% endif %}</td>
+                    <td>{{ project.name }}</td>
+                    <td class="text-center">{% if project.webhook == request.url_root %}Yes{% else %}No{% endif %}</td>
                     <td class="text-center">
-                        <a href="{{ url_for('analysis.analyse', short_name=p.short_name) }}"
+                        <a href="{{ url_for('analysis.setup', short_name=project.short_name) }}"
+                           class="btn btn-sm btn-info">Setup
+                        </a>
+                        <a href="{{ url_for('analysis.analyse', short_name=project.short_name) }}"
                            class="btn btn-sm btn-info">Analyse
                         </a>
-                        <a href="{{ url_for('download.download_input', short_name=p.short_name) }}"
+                        <a href="{{ url_for('download.download_input', short_name=project.short_name) }}"
                            class="btn btn-sm btn-info">Download Input
                         </a>
                     </td>

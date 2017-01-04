@@ -2,8 +2,8 @@
 """Analysis module for pybossa-analyst."""
 
 import time
-import numpy as np
-from pybossa_analyst import client
+import numpy
+import pbclient
 
 
 def _extract_keys(df):
@@ -17,9 +17,18 @@ def _extract_keys(df):
 
 def _drop_empty_rows(df):
     """Drop rows that contain no data."""
-    df = df.replace('', np.nan)
+    df = df.replace('', numpy.nan)
     df = df.dropna(how='all')
     return df
+
+
+def _get_task_run_dataframe(api_key, endpoint, short_name, task_id):
+    """Return a dataframe containing all task run info for a task."""
+    e = enki.Enki(api_key, endpoint, short_name, all=1)
+    e.get_tasks(task_id=task_id)
+    e.get_task_runs()
+    t = e.tasks[0]
+    return e.task_runs_df[t.id]
 
 
 def analyse(api_key, endpoint, project_id, result_id, match_percentage,
@@ -36,10 +45,10 @@ def analyse(api_key, endpoint, project_id, result_id, match_percentage,
     'Unanalysed' so that the different answers can be checked manually later.
     """
     time.sleep(sleep)  # To handle API rate limit when analysing many results
-    r = client.get_results(api_key, endpoint, project_id,
-                           id=result_id, limit=1)[0]
-    df = client.get_task_run_dataframe(api_key, endpoint, project_id,
-                                       r.task_id)
+    pbclient.set('api_key', api_key)
+    pbclient.set('endpoint', endpoint)
+    r = pbclient.get_results(project_id, id=result_id, limit=1, all=1)[0]
+    df = _get_task_run_dataframe(api_key, endpoint, short_name, r.task_id)
     keys = [k for k in _extract_keys(df) if k not in excluded_keys]
     df = df[keys]
     df = _drop_empty_rows(df)

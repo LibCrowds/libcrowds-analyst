@@ -7,7 +7,7 @@ from wtforms.fields import SelectField, TextField
 from wtforms.validators import required
 
 
-class ReanalysisForm(Form):
+class SetupForm(Form):
     """Form for triggering result reanalysis."""
     result_filter = SelectField('Filter:',
                                 choices=[('all', 'All'), ('None', 'New'),
