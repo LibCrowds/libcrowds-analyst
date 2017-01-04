@@ -5,24 +5,6 @@
     justify-content: center;
 }
 
-record {
-    border-bottom: 1px solid #EFEFEF;
-    display: block;
-    padding: 20px 0px
-}
-
 .answer-group {
     margin-bottom: 50px;
-}
-
-#alert-messages {
-    width: 50%;
-    position: fixed;
-    top: 2em;
-    right: 2em;
-    padding: 2em;
-}
-
-#alert-messages p {
-    padding: 1em 0em;
 }
