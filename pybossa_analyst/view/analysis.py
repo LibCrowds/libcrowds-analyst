@@ -18,16 +18,23 @@ MINUTE = 60
 
 
 def _get_projects(**kwargs):
-    """Configure PyBossa client and retrieve projects"""
+    """Configure PyBossa client and retrieve projects."""
     pbclient.set('api_key', session['api_key'])
     pbclient.set('endpoint', current_app.config['ENDPOINT'])
     projects = pbclient.find_project(**kwargs)
     if not projects:
-        if pbclient.find_project(short_name=short_name, limit=1, all=1):
+        if pbclient.find_project(all=1, **kwargs):
             abort(403)
         else:
             abort(404)
     return projects
+
+
+def _ensure_authorized_to_update(project):
+    """Ensure that a project can be updated using the current API key."""
+    resp = pbclient.update_project(project)
+    if isinstance(resp, dict) and resp.get('status_code') == 401:
+        abort(401)
 
 
 @blueprint.route('/')
@@ -45,8 +52,10 @@ def analyse(short_name):
     """View for analysing the next empty result."""
     project = _get_projects(short_name=short_name, limit=1)[0]
     results = pbclient.find_results(project.id, limit=1, info='Unanalysed')
+    _ensure_authorized_to_update(project)
     if not results:  # pragma: no cover
-        flash('There are no unanlysed results to process!', 'success')
+        flash('There are no unanlysed results to process for this project!',
+              'success')
         return redirect(url_for('.index'))
 
     result = results[0]
@@ -60,6 +69,7 @@ def analyse_result(short_name, result_id):
     """View for analysing a result."""
     project = _get_projects(short_name=short_name, limit=1)[0]
     results = pbclient.find_results(project.id, limit=1)
+    _ensure_authorized_to_update(project)
     if not results:  # pragma: no cover
         abort(404)
 
@@ -87,16 +97,18 @@ def analyse_result(short_name, result_id):
 def reanalyse(short_name):
     """View for triggering reanalysis of all results."""
     project = _get_projects(short_name=short_name, limit=1)[0]
+    project_id = project.id
+    _ensure_authorized_to_update(project)
     form = forms.ReanalysisForm(request.form)
     if request.method == 'POST' and form.validate():
         _filter = form.result_filter.data
-        results = client.get_all_results(api_key, endpoint, project.id)
+        results = client.get_all_results(api_key, endpoint, project_id)
         results = filter(lambda x: str(x.info) == _filter if _filter != 'all'
                          else True, results)
         for r in results:
             match_percentage = current_app.config['MATCH_PERCENTAGE']
             exclude = current_app.config['EXCLUDED_KEYS']
-            kwargs = {'project_id': project.id,
+            kwargs = {'project_id': project_id,
                       'result_id': r.id,
                       'match_percentage': match_percentage,
                       'exclude': exclude}
