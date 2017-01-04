@@ -68,10 +68,7 @@ def setup_hooks(app):
     """Setup hooks."""
     @app.context_processor
     def _global_template_context():
-        return dict(
-            brand=app.config['BRAND'],
-            github_url=app.config['GITHUB_URL']
-        )
+        return dict(brand=app.config['BRAND'])
 
 
 def setup_z3950_manager(app):

@@ -1,5 +1,3 @@
-USERNAME = 'admin'
-PASSWORD = 'secret'
 SECRET_KEY = 'its-a-secret'
 HOST = '0.0.0.0'
 PORT = 5001
