@@ -61,7 +61,6 @@ def analyse(short_name):
         return redirect(url_for('.index'))
 
     result = results[0]
-    print result
     return redirect(url_for('.analyse_result', short_name=short_name,
                             result_id=result.id))
 
