@@ -17,9 +17,11 @@ MINUTE = 60
 def index():
     """Index view for receiving webhooks."""
     payload = request.json or {}
-    payload['api_key'] = current_app.config['API_KEY']
-    payload['endpoint'] = current_app.config['ENDPOINT']
     if request.method == 'POST' and payload['event'] == 'task_completed':
+        payload['api_key'] = current_app.config['API_KEY']
+        payload['endpoint'] = current_app.config['ENDPOINT']
+        payload['match_percentage'] = current_app.config['MATCH_PERCENTAGE']
+        payload['excluded_keys'] = current_app.config['EXCLUDED_KEYS']
         queue.enqueue_call(func=analysis.analyse,
                            kwargs=payload,
                            timeout=10*MINUTE)
