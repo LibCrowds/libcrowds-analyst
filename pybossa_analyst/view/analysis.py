@@ -17,15 +17,10 @@ queue = Queue('pybossa_analyst', connection=Redis())
 MINUTE = 60
 
 
-def _get_projects(**kwargs):
-    """Configure PyBossa client and retrieve projects."""
-    projects = client.get_all_projects(**kwargs)
-    if not projects:
-        if client.get_all_projects(all=1, **kwargs):
-            abort(403)
-        else:
-            abort(404)
-    return projects
+def _configure_pbclient():
+    """Configure PyBossa client."""
+    pbclient.set('api_key', session['api_key'])
+    pbclient.set('endpoint', current_app.config['ENDPOINT'])
 
 
 def _ensure_authorized_to_update(project):
@@ -39,20 +34,24 @@ def _ensure_authorized_to_update(project):
 @login_required
 def index():
     """Projects view."""
-    pbclient.set('api_key', session['api_key'])
-    pbclient.set('endpoint', current_app.config['ENDPOINT'])
-    projects = _get_projects()
-    api_key = session['api_key']
-    return render_template('index.html', projects=projects, api_key=api_key)
+    _configure_pbclient()
+    projects = pbclient.find_project()
+    if not projects:
+        abort(404)
+
+    return render_template('index.html', projects=projects)
 
 
 @blueprint.route('/<short_name>')
 @login_required
 def analyse(short_name):
     """View for analysing the next empty result."""
-    pbclient.set('api_key', session['api_key'])
-    pbclient.set('endpoint', current_app.config['ENDPOINT'])
-    project = _get_projects(short_name=short_name, limit=1)[0]
+    _configure_pbclient()
+    projects = pbclient.find_project(short_name=short_name, limit=1)
+    if not projects:
+        abort(404)
+
+    project = projects[0]
     results = pbclient.find_results(project.id, limit=1, info='Unanalysed')
     _ensure_authorized_to_update(project)
     if not results:  # pragma: no cover
@@ -69,9 +68,12 @@ def analyse(short_name):
 @login_required
 def analyse_result(short_name, result_id):
     """View for analysing a result."""
-    pbclient.set('api_key', session['api_key'])
-    pbclient.set('endpoint', current_app.config['ENDPOINT'])
-    project = _get_projects(short_name=short_name, limit=1)[0]
+    _configure_pbclient()
+    projects = pbclient.find_project(short_name=short_name, limit=1)
+    if not projects:
+        abort(404)
+
+    project = projects[0]
     results = pbclient.find_results(project.id, limit=1)
     if not results:  # pragma: no cover
         abort(404)
@@ -105,24 +107,31 @@ def analyse_result(short_name, result_id):
 @login_required
 def setup(short_name):
     """View for setting up results analysis."""
-    pbclient.set('api_key', session['api_key'])
-    pbclient.set('endpoint', current_app.config['ENDPOINT'])
-    project = _get_projects(short_name=short_name)[0]
-    project_id = project.id
+    _configure_pbclient()
+    projects = pbclient.find_project(short_name=short_name, limit=1)
+    if not projects:
+        abort(404)
+
+    project = projects[0]
     _ensure_authorized_to_update(project)
+    project = pbclient.find_project(short_name=short_name, limit=1)[0]
+
     form = forms.SetupForm(request.form)
     if request.method == 'POST' and form.validate():
         _filter = form.result_filter.data
-        results = client.get_all_results(project_id=project_id)
+        results = client.get_all_results(project_id=project.id)
         results = filter(lambda x: str(x.info) == _filter if _filter != 'all'
                          else True, results)
-        for r in results:
-            match_percentage = current_app.config['MATCH_PERCENTAGE']
-            exclude = current_app.config['EXCLUDED_KEYS']
-            kwargs = {'project_id': project_id,
-                      'result_id': r.id,
-                      'match_percentage': match_percentage,
-                      'exclude': exclude}
+        for result in results:
+            kwargs = {
+                'api_key': session['api_key'],
+                'endpoint': current_app.config['ENDPOINT'],
+                'project_short_name': project.short_name,
+                'project_id': project.id,
+                'result_id': result.id,
+                'match_percentage': current_app.config['MATCH_PERCENTAGE'],
+                'excluded_keys': current_app.config['EXCLUDED_KEYS']
+            }
             queue.enqueue_call(func=analysis.analyse,
                                kwargs=kwargs,
                                timeout=10*MINUTE)
