@@ -7,7 +7,7 @@ from rq import Queue
 from flask import Blueprint
 from flask import render_template, request, abort, flash, redirect, url_for
 from flask import current_app, session
-from pybossa_analyst import analysis, forms, client
+from pybossa_analyst import analysis, forms, client, object_loader
 from pybossa_analyst.login import login_required
 
 
@@ -35,7 +35,7 @@ def _ensure_authorized_to_update(project):
 def index():
     """Projects view."""
     _configure_pbclient()
-    projects = pbclient.find_project()
+    projects = object_loader.load(pbclient.find_project)
     if not projects:
         abort(404)
 

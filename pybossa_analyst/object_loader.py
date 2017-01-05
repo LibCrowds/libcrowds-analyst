@@ -1,10 +1,12 @@
 # -*- coding: utf8 -*-
-"""API client module for pybossa-analyst."""
+"""Object loader module for pybossa-analyst."""
 
 import pbclient
 
 
-def _load(func, **query):
+def load(func, **kwargs):
+    """Load all domain objects."""
+    query = kwargs or {}
     query['limit'] = 100
     items = func(**query)
     last_fetched = items
@@ -16,11 +18,3 @@ def _load(func, **query):
 
 def _not_exhausted(last_fetched, query):
     return (len(last_fetched) != 0 and len(last_fetched) == query['limit'])
-
-def get_all_results(**kwargs):
-    """Return all results."""
-    return _load(pbclient.find_results, **kwargs)
-
-def get_all_projects(**kwargs):
-    """Return all projects."""
-    return _load(pbclient.find_project, **kwargs)
