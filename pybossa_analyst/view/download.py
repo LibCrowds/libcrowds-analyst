@@ -6,36 +6,29 @@ from flask import Blueprint
 from flask import render_template, request, abort, flash
 from flask import current_app, Response, session
 from werkzeug.utils import secure_filename
-from pybossa_analyst import forms, zip_builder, client
+from pybossa_analyst import forms, zip_builder, object_loader
 from pybossa_analyst.login import login_required
 
 
 blueprint = Blueprint('download', __name__)
 
 
-def _get_projects(**kwargs):
-    """Configure PyBossa client and retrieve projects"""
-    pbclient.set('api_key', session['api_key'])
-    pbclient.set('endpoint', current_app.config['ENDPOINT'])
-    projects = pbclient.find_project(**kwargs)
-    if not projects:
-        if pbclient.find_project(short_name=short_name, limit=1, all=1):
-            abort(403)
-        else:
-            abort(404)
-    return projects
-
-
 @blueprint.route('/<short_name>', methods=['GET', 'POST'])
 @login_required
 def download_input(short_name):
     """View to prepare a zip file for download."""
-    project = _get_projects(short_name=short_name, limit=1)[0]
+    pbclient.set('api_key', session['api_key'])
+    pbclient.set('endpoint', current_app.config['ENDPOINT'])
+    projects = pbclient.find_project(short_name=short_name, limit=1)
+    if not projects:
+        abort(404)
+
+    project = projects[0]
     form = forms.DownloadForm(request.form)
     if request.method == 'POST' and form.validate():
         importer = form.importer.data
         task_ids = form.task_ids.data.split()
-        tasks = pbclient.find_tasks(project_id=project.id)
+        tasks = object_loader.load(pbclient.find_tasks, project_id=project.id)
         valid_task_ids = [str(t.id) for t in tasks]
         tasks_to_export = [t for t in tasks if str(t.id) in task_ids and
                            str(t.id) in valid_task_ids]
