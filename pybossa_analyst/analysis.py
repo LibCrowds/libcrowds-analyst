@@ -2,17 +2,18 @@
 """Analysis module for pybossa-analyst."""
 
 import time
+import enki
 import numpy
-import pbclient
 
 
-def _extract_keys(df):
-    """Return all keys from all task run info fields."""
+def _drop_excluded_keys(df, excluded_keys):
+    """Drop excluded keys from task run info fields."""
     keyset = set()
     for i in range(len(df)):
         for k in df.iloc[i]['info'].keys():
             keyset.add(k)
-    return list(keyset)
+    keys = [k for k in keyset if k not in excluded_keys]
+    return df[keys]
 
 
 def _drop_empty_rows(df):
@@ -22,17 +23,29 @@ def _drop_empty_rows(df):
     return df
 
 
-def _get_task_run_dataframe(api_key, endpoint, short_name, task_id):
+def _check_for_n_percent_of_matches(df, n_task_runs, match_percentage):
+    """Check if n percent of answers match for each key."""
+    required_matches = int(round(n_task_runs*(match_percentage / 100.0)))
+    info = {}
+    for k in df.keys():
+        if df[k].value_counts().max() < required_matches:
+            info = 'Unanalysed'
+            continue
+        info[k] = df[k].value_counts().idxmax()
+    return info
+
+
+def _get_task_run_df(api_key, endpoint, project_short_name, task_id):
     """Return a dataframe containing all task run info for a task."""
-    e = enki.Enki(api_key, endpoint, short_name, all=1)
+    e = enki.Enki(api_key, endpoint, project_short_name)
     e.get_tasks(task_id=task_id)
     e.get_task_runs()
     t = e.tasks[0]
     return e.task_runs_df[t.id]
 
 
-def analyse(api_key, endpoint, project_id, result_id, match_percentage,
-            excluded_keys=[], sleep=2, **kwargs):
+def analyse(api_key, endpoint, project_id, result_id, project_short_name,
+            match_percentage, excluded_keys=[], sleep=2, **kwargs):
     """Analyser for all projects.
 
     Check that the info fields of each task run match n percent of the time
@@ -45,26 +58,19 @@ def analyse(api_key, endpoint, project_id, result_id, match_percentage,
     'Unanalysed' so that the different answers can be checked manually later.
     """
     time.sleep(sleep)  # To handle API rate limit when analysing many results
-    pbclient.set('api_key', api_key)
-    pbclient.set('endpoint', endpoint)
-    r = pbclient.get_results(project_id, id=result_id, limit=1, all=1)[0]
-    df = _get_task_run_dataframe(api_key, endpoint, short_name, r.task_id)
-    keys = [k for k in _extract_keys(df) if k not in excluded_keys]
-    df = df[keys]
+    enki.pbclient.set('api_key', api_key)
+    enki.pbclient.set('endpoint', endpoint)
+    r = enki.pbclient.find_results(project_id, id=result_id, limit=1, all=1)[0]
+    df = _get_task_run_df(api_key, endpoint, project_short_name, r.task_id)
+    n_task_runs = len(df.index)
+
+    df = _drop_excluded_keys(df, excluded_keys)
     df = _drop_empty_rows(df)
 
     if df.empty:
-        r.info = {k: "" for k in keys}
-        client.update_result(r)
+        r.info = {k: "" for k in df.keys()}
+        enki.pbclient.update_result(r)
         return
 
-    # Check for n percent of matches
-    required_matches = int(round(len(df.index)*(match_percentage / 100.0)))
-    info = {}
-    for k in keys:
-        if df[k].value_counts().max() < required_matches:
-            info = 'Unanalysed'
-            continue
-        info[k] = df[k].value_counts().idxmax()
-    r.info = info
-    client.update_result(api_key, endpoint, r)
+    r.info = _check_for_n_percent_of_matches(df, n_task_runs, match_percentage)
+    enki.pbclient.update_result(r)
