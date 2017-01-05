@@ -118,25 +118,19 @@ def setup(short_name):
 
     form = forms.SetupForm(request.form)
     if request.method == 'POST' and form.validate():
-        _filter = form.result_filter.data
-        results = client.get_all_results(project_id=project.id)
-        results = filter(lambda x: str(x.info) == _filter if _filter != 'all'
-                         else True, results)
-        for result in results:
-            kwargs = {
-                'api_key': session['api_key'],
-                'endpoint': current_app.config['ENDPOINT'],
-                'project_short_name': project.short_name,
-                'project_id': project.id,
-                'result_id': result.id,
-                'match_percentage': current_app.config['MATCH_PERCENTAGE'],
-                'excluded_keys': current_app.config['EXCLUDED_KEYS']
-            }
-            queue.enqueue_call(func=analysis.analyse,
-                               kwargs=kwargs,
-                               timeout=10*MINUTE)
-        flash('''{0} results will be reanalysed.
-              '''.format(len(results)), 'success')
+        kwargs = {
+            'api_key': session['api_key'],
+            'endpoint': current_app.config['ENDPOINT'],
+            'project_id': project.id,
+            'project_short_name': project.short_name,
+            'info_filter': form.info_filter.data,
+            'match_percentage': current_app.config['MATCH_PERCENTAGE'],
+            'excluded_keys': current_app.config['EXCLUDED_KEYS']
+        }
+        queue.enqueue_call(func=analysis.analyse_multiple,
+                           kwargs=kwargs,
+                           timeout=10*MINUTE)
+        flash('"{0}" results will be reanalysed.'.format(_filter), 'success')
     elif request.method == 'POST':  # pragma: no cover
         flash('Please correct the errors.', 'danger')
     return render_template('setup.html', title="Setup", project=project,

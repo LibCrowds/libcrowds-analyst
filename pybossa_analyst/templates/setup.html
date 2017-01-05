@@ -14,7 +14,7 @@
             </p>
             <form method="POST" action="{{ url_for('analysis.setup', short_name=project.short_name) }}">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-                {{ render_field(form.result_filter, class="form-control") }}
+                {{ render_field(form.info_filter, class="form-control") }}
                 <div class="text-right">
                     <input class="btn btn-success" type="submit" value="Continue"></input>
                 </div>
