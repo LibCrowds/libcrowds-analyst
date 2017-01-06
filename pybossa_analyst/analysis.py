@@ -46,6 +46,13 @@ def _get_task_run_df(api_key, endpoint, project_short_name, task_id):
     return e.task_runs_df[t.id]
 
 
+def _filter_results(results, info_filter):
+    """Filter results based on their info field."""
+    return filter(lambda x: (info_filter == "All") or
+                            (not x.info and info_filter == "New") or
+                            (x.info == info_filter), results)
+
+
 def analyse(api_key, endpoint, project_id, result_id, project_short_name,
             match_percentage, excluded_keys=[], **kwargs):
     """Analyser for all projects.
@@ -85,8 +92,7 @@ def analyse_multiple(api_key, endpoint, project_id, project_short_name,
     time.sleep(2)  # To handle API rate limit when analysing many results
     results = object_loader.load(enki.pbclient.find_results,
                                  project_id=project_id)
-    results = filter(lambda x: str(x.info) == info_filter
-                     if info_filter != 'all' else True, results)
+    results = _filter_results(results, info_filter)
     for result in results:
         kwargs = {
             'api_key': api_key,

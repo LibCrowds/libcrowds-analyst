@@ -105,7 +105,6 @@ class TestAnalysis(object):
         mock_enki.pbclient.update_result.assert_called_with(result)
         assert result.info == {'n': ''}
 
-
     def test_unanalysed_result_updated(self, create_task_run_df, mocker,
                                        project, result, task):
         """Test that an 'Unanalysed' result is updated correctly."""
@@ -127,7 +126,6 @@ class TestAnalysis(object):
         mock_enki.pbclient.update_result.assert_called_with(result)
         assert result.info == 'Unanalysed'
 
-
     def test_matched_result_updated(self, create_task_run_df, mocker,
                                     project, result, task):
         """Test that a matched result is updated correctly."""
@@ -148,3 +146,9 @@ class TestAnalysis(object):
         analysis.analyse(**kwargs)
         mock_enki.pbclient.update_result.assert_called_with(result)
         assert result.info == {'n': '42'}
+
+    def test_new_results_filtered(self, result):
+        """Test new results filtered correctly."""
+        result.info = None
+        filtered = analysis._filter_results([result], "New")
+        assert filtered == [result]
