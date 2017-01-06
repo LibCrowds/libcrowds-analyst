@@ -28,10 +28,11 @@ def _check_for_n_percent_of_matches(df, n_task_runs, match_percentage):
     """Check if n percent of answers match for each key."""
     required_matches = int(round(n_task_runs*(match_percentage / 100.0)))
     info = {}
+    df = df.replace(numpy.nan, '')  # Replace Nan with the empty string
     for k in df.keys():
         if df[k].value_counts().max() < required_matches:
             info = 'Unanalysed'
-            continue
+            break
         info[k] = df[k].value_counts().idxmax()
     return info
 
@@ -83,7 +84,7 @@ def analyse_multiple(api_key, endpoint, project_id, project_short_name,
     enki.pbclient.set('endpoint', endpoint)
     time.sleep(2)  # To handle API rate limit when analysing many results
     results = object_loader.load(enki.pbclient.find_results,
-                                 project_id=project.id)
+                                 project_id=project_id)
     results = filter(lambda x: str(x.info) == info_filter
                      if info_filter != 'all' else True, results)
     for result in results:

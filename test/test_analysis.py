@@ -1,5 +1,6 @@
 # -*- coding: utf8 -*-
 
+import numpy
 from pytest_mock import mocker
 from pybossa_analyst import analysis
 
@@ -30,10 +31,25 @@ class TestAnalysis(object):
         df = analysis._drop_empty_rows(df)
         assert len(df) == 1 and df['n'][0] == '42'
 
+    def test_partial_rows_are_not_dropped(self, create_task_run_df):
+        """Test partial rows are not dropped."""
+        tr_info = [{'n': '42', 'comment': ''}]
+        df = create_task_run_df(tr_info)
+        df = analysis._drop_empty_rows(df)
+        assert len(df) == 1 and df['n'][0] == '42'
+
     def test_match_percent_not_met(self, create_task_run_df):
         """Test that 'Unanalysed' is returned when match percentage not met."""
         tr_info = [{'n': '42'}, {'n': ''}]
         df = create_task_run_df(tr_info)[['n']]
+        info = analysis._check_for_n_percent_of_matches(df, 2, 100)
+        assert info == "Unanalysed"
+
+    def test_match_percent_not_met_with_nan_cols(self, create_task_run_df):
+        """Test that 'Unanalysed' is still returned with NaN columns."""
+        tr_info = [{'n': '', 'comment': ''}]
+        df = create_task_run_df(tr_info)[['n', 'comment']]
+        df = df.replace('', numpy.nan)
         info = analysis._check_for_n_percent_of_matches(df, 2, 100)
         assert info == "Unanalysed"
 
