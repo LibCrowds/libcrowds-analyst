@@ -51,12 +51,13 @@ def index():
 def analyse(short_name):
     """View for analysing the next empty result."""
     _configure_pbclient()
-    projects = pbclient.find_project(short_name=short_name, limit=1)
+    projects = pbclient.find_project(short_name=short_name, limit=1, all=1)
     if not projects:  # pragma: no cover
         abort(404)
 
     project = projects[0]
-    results = pbclient.find_results(project.id, limit=1, info='Unanalysed')
+    results = pbclient.find_results(project.id, limit=1, all=1,
+                                    info='Unanalysed')
     if not results:  # pragma: no cover
         flash('There are no unanlysed results to process for this project!',
               'success')
@@ -72,18 +73,18 @@ def analyse(short_name):
 def analyse_result(short_name, result_id):
     """View for analysing a result."""
     _configure_pbclient()
-    projects = pbclient.find_project(short_name=short_name, limit=1)
+    projects = pbclient.find_project(short_name=short_name, limit=1, all=1)
     if not projects:  # pragma: no cover
         abort(404)
 
     project = projects[0]
-    results = pbclient.find_results(project.id, id=result_id, limit=1)
+    results = pbclient.find_results(project.id, id=result_id, limit=1, all=1)
     if not results:  # pragma: no cover
         abort(404)
 
     result = results[0]
-    task = pbclient.find_tasks(project.id, id=result.task_id)[0]
-    taskruns = pbclient.find_taskruns(project.id, task_id=task.id)
+    task = pbclient.find_tasks(project.id, id=result.task_id, all=1)[0]
+    taskruns = pbclient.find_taskruns(project.id, task_id=task.id, all=1)
     _ensure_authorized_to_update(short_name)
 
     if request.method == 'POST':
@@ -111,7 +112,7 @@ def analyse_result(short_name, result_id):
 def setup(short_name):
     """View for setting up results analysis."""
     _configure_pbclient()
-    projects = pbclient.find_project(short_name=short_name, limit=1)
+    projects = pbclient.find_project(short_name=short_name, limit=1, all=1)
     if not projects:  # pragma: no cover
         abort(404)
 
