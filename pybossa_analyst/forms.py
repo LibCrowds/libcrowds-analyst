@@ -10,7 +10,7 @@ from wtforms.validators import required
 class SetupForm(Form):
     """Form for triggering result reanalysis."""
     info_filter = SelectField('Filter:',
-                              choices=[('all', 'All'), ('None', 'New'),
+                              choices=[('All', 'All'), ('New', 'New'),
                                        ('Unanalysed', 'Unanalysed')])
 
 
