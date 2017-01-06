@@ -39,7 +39,7 @@ def _check_for_n_percent_of_matches(df, n_task_runs, match_percentage):
 
 def _get_task_run_df(api_key, endpoint, project_short_name, task_id):
     """Return a dataframe containing all task run info for a task."""
-    e = enki.Enki(api_key, endpoint, project_short_name)
+    e = enki.Enki(api_key, endpoint, project_short_name, all=1)
     e.get_tasks(task_id=task_id)
     e.get_task_runs()
     t = e.tasks[0]
@@ -91,7 +91,7 @@ def analyse_multiple(api_key, endpoint, project_id, project_short_name,
     enki.pbclient.set('endpoint', endpoint)
     time.sleep(2)  # To handle API rate limit when analysing many results
     results = object_loader.load(enki.pbclient.find_results,
-                                 project_id=project_id)
+                                 project_id=project_id, all=1)
     results = _filter_results(results, info_filter)
     for result in results:
         kwargs = {
