@@ -15,7 +15,7 @@
                     <a href="{{ url_for('projects.index') }}">Projects</a>
                 </li>
                 <li {% if active_page == "help" %}class="active"{% endif %}>
-                    <a href="#">Help</a>
+                    <a href="{{ url_for('home.help') }}">Help</a>
                 </li>
             </ul>
             <ul class="nav navbar-nav navbar-right">
