@@ -12,7 +12,7 @@ from pybossa_analyst import analysis, forms, object_loader
 from pybossa_analyst.login import login_required
 
 
-blueprint = Blueprint('analysis', __name__)
+blueprint = Blueprint('projects', __name__)
 
 queue = Queue('pybossa_analyst', connection=Redis())
 MINUTE = 60

@@ -12,7 +12,7 @@
                 <strong>WARNING: </strong>Clicking the button below will trigger reanalysis of results and override
                 current result data.
             </p>
-            <form method="POST" action="{{ url_for('analysis.setup', short_name=project.short_name) }}">
+            <form method="POST" action="{{ url_for('projects.setup', short_name=project.short_name) }}">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
                 {{ render_field(form.info_filter, class="form-control") }}
                 <div class="text-right">

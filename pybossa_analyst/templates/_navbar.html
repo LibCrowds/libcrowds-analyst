@@ -7,12 +7,12 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="{{ url_for('analysis.index') }}">{{ brand }}</a>
+            <a class="navbar-brand" href="{{ url_for('projects.index') }}">{{ brand }}</a>
         </div>
         <div class="collapse navbar-collapse" id="main-navbar-collapse">
             <ul class="nav navbar-nav">
                 <li {% if active_page == "projects" %}class="active"{% endif %}>
-                    <a href="{{ url_for('analysis.index') }}">Projects</a>
+                    <a href="{{ url_for('projects.index') }}">Projects</a>
                 </li>
                 <li {% if active_page == "help" %}class="active"{% endif %}>
                     <a href="#">Help</a>

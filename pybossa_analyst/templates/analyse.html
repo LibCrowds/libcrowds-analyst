@@ -12,7 +12,7 @@
         </div>
         <div class="col-xs-12 col-md-6 col-md-pull-6">
             <form id="answer-form" method="POST" role="form"
-                  action="{{url_for('analysis.analyse_result', short_name=project.short_name, result_id=result.id)}}">
+                  action="{{url_for('projects.analyse_result', short_name=project.short_name, result_id=result.id)}}">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
                 {% for key in keys %}
                     <div id="page-{{ loop.index }}" class="page" {% if not loop.first %}style="display: none;"{% endif %}>

@@ -35,10 +35,10 @@ def configure_app(app):
 def setup_url_rules(app):
     """Setup URL rules."""
     from pybossa_analyst.view.home import blueprint as home
-    from pybossa_analyst.view.analysis import blueprint as analyse
+    from pybossa_analyst.view.projects import blueprint as projects
     from pybossa_analyst.view.download import blueprint as download
     app.register_blueprint(home, url_prefix='/')
-    app.register_blueprint(analyse, url_prefix='/analysis')
+    app.register_blueprint(projects, url_prefix='/projects')
     app.register_blueprint(download, url_prefix='/download')
 
 
