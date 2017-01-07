@@ -6,24 +6,12 @@
 (https://coveralls.io/github/alexandermendes/pybossa-analyst?branch=master)
 
 
-A web application to help with real-time analysis of PyBossa results.
+A web application to help with real-time analysis and verification of PyBossa results.
 
 When a webhook is recieved from your PyBossa server to indicate that a task has been completed the application
-analyses all of the task runs associated with that task, by default looking for a 60% match rate accross all
-answer keys (i.e. 2 out of 3, 5 out of 8, or 12 out of 20 people entered the same answer etc.). For tasks where
-a match could not be found the application provides templates to check each answer submitted for a task and select
-the correct one (if present).
-
-The basic process for analysis is as follows:
-
-- Check that the info fields of each task run match n percent of the time or above, disregarding task runs
-where all of the info fields are blank.
-- For tasks where we have a sufficent number of matches the result will be set to a dictionary containing
-the task run info keys and the matched values.
-- For tasks where all info fields of all task runs are empty the result will be set to a dictionary containing
-the task run info keys and empty values.
-- For all other tasks the result will be set to the string 'Unanalysed' so that the different answers can be checked
-manually later.
+analyses all task runs associated with that task, by default looking for a specified match rate for each answer
+key. If a match is found the result associated with the task is updated automatically. For tasks where a match
+cannot be found the application provides templates to check each answer and set the final result.
 
 
 ## Requirements
@@ -40,7 +28,7 @@ Install the required development packages:
 sudo apt-get install libxml2-dev libxslt-dev python-dev lib32z1-dev
 ```
 
-To install pybossa-analyst to a virtual environment:
+Install pybossa-analyst to a virtual environment:
 
 ```
 git clone https://github.com/alexandermendes/pybossa-analyst
@@ -65,30 +53,3 @@ vim settings.py
 
 For deployment using nginx, uwsgi and supervisor a number of template files are
 provided in the [contrib](./contrib) folder.
-
-
-### Endpoints
-
-- Process the next unanalysed result:
-
-```http
-GET /<project_short_name>
-```
-
-- Process a specific result:
-
-```http
-GET /<project_short_name>/<result_id>
-```
-
-- Trigger reanalysis for all of a project's results:
-
-```http
-GET /<project_short_name>/reanalyse
-```
-
-- Download the original input (e.g. the images) associated with a list of tasks:
-
-```http
-GET /<project_short_name>/download
-```
