@@ -49,7 +49,7 @@ def analyse(short_name):
     results = pbclient.find_results(project.id, limit=1, all=1,
                                     info='Unverified')
     if not results:  # pragma: no cover
-        flash('There are no unanlysed results to process for this project!',
+        flash('There are no unverified results to process for this project!',
               'success')
         return redirect(url_for('.index'))
 
