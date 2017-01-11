@@ -11,7 +11,7 @@ class SetupForm(FlaskForm):
     """Form for triggering result reanalysis."""
     info_filter = SelectField('Filter:',
                               choices=[('All', 'All'), ('New', 'New'),
-                                       ('Unanalysed', 'Unanalysed')])
+                                       ('Unverified', 'Unverified')])
 
 
 class DownloadForm(FlaskForm):

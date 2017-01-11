@@ -39,26 +39,26 @@ class TestAnalysis(object):
         assert len(df) == 1 and df['n'][0] == '42'
 
     def test_match_percent_not_met(self, create_task_run_df):
-        """Test that 'Unanalysed' is returned when match percentage not met."""
+        """Test that 'Unverified' is returned when match percentage not met."""
         tr_info = [{'n': '42'}, {'n': ''}]
         df = create_task_run_df(tr_info)[['n']]
         info = analysis._check_for_n_percent_of_matches(df, 2, 100)
-        assert info == "Unanalysed"
+        assert info == "Unverified"
 
     def test_match_percent_not_met_with_nan_cols(self, create_task_run_df):
-        """Test that 'Unanalysed' is still returned with NaN columns."""
+        """Test that 'Unverified' is still returned with NaN columns."""
         tr_info = [{'n': '', 'comment': ''}]
         df = create_task_run_df(tr_info)[['n', 'comment']]
         df = df.replace('', numpy.nan)
         info = analysis._check_for_n_percent_of_matches(df, 2, 100)
-        assert info == "Unanalysed"
+        assert info == "Unverified"
 
     def test_match_percent_not_met_with_empty_rows(self, create_task_run_df):
-        """Test that 'Unanalysed' is still returned when empty rows dropped."""
+        """Test that 'Unverified' is still returned when empty rows dropped."""
         tr_info = [{'n': '42'}]
         df = create_task_run_df(tr_info)[['n']]
         info = analysis._check_for_n_percent_of_matches(df, 2, 100)
-        assert info == "Unanalysed"
+        assert info == "Unverified"
 
     def test_answer_set_when_match_percent_met(self, create_task_run_df):
         """Test that answer is set correctly when match percentage not met."""
@@ -105,9 +105,9 @@ class TestAnalysis(object):
         mock_enki.pbclient.update_result.assert_called_with(result)
         assert result.info == {'n': ''}
 
-    def test_unanalysed_result_updated(self, create_task_run_df, mocker,
+    def test_unverified_result_updated(self, create_task_run_df, mocker,
                                        project, result, task):
-        """Test that an 'Unanalysed' result is updated correctly."""
+        """Test that an 'Unverified' result is updated correctly."""
         mock_enki = mocker.patch('pybossa_analyst.analysis.enki')
         tr_info = [{'n': '42'}, {'n': ''}]
         df = create_task_run_df(tr_info)
@@ -124,7 +124,7 @@ class TestAnalysis(object):
         }
         analysis.analyse(**kwargs)
         mock_enki.pbclient.update_result.assert_called_with(result)
-        assert result.info == 'Unanalysed'
+        assert result.info == 'Unverified'
 
     def test_matched_result_updated(self, create_task_run_df, mocker,
                                     project, result, task):

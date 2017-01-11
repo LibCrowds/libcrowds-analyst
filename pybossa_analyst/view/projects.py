@@ -47,7 +47,7 @@ def analyse(short_name):
 
     project = projects[0]
     results = pbclient.find_results(project.id, limit=1, all=1,
-                                    info='Unanalysed')
+                                    info='Unverified')
     if not results:  # pragma: no cover
         flash('There are no unanlysed results to process for this project!',
               'success')

@@ -31,7 +31,7 @@ def _check_for_n_percent_of_matches(df, n_task_runs, match_percentage):
     df = df.replace(numpy.nan, '')  # Replace Nan with the empty string
     for k in df.keys():
         if df[k].value_counts().max() < required_matches:
-            info = 'Unanalysed'
+            info = 'Unverified'
             break
         info[k] = df[k].value_counts().idxmax()
     return info
@@ -64,7 +64,7 @@ def analyse(api_key, endpoint, project_id, result_id, project_short_name,
     values. For tasks where all info fields of all task runs are empty the
     result will be set to a dictionary containing the task run info keys and
     empty values. For all other tasks the result will be set to the string
-    'Unanalysed' so that the different answers can be checked manually later.
+    'Unverified' so that the different answers can be checked manually later.
     """
     enki.pbclient.set('api_key', api_key)
     enki.pbclient.set('endpoint', endpoint)
