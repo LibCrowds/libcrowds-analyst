@@ -28,5 +28,7 @@ def generate(tasks, importer):
     z = zipstream.ZipFile(compression=zipstream.ZIP_DEFLATED)
     if importer == 'flickr':
         return _generate_zip("title", "url")
+    elif importer == 'dropbox':
+        return _generate_zip("filename", "link_raw")
     else:
         raise ValueError("Unknown importer type")
