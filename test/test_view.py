@@ -36,46 +36,79 @@ class TestView(object):
         test_client.get('/logout')
         assert not session.get('api_key')
 
-    def test_next_unanalysed_result_returned(self, test_client,
+    def test_list_of_projects_returned(self, test_client, login, mocker,
+                                       project, result):
+        """Test the main projects page is rendered with a list of projects."""
+        mock_rd = mocker.patch('pybossa_analyst.view.projects.render_template')
+        mock_rd.return_value = "OK"
+        mock_ld = mocker.patch('pybossa_analyst.view.projects.object_loader')
+        mock_ld.load.return_value = [project]
+        resp = test_client.get('/projects/')
+        mock_rd.assert_called_with('index.html', projects=[project])
+
+    def test_next_unverified_result_returned(self, test_client, login,
                                              mocker, project, result):
         """Test redirect to display next unanalysed result."""
-        pass
+        mock_redirect = mocker.patch('pybossa_analyst.view.projects.redirect')
+        mock_redirect.return_value = "OK"
+        mock_pbclient = mocker.patch('pybossa_analyst.view.projects.pbclient')
+        mock_pbclient.find_results.return_value = [result]
+        url = "/projects/{}".format(project.short_name)
+        test_client.get(url)
+        expected = '/projects/{0}/{1}'.format(project.short_name, result.id)
+        mock_redirect.assert_called_with(expected)
 
-    def test_reanalysis_of_all_tasks(self, test_client, mocker, result,
-                                     project, app):
-        """Test that reanalysis of all tasks is triggered correctly."""
-        pass
+    def test_excluded_keys_not_returned(self, test_client, login, mocker,
+                                        project, result, create_task_run, app):
+        """Test excluded keys are not returned for analysis."""
+        mock_auth = mocker.patch('pybossa_analyst.view.projects.auth')
+        mock_rd = mocker.patch('pybossa_analyst.view.projects.render_template')
+        mock_rd.return_value = "OK"
+        mock_pbclient = mocker.patch('pybossa_analyst.view.projects.pbclient')
+        tr_info = {"foo": "bar", "n": "42"}
+        task_run = create_task_run(1, tr_info)
+        app.config['EXCLUDED_KEYS'] = ["foo"]
+        mock_pbclient.find_taskruns.return_value = [task_run]
+        url = '/projects/{0}/{1}'.format(project.short_name, result.id)
+        test_client.get(url)
+        assert mock_rd.call_args[1]['keys'] == {'n'}
 
-    def test_reanalysis_of_new_tasks(self, test_client, mocker, result,
-                                     project, app):
-        """Test that reanalysis of new tasks is triggered correctly."""
-        pass
+    def test_reanalysis(self, test_client, login, mocker, result, project,
+                        app):
+        """Test that result reanalysis is triggered correctly."""
+        mock_auth = mocker.patch('pybossa_analyst.view.projects.auth')
+        mock_pbclient = mocker.patch('pybossa_analyst.view.projects.pbclient')
+        mock_pbclient.find_project.return_value = [project]
+        mock_queue = mocker.patch('pybossa_analyst.view.projects.queue')
+        url = "/projects/{}/setup".format(project.short_name)
+        info_filter = "All"
+        data = {"info_filter": info_filter}
+        test_client.post(url, data=data)
+        func = analysis.analyse_multiple
+        kwargs = {
+            'api_key': app.config['API_KEY'],
+            'endpoint': app.config['ENDPOINT'],
+            'project_id': project.id,
+            'project_short_name': project.short_name,
+            'info_filter': info_filter,
+            'match_percentage': app.config['MATCH_PERCENTAGE'],
+            'excluded_keys': app.config['EXCLUDED_KEYS']
+        }
+        mock_queue.enqueue_call.assert_called_with(func=func,
+                                                   kwargs=kwargs,
+                                                   timeout=600)
 
-    def test_reanalysis_of_unanalysed_tasks(self, test_client, mocker, result,
-                                            project, app):
-        """Test that reanalysis of Unanalysed tasks is triggered correctly."""
-        pass
-
-    def test_reanalysis_of_no_tasks(self, test_client, mocker, task, result,
-                                    project, app):
-        """Test reanalysis of tasks filter works when no tasks selected."""
-        pass
-
-    def test_result_updated_after_analysis(self, test_client, mocker, result,
-                                           project):
-        """Test that the result is updated correctly following analysis."""
-        pass
-
-    def test_csrf_token_removed_after_analysis(self, test_client, mocker,
-                                               result, project):
-        """Test that the CSRF token is not saved to the final result info."""
-        pass
-
-    def test_correct_data_returned_for_analysis(self, test_client, mocker,
-                                                result, project, task,
-                                                create_task_run):
-        """Test that the correct data is returned for analysis."""
-        pass
+    def test_verified_result_updated(self, test_client, login, mocker, result,
+                                     project):
+        """Test that the result is updated correctly following verification."""
+        mock_auth = mocker.patch('pybossa_analyst.view.projects.auth')
+        mock_pbclient = mocker.patch('pybossa_analyst.view.projects.pbclient')
+        mock_pbclient.find_results.return_value = [result]
+        url = "/projects/{0}/{1}".format(project.short_name, result.id)
+        data = {"foo": "bar"}
+        test_client.post(url, data=data)
+        assert result.info == data
+        mock_pbclient.update_result.assert_called_with(result)
 
     def test_invalid_task_ids_identified(self, test_client, login, mocker,
                                          project, task):

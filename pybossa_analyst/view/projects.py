@@ -7,9 +7,8 @@ from rq import Queue
 from flask import Blueprint
 from flask import render_template, request, abort, flash, redirect, url_for
 from flask import current_app, session
-from pybossa_analyst import analysis, forms, object_loader
+from pybossa_analyst import analysis, forms, object_loader, auth
 from pybossa_analyst.login import login_required
-from pybossa_analyst.auth import ensure_authorized_to_update
 
 
 blueprint = Blueprint('projects', __name__)
@@ -75,19 +74,19 @@ def analyse_result(short_name, result_id):
     result = results[0]
     task = pbclient.find_tasks(project.id, id=result.task_id, all=1)[0]
     taskruns = pbclient.find_taskruns(project.id, task_id=task.id, all=1)
-    ensure_authorized_to_update(short_name)
+    auth.ensure_authorized_to_update(short_name)
 
     if request.method == 'POST':
         data = request.form.to_dict()
         data.pop('csrf_token', None)
         result.info = data
         resp = pbclient.update_result(result)
-        if isinstance(resp, dict) and resp.get('exception_msg'):
+        error = isinstance(resp, dict) and resp.get('exception_msg')
+        if error:  # pragma: no cover
             err_msg = '{0}: {1}'.format(resp['exception_cls'],
                                         resp['exception_msg'])
             flash(err_msg, 'danger')
-        url = url_for('.analyse', short_name=short_name)
-        return redirect(url)
+        return redirect(url_for('.analyse', short_name=short_name))
 
     excluded_keys = current_app.config['EXCLUDED_KEYS']
     keys = set(k for tr in taskruns for k in tr.info.keys()
@@ -107,7 +106,7 @@ def setup(short_name):
         abort(404)
 
     project = projects[0]
-    ensure_authorized_to_update(short_name)
+    auth.ensure_authorized_to_update(short_name)
 
     form = forms.SetupForm(request.form)
     if request.method == 'POST' and form.validate():

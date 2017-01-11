@@ -52,7 +52,7 @@ def setup_csrf(app):
 def setup_error_handler(app):
     """Setup error handler."""
     @app.errorhandler(Exception)
-    def _handle_error(e):
+    def _handle_error(e):  # pragma: no cover
         if app.debug:
             raise
         if isinstance(e, RequestException):
