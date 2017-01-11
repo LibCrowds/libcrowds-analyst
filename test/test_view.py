@@ -121,7 +121,7 @@ class TestView(object):
         bad_task_id = "some_bad_id"
         data = {'importer': 'flickr', 'task_ids': bad_task_id}
         resp = test_client.post(url, data=data)
-        err_msg = 'Invalid task IDs: {0}'.format(bad_task_id)
+        err_msg = 'Invalid task IDs entered for this project'
         mock_flash.assert_called_with(err_msg, 'danger')
 
     def test_zip_headers(self, test_client, login, mocker, task, project):
