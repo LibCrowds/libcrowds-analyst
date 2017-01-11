@@ -5,23 +5,28 @@ import requests
 import zipstream
 
 
-def _generate_flickr_zip(tasks):
-    """Generate an image set containing images downloaded from Flickr."""
+def _stream_content(url):
+    """Stream response data."""
+    r = requests.get(url, stream=True)
+    for chunk in r.iter_content():
+        yield chunk
+
+
+def _generate_zip(tasks, fn_key, url_key):
+    """Generate a zip containing downloaded task data."""
     z = zipstream.ZipFile(compression=zipstream.ZIP_DEFLATED)
     for t in tasks:
-        if not t.info.get('url') or not t.info.get('title'):
-            raise ValueError('Invalid Flickr task')
-        url = t.info['url']
-        title = t.info['title']
-        img = requests.get(url).content
-        z.write_iter(title, img)
-        for chunk in z:
-            yield chunk
+        fn = t.info[fn_key]
+        url = t.info[url_key]
+        z.write_iter(fn, _stream_content(url))
+    for chunk in z:
+        yield chunk
 
 
 def generate(tasks, importer):
     """Generate a zip file containing original task input."""
+    z = zipstream.ZipFile(compression=zipstream.ZIP_DEFLATED)
     if importer == 'flickr':
-        return _generate_flickr_zip(tasks)
+        return _generate_zip("title", "url")
     else:
         raise ValueError("Unknown importer type")
