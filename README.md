@@ -8,10 +8,16 @@
 
 A web application to help with real-time analysis and verification of PyBossa results.
 
-When a webhook is recieved from your PyBossa server to indicate that a task has been completed the application
-analyses all task runs associated with that task, by default looking for a specified match rate for each answer
-key. If a match is found the result associated with the task is updated automatically. For tasks where a match
-cannot be found the application provides templates to check each answer and set the final result.
+When a webhook is received from your PyBossa server to indicate that a task has been completed
+PyBossa Analyst analyses all task runs associated with that task, looking for a specified
+match rate for each answer key (disregarding task runs where all answer fields have been left
+blank). If a match is found the result associated with the task is updated to the matched answer
+for each key. If all keys for all answers have been left blank the result will be set to the
+empty string for each key.For tasks where a match cannot be found the result will be set to
+"Unverified" and the application provides templates to check each of these unverified answers
+and manually set the final result.
+
+See
 
 
 ## Requirements
