@@ -53,4 +53,4 @@ def logout():
 @blueprint.route('help')
 def help():
     """Help view."""
-    return render_template('help.html')
+    return render_template('help.html', title="Help")
