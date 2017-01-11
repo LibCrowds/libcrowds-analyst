@@ -25,7 +25,6 @@ def _generate_zip(tasks, fn_key, url_key):
 
 def generate(tasks, importer):
     """Generate a zip file containing original task input."""
-    z = zipstream.ZipFile(compression=zipstream.ZIP_DEFLATED)
     if importer == 'flickr':
         return _generate_zip(tasks, "title", "url")
     elif importer == 'dropbox':
