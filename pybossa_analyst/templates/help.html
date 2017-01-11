@@ -150,5 +150,27 @@
         </div>
     </section>
 
+    <section id="theme-integration">
+        <div class="row">
+            <div class="col-xs-12">
+                <h3>Theme integration</h3>
+                <p>
+                    You may want to integrate a link to the analyst application into your main PyBossa theme. For example
+                    you could add a variable to your main PyBossa configuration file pointing to your {{ brand }} base URL
+                    then add a link to each project dashboard page as follows:
+                </p>
+                <div class="well">
+                    {% raw %}
+                    {% if config.get('PYBOSSA_ANALYST_URL') %}
+                        <br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&lt;a href="{{ config['PYBOSSA_ANALYST_URL'] }}/projects/{{ project.short_name }}?api_key={{ current_user.api_key }}">Analysis&lt;/a>
+                        <br>
+                    {% endif %}
+                    {% endraw %}
+                </div>
+            </div>
+        </div>
+    </section>
+
  </div>
 {% endblock %}
