@@ -7,7 +7,6 @@ from rq import Queue
 from flask import Blueprint
 from flask import render_template, request, abort, flash, redirect, url_for
 from flask import current_app, session
-from werkzeug.exceptions import Unauthorized
 from pybossa_analyst import analysis, forms, object_loader
 from pybossa_analyst.login import login_required
 
@@ -22,16 +21,6 @@ def _configure_pbclient():
     """Configure PyBossa client."""
     pbclient.set('api_key', session['api_key'])
     pbclient.set('endpoint', current_app.config['ENDPOINT'])
-
-
-def _ensure_authorized_to_update(short_name):
-    """Ensure that a result can be updated using the current API key."""
-    p = pbclient.find_project(short_name=short_name, all=1)[0]
-    r = pbclient.find_results(p.id, limit=1, all=1)[0]
-    resp = pbclient.update_result(r)
-    if isinstance(resp, dict) and resp.get('status_code') == 401:
-        raise Unauthorized("""You are not authorised to update results for
-                           this project using the API key provided""")
 
 
 @blueprint.route('/')
@@ -85,7 +74,7 @@ def analyse_result(short_name, result_id):
     result = results[0]
     task = pbclient.find_tasks(project.id, id=result.task_id, all=1)[0]
     taskruns = pbclient.find_taskruns(project.id, task_id=task.id, all=1)
-    _ensure_authorized_to_update(short_name)
+    ensure_authorized_to_update(short_name)
 
     if request.method == 'POST':
         data = request.form.to_dict()
@@ -117,7 +106,7 @@ def setup(short_name):
         abort(404)
 
     project = projects[0]
-    _ensure_authorized_to_update(short_name)
+    ensure_authorized_to_update(short_name)
 
     form = forms.SetupForm(request.form)
     if request.method == 'POST' and form.validate():
