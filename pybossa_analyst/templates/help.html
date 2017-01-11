@@ -19,14 +19,45 @@
                 <p>
                     When a webhook is received from your PyBossa server to indicate that a task has been completed
                     {{ brand }} analyses all task runs associated with that task, looking for a specified
-                    match rate for each answer key. If a match is found the result associated with the task is
-                    updated automatically. For tasks where a match cannot be found the application provides
-                    templates to check each answer and set the final result.
+                    match rate for each answer key (disregarding task runs where all answer fields have been left
+                    blank). If a match is found the result associated with the task is updated to the matched answer
+                    for each key. If all keys for all answers have been left blank the result will be set to the
+                    empty string for each key.For tasks where a match cannot be found the result will be set to
+                    "Unverified" and the application provides templates to check each of these unverified answers
+                    and manually set the final result.
                 </p>
                 <p>
                     The match rate for {{ brand }} is currently set to {{ config['MATCH_PERCENTAGE'] }}%, which
                     can be modified via the application's main configuration file.
                 </p>
+                <h4>Examples</h4>
+                <p>If the match rate was set to 100% results would be set as follows:</p>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th class="col-xs-3">Answer One</th>
+                            <th class="col-xs-3">Answer Two</th>
+                            <th class="col-xs-3">Result</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th class="col-xs-3">{"foo": "bar"}</th>
+                            <th class="col-xs-3">{"foo": "bar"}</th>
+                            <th class="col-xs-3">{"foo": "bar"}</th>
+                        </tr>
+                        <tr>
+                            <th class="col-xs-3">{"foo": ""}</th>
+                            <th class="col-xs-3">{"foo": ""}</th>
+                            <th class="col-xs-3">{"foo": ""}</th>
+                        </tr>
+                        <tr>
+                            <th class="col-xs-3">{"foo": "bar"}</th>
+                            <th class="col-xs-3">{"foo": ""}</th>
+                            <th class="col-xs-3">"Unverified"</th>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
     </section>
