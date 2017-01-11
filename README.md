@@ -17,8 +17,6 @@ empty string for each key.For tasks where a match cannot be found the result wil
 "Unverified" and the application provides templates to check each of these unverified answers
 and manually set the final result.
 
-See
-
 
 ## Requirements
 
@@ -59,3 +57,12 @@ vim settings.py
 
 For deployment using nginx, uwsgi and supervisor a number of template files are
 provided in the [contrib](./contrib) folder.
+
+
+## Testing
+
+To run tests:
+
+```
+python setup.py test
+```
