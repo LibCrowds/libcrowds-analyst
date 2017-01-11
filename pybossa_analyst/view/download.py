@@ -33,12 +33,9 @@ def download_input(short_name):
         tasks = object_loader.load(pbclient.find_tasks, project_id=project.id,
                                    all=1)
         valid_ids = [str(t.id) for t in tasks]
-        tasks_to_export = [t for t in tasks if str(t.id) in task_ids and
-                           str(t.id) in valid_ids]
-        invalid_ids = [t_id for t_id in task_ids if t_id not in valid_ids]
-        if invalid_ids:
-            err_msg = 'Invalid task IDs: {0}'.format(', '.join(invalid_ids))
-            flash(err_msg, 'danger')
+        tasks_to_export = filter(lambda x: str(x.id) in valid_ids, tasks)
+        if not set(task_ids).issubset(valid_ids):
+            flash('Invalid task IDs entered for this project', 'danger')
             return render_template('download_input.html', project=project,
                                    title="Download Input", form=form)
 
