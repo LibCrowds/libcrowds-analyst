@@ -30,7 +30,8 @@ def download_input(short_name):
     if request.method == 'POST' and form.validate():
         importer = form.importer.data
         task_ids = form.task_ids.data.split()
-        tasks = object_loader.load(pbclient.find_tasks, project_id=project.id)
+        tasks = object_loader.load(pbclient.find_tasks, project_id=project.id,
+                                   all=1)
         valid_ids = [str(t.id) for t in tasks]
         tasks_to_export = [t for t in tasks if str(t.id) in task_ids and
                            str(t.id) in valid_ids]
