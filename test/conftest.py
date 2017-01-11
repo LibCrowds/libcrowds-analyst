@@ -4,41 +4,43 @@ import os
 import json
 import enki
 import pytest
-import base64
 from pybossa_analyst.core import create_app
 
 os.environ['PYBOSSA_ANALYST_SETTINGS'] = '../settings_test.py'
 flask_app = create_app()
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture
 def app(request):
     ctx = flask_app.app_context()
     ctx.push()
 
     def teardown():
         ctx.pop()
+
     request.addfinalizer(teardown)
     return flask_app
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture
 def test_client(app):
     return app.test_client()
 
 
 @pytest.fixture
-def auth_headers():
-    user = base64.b64encode(b"admin:secret")
-    return {"Authorization": "Basic {user}".format(user=user)}
-
+def login(test_client, app):
+    data = {'api_key': app.config['API_KEY']}
+    with test_client as c:
+        c.post('/login', data=data)
+        yield c
 
 @pytest.fixture
 def project():
     return enki.pbclient.DomainObject({
         "id": 1,
-        "short_name": "short_name",
-        "name": "Some Project"
+        "name": "Some Project",
+        "short_name": "some_project",
+        "webhook": "http://example.com",
     })
 
 
@@ -57,11 +59,12 @@ def task(project):
 
 
 @pytest.fixture
-def result(task):
+def result(project, task):
     return enki.pbclient.DomainObject({
         "id": 123,
+        "project_id": project.id,
         "task_id": task.id,
-        "info": {"n": 42}
+        "info": None
     })
 
 

@@ -152,3 +152,24 @@ class TestAnalysis(object):
         result.info = None
         filtered = analysis._filter_results([result], "New")
         assert filtered == [result]
+
+    def test_multiple_results_analysed(self, mocker, create_task_run_df,
+                                       project, result):
+        """Test multiple results analysed and updated."""
+        mock_enki = mocker.patch('pybossa_analyst.analysis.enki')
+        mock_enki.pbclient.find_results.return_value = [result]
+        tr_info = [{'n': '42'}]
+        df = create_task_run_df(tr_info)
+        mock_enki.Enki().task_runs_df.__getitem__.return_value = df
+        kwargs = {
+            'api_key': 'api_key',
+            'endpoint': 'endpoint',
+            'project_short_name': project.short_name,
+            'project_id': project.id,
+            'info_filter': 'All',
+            'match_percentage': 100,
+            'excluded_keys': []
+        }
+        analysis.analyse_multiple(**kwargs)
+        mock_enki.pbclient.update_result.assert_called_with(result)
+        assert result.info == {'n': '42'}
