@@ -5,7 +5,7 @@ from redis import Redis
 from flask import Blueprint
 from flask import render_template, request, session, flash, redirect, url_for
 from flask import current_app, send_file, Response
-from pybossa_analyst import forms
+from pybossa_analyst import forms, analysis
 
 
 blueprint = Blueprint('home', __name__)
@@ -26,7 +26,7 @@ def index():
                            kwargs=payload,
                            timeout=10*MINUTE)
         return "OK"
-    return redirect(url_for('analysis.index'))
+    return redirect(url_for('projects.index'))
 
 
 @blueprint.route('login', methods=['GET', 'POST'])
@@ -35,8 +35,8 @@ def login():
     form = forms.LoginForm(request.form)
     if request.method == "POST" and form.validate():
         session['api_key'] = form.api_key.data
-        return redirect(url_for('analysis.index'))
-    elif request.method == "POST":
+        return redirect(url_for('projects.index'))
+    elif request.method == "POST":  # pragma: no cover
         flash('Please correct the errors.', 'danger')
     return render_template('login.html', title="Sign in", form=form,
                            next=request.args.get('next'))
@@ -48,3 +48,9 @@ def logout():
     session.pop('api_key', None)
     flash('You are now logged out.', 'success')
     return redirect(url_for('.login'))
+
+
+@blueprint.route('help')
+def help():
+    """Help view."""
+    return render_template('help.html')
