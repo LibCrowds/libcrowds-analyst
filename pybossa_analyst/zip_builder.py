@@ -5,11 +5,9 @@ import requests
 import zipstream
 
 
-def _stream_content(url):
-    """Stream response data."""
-    r = requests.get(url, stream=True)
-    for chunk in r.iter_content():
-        yield chunk
+def _download(url):
+    """Download data from a URL."""
+    yield requests.get(url).content
 
 
 def _generate_zip(tasks, fn_key, url_key):
@@ -18,7 +16,7 @@ def _generate_zip(tasks, fn_key, url_key):
     for t in tasks:
         fn = t.info[fn_key]
         url = t.info[url_key]
-        z.write_iter(fn, _stream_content(url))
+        z.write_iter(fn, _download(url))
     for chunk in z:
         yield chunk
 
