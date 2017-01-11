@@ -7,7 +7,7 @@ import zipstream
 
 def _generate_flickr_zip(tasks):
     """Generate an image set containing images downloaded from Flickr."""
-    z = zipstream.ZipFile()
+    z = zipstream.ZipFile(compression=zipstream.ZIP_DEFLATED)
     for t in tasks:
         if not t.info.get('url') or not t.info.get('title'):
             raise ValueError('Invalid Flickr task')
