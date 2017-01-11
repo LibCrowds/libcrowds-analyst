@@ -1,27 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <title>PyBossa Analyst - {{ title }}</title>
+        <title>{{ brand }}{% if title %} | {{ title }}{% endif %}</title>
         <meta charset="UTF-8">
         <meta http-equiv="X-UA-Compatible" content="IE=Edge">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta name="author" content="Alexander Mendes">
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"
-              integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7"
-              crossorigin="anonymous">
-        <link rel="stylesheet" href="{{url_for('static', filename='styles.css')}}">
+        <link rel="shortcut icon" href="#" />
+        <link rel="stylesheet" href="{{url_for('static', filename='vendor/bootstrap.min.css')}}?v1.0.1">
+        <link rel="stylesheet" href="{{url_for('static', filename='css/styles.css')}}">
     </script>
     </head>
     <body>
-        <div class="container">
-            <h1><a href="{{ config['ENDPOINT'] }}"><span class="glyphicon glyphicon-home"></span></a> {{ title }}</h1>
-            <hr>
-            {% block content %}{% endblock %}
-        </div>
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.js"></script>
-        <script src="{{url_for('static', filename='notify.js')}}?v0.1.0"></script>
-        <script src="{{url_for('static', filename='scripts.js')}}?v1.0.1"></script>
+        {% block content %}
+        {% endblock %}
+        <script src="{{url_for('static', filename='vendor/jquery.min.js')}}"></script>
+        <script src="{{url_for('static', filename='vendor/bootstrap.min.js')}}"></script>
+        <script src="{{url_for('static', filename='js/notify.js')}}?v0.1.0"></script>
+        <script src="{{url_for('static', filename='js/scripts.js')}}?v1.0.1"></script>
         {% include '_flash_messages.html' %}
     </body>
 </html>

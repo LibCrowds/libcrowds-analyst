@@ -1,20 +1,26 @@
 # -*- coding: utf8 -*-
 """Forms module for pybossa-analyst."""
 
-from flask.ext.wtf import Form
+from flask_wtf import FlaskForm
 from wtforms import TextAreaField
-from wtforms.fields import SelectField
+from wtforms.fields import SelectField, TextField
 from wtforms.validators import required
 
 
-class ReanalysisForm(Form):
+class SetupForm(FlaskForm):
     """Form for triggering result reanalysis."""
-    result_filter = SelectField('Filter:',
-                                choices=[('all', 'All'), ('None', 'New'),
-                                         ('Unanalysed', 'Unanalysed')])
+    info_filter = SelectField('Filter:',
+                              choices=[('All', 'All'), ('New', 'New'),
+                                       ('Unverified', 'Unverified')])
 
 
-class DownloadForm(Form):
+class DownloadForm(FlaskForm):
     """Form for downloading original task input."""
     task_ids = TextAreaField('Task IDs:', validators=[required()])
     importer = SelectField('Importer Type:', choices=[('flickr', 'Flickr')])
+
+
+class LoginForm(FlaskForm):
+    """Form for logging in user's using their PyBossa API key."""
+    err_msg = "The API key is required"
+    api_key = TextField('API Key:', validators=[required(err_msg)])

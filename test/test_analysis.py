@@ -1,5 +1,6 @@
 # -*- coding: utf8 -*-
 
+import numpy
 from pytest_mock import mocker
 from pybossa_analyst import analysis
 
@@ -7,83 +8,168 @@ from pybossa_analyst import analysis
 class TestAnalysis(object):
     """Test analysis module."""
 
-    def test_get_task_run_keys(self, create_task_run_df):
-        """Test all task run keys are returned."""
-        tr_info = [{'n': 42}, {'comment': 'hello'}]
+    def test_all_keys_returned(self, create_task_run_df):
+        """Test all task run keys are returned when none are excluded."""
+        tr_info = [{'n': '42'}, {'comment': 'hello'}]
+        excluded = []
         df = create_task_run_df(tr_info)
-        keys = analysis._extract_keys(df)
-        assert sorted(keys) == sorted(['n', 'comment'])
+        df = analysis._drop_excluded_keys(df, excluded)
+        assert sorted(df.keys()) == sorted(['n', 'comment'])
+
+    def test_keys_excluded(self, create_task_run_df):
+        """Test excluded keys are not returned."""
+        tr_info = [{'n': '42'}, {'comment': 'hello'}]
+        excluded = ['comment']
+        df = create_task_run_df(tr_info)
+        df = analysis._drop_excluded_keys(df, excluded)
+        assert df.keys() == ['n']
 
     def test_empty_rows_dropped(self, create_task_run_df):
         """Test empty rows are dropped."""
-        tr_info = [{'n': 42, 'comment': ''}, {'n': '', 'comment': ''}]
-        df = create_task_run_df(tr_info)[['n', 'comment']]
+        tr_info = [{'n': '42'}, {'n': ''}]
+        df = create_task_run_df(tr_info)[['n']]
         df = analysis._drop_empty_rows(df)
-        assert len(df) == 1
-        assert df['n'][0] == 42
+        assert len(df) == 1 and df['n'][0] == '42'
 
-    def test_result_when_no_answers(self, create_task_run_df, mocker, project,
-                                    task, result):
-        """Test result info correct when no answers."""
+    def test_partial_rows_are_not_dropped(self, create_task_run_df):
+        """Test partial rows are not dropped."""
+        tr_info = [{'n': '42', 'comment': ''}]
+        df = create_task_run_df(tr_info)
+        df = analysis._drop_empty_rows(df)
+        assert len(df) == 1 and df['n'][0] == '42'
+
+    def test_match_percent_not_met(self, create_task_run_df):
+        """Test that 'Unverified' is returned when match percentage not met."""
+        tr_info = [{'n': '42'}, {'n': ''}]
+        df = create_task_run_df(tr_info)[['n']]
+        info = analysis._check_for_n_percent_of_matches(df, 2, 100)
+        assert info == "Unverified"
+
+    def test_match_percent_not_met_with_nan_cols(self, create_task_run_df):
+        """Test that 'Unverified' is still returned with NaN columns."""
         tr_info = [{'n': '', 'comment': ''}]
-        df = create_task_run_df(tr_info)
-        mock_client = mocker.patch('pybossa_analyst.analysis.pybossa_client')
-        mock_client.get_task_run_dataframe.return_value = df
-        mock_client.get_results.return_value = [result]
-        analysis.analyse(project.id, task.id, 60, sleep=0)
-        mock_client.update_result.assert_called_with(result)
-        assert result.info == {'n': '', 'comment': ''}
+        df = create_task_run_df(tr_info)[['n', 'comment']]
+        df = df.replace('', numpy.nan)
+        info = analysis._check_for_n_percent_of_matches(df, 2, 100)
+        assert info == "Unverified"
 
-    def test_result_when_matching_answers(self, create_task_run_df, mocker,
-                                          project, task, result):
-        """Test result info correct when match percentage met."""
-        tr_info = [{'n': 42, 'comment': 'ok'}, {'n': 42, 'comment': ''},
-                   {'n': 2, 'comment': 'ok'}, {'n': 1, 'comment': 'ok'},
-                   {'n': 42, 'comment': ''}]
-        df = create_task_run_df(tr_info)
-        mock_client = mocker.patch('pybossa_analyst.analysis.pybossa_client')
-        mock_client.get_task_run_dataframe.return_value = df
-        mock_client.get_results.return_value = [result]
-        analysis.analyse(project.id, task.id, 60, sleep=0)
-        mock_client.update_result.assert_called_with(result)
-        assert result.info == {'n': 42, 'comment': 'ok'}
+    def test_match_percent_not_met_with_empty_rows(self, create_task_run_df):
+        """Test that 'Unverified' is still returned when empty rows dropped."""
+        tr_info = [{'n': '42'}]
+        df = create_task_run_df(tr_info)[['n']]
+        info = analysis._check_for_n_percent_of_matches(df, 2, 100)
+        assert info == "Unverified"
 
-    def test_result_when_non_matching_answers(self, create_task_run_df, mocker,
-                                              project, task, result):
-        """Test result info correct when match percentage not met."""
-        tr_info = [{'n': 42, 'comment': 'ok'}, {'n': 42, 'comment': 'ok'},
-                   {'n': 1, 'comment': '1'}, {'n': 2, 'comment': '2'},
-                   {'n': 3, 'comment': '3'}]
-        df = create_task_run_df(tr_info)
-        mock_client = mocker.patch('pybossa_analyst.analysis.pybossa_client')
-        mock_client.get_task_run_dataframe.return_value = df
-        mock_client.get_results.return_value = [result]
-        analysis.analyse(project.id, task.id, 60, sleep=0)
-        mock_client.update_result.assert_called_with(result)
-        assert result.info == 'Unanalysed'
+    def test_answer_set_when_match_percent_met(self, create_task_run_df):
+        """Test that answer is set correctly when match percentage not met."""
+        tr_info = [{'n': '42'}, {'n': '42'}]
+        df = create_task_run_df(tr_info)[['n']]
+        info = analysis._check_for_n_percent_of_matches(df, 2, 100)
+        assert info == {'n': '42'}
 
-    def test_result_when_some_matching_answers(self, create_task_run_df,
-                                               mocker, project, task, result):
-        """Test result info correct when match percentage partially met."""
-        tr_info = [{'n': 1, 'comment': 'ok'}, {'n': 2, 'comment': 'ok'},
-                   {'n': 3, 'comment': 'ok'}, {'n': 4, 'comment': 'ok'},
-                   {'n': 5, 'comment': ''}]
-        df = create_task_run_df(tr_info)
-        mock_client = mocker.patch('pybossa_analyst.analysis.pybossa_client')
-        mock_client.get_task_run_dataframe.return_value = df
-        mock_client.get_results.return_value = [result]
-        analysis.analyse(project.id, task.id, 60, sleep=0)
-        mock_client.update_result.assert_called_with(result)
-        assert result.info == 'Unanalysed'
+    def test_correct_result_analysed(self, create_task_run_df, mocker,
+                                     project, result, task):
+        """Test that the correct result is analysed."""
+        mock_enki = mocker.patch('pybossa_analyst.analysis.enki')
+        kwargs = {
+            'api_key': 'api_key',
+            'endpoint': 'endpoint',
+            'project_short_name': project.short_name,
+            'project_id': project.id,
+            'result_id': result.id,
+            'match_percentage': 100,
+            'excluded_keys': []
+        }
+        analysis.analyse(**kwargs)
+        mock_enki.pbclient.find_results.assert_called_with(project.id, limit=1,
+                                                           id=result.id, all=1)
 
-    def test_keys_excluded(self, create_task_run_df, mocker, project, task,
-                           result):
-        """Test that the specified keys are excluded from analysis."""
-        tr_info = [{'n': 42, 'comment': 'ok'}, {'n': 42, 'comment': 'ok'}]
+    def test_empty_result_updated(self, create_task_run_df, mocker, project,
+                                  result, task):
+        """Test that an empty result is updated correctly."""
+        mock_enki = mocker.patch('pybossa_analyst.analysis.enki')
+        tr_info = [{'n': ''}]
         df = create_task_run_df(tr_info)
-        mock_client = mocker.patch('pybossa_analyst.analysis.pybossa_client')
-        mock_client.get_task_run_dataframe.return_value = df
-        mock_client.get_results.return_value = [result]
-        analysis.analyse(project.id, task.id, 60, exclude=['comment'], sleep=0)
-        mock_client.update_result.assert_called_with(result)
-        assert result.info == {'n': 42}
+        mock_enki.pbclient.find_results.return_value = [result]
+        mock_enki.Enki().task_runs_df.__getitem__.return_value = df
+        kwargs = {
+            'api_key': 'api_key',
+            'endpoint': 'endpoint',
+            'project_short_name': project.short_name,
+            'project_id': project.id,
+            'result_id': result.id,
+            'match_percentage': 100,
+            'excluded_keys': []
+        }
+        analysis.analyse(**kwargs)
+        mock_enki.pbclient.update_result.assert_called_with(result)
+        assert result.info == {'n': ''}
+
+    def test_unverified_result_updated(self, create_task_run_df, mocker,
+                                       project, result, task):
+        """Test that an 'Unverified' result is updated correctly."""
+        mock_enki = mocker.patch('pybossa_analyst.analysis.enki')
+        tr_info = [{'n': '42'}, {'n': ''}]
+        df = create_task_run_df(tr_info)
+        mock_enki.pbclient.find_results.return_value = [result]
+        mock_enki.Enki().task_runs_df.__getitem__.return_value = df
+        kwargs = {
+            'api_key': 'api_key',
+            'endpoint': 'endpoint',
+            'project_short_name': project.short_name,
+            'project_id': project.id,
+            'result_id': result.id,
+            'match_percentage': 100,
+            'excluded_keys': []
+        }
+        analysis.analyse(**kwargs)
+        mock_enki.pbclient.update_result.assert_called_with(result)
+        assert result.info == 'Unverified'
+
+    def test_matched_result_updated(self, create_task_run_df, mocker,
+                                    project, result, task):
+        """Test that a matched result is updated correctly."""
+        mock_enki = mocker.patch('pybossa_analyst.analysis.enki')
+        tr_info = [{'n': '42'}, {'n': '42'}]
+        df = create_task_run_df(tr_info)
+        mock_enki.pbclient.find_results.return_value = [result]
+        mock_enki.Enki().task_runs_df.__getitem__.return_value = df
+        kwargs = {
+            'api_key': 'api_key',
+            'endpoint': 'endpoint',
+            'project_short_name': project.short_name,
+            'project_id': project.id,
+            'result_id': result.id,
+            'match_percentage': 100,
+            'excluded_keys': []
+        }
+        analysis.analyse(**kwargs)
+        mock_enki.pbclient.update_result.assert_called_with(result)
+        assert result.info == {'n': '42'}
+
+    def test_new_results_filtered(self, result):
+        """Test new results filtered correctly."""
+        result.info = None
+        filtered = analysis._filter_results([result], "New")
+        assert filtered == [result]
+
+    def test_multiple_results_analysed(self, mocker, create_task_run_df,
+                                       project, result):
+        """Test multiple results analysed and updated."""
+        mock_enki = mocker.patch('pybossa_analyst.analysis.enki')
+        mock_enki.pbclient.find_results.return_value = [result]
+        tr_info = [{'n': '42'}]
+        df = create_task_run_df(tr_info)
+        mock_enki.Enki().task_runs_df.__getitem__.return_value = df
+        kwargs = {
+            'api_key': 'api_key',
+            'endpoint': 'endpoint',
+            'project_short_name': project.short_name,
+            'project_id': project.id,
+            'info_filter': 'All',
+            'match_percentage': 100,
+            'excluded_keys': []
+        }
+        analysis.analyse_multiple(**kwargs)
+        mock_enki.pbclient.update_result.assert_called_with(result)
+        assert result.info == {'n': '42'}

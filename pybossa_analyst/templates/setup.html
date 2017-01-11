@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% from '_helpers.html' import render_field %}
+
+{% block content %}
+{% include "_navbar.html" %}
+<div class="container">
+    <div class="row">
+        <div class="col-xs-12">
+            <h1>{{ project.name }}: {{ title }}</h1>
+            <hr>
+            <p class="lead">
+                <strong>WARNING: </strong>Clicking the button below will trigger reanalysis of results and override
+                current result data.
+            </p>
+            <form method="POST" action="{{ url_for('projects.setup', short_name=project.short_name) }}">
+                {{ form.csrf_token }}
+                {{ render_field(form.info_filter, class="form-control") }}
+                <div class="text-right">
+                    <input class="btn btn-success" type="submit" value="Continue"></input>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

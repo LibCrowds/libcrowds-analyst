@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="flexbox-center">
+    <div class="col-md-6 text-center">
+        <h1>{{ exception.code }}</h1>
+        <p class="lead">{{ exception.__class__.__name__ }}<p>
+        <p>{{ exception.description }}</p>
+    </div>
+ </div>
+{% endblock %}

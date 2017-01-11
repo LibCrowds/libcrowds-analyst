@@ -1,5 +1,5 @@
 import re
-from setuptools import setup
+from setuptools import setup, find_packages
 
 requirements = [
     "Flask>=0.10.1, <0.10.2",
@@ -34,6 +34,7 @@ setup(
     license="BSD",
     url="https://github.com/alexandermendes/pybossa-analyst",
     zip_safe=False,
+    packages=find_packages(),
     install_requires=requirements,
     setup_requires=setup_requirements,
     tests_require=test_requirements,

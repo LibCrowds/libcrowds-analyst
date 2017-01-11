@@ -1,14 +1,9 @@
 # PyBossa API key for an admin user
+# This key is used to update results when a webhook is received
 API_KEY = ''
 
 # URL of the PyBossa server
 ENDPOINT = 'http://{your-pybossa-server}'
-
-# Basic auth username for pybossa-analyst
-USERNAME = 'admin'
-
-# Basic auth password for pybossa-analyst
-PASSWORD = 'secret'
 
 # Key for cryptographically signing form data
 SECRET_KEY = 'its-a-secret'
@@ -21,13 +16,16 @@ PORT = 5001
 DEBUG = False
 
 # Flask-Z3950 config
-# Add a database with id 'oclc' to replace any 'oclc' task run info keys with
-# their record summaries
-# Z3950_DATABASES = {"id": {'host': '', 'db': '', 'port': '', 'user': '',
-#                           'password': ''}}
+# Add a Z39.50 database with id 'oclc' to replace any 'oclc' task run info keys
+# with their record summaries
+# Z3950_DATABASES = {"oclc": {'host': '', 'db': '', 'port': '', 'user': '',
+#                             'password': ''}}
 
 # Required match percentage
 MATCH_PERCENTAGE = 60
 
 # Task run info keys to be excluded from results processing
 EXCLUDED_KEYS = []
+
+# General info
+BRAND = 'PyBossa Analyst'

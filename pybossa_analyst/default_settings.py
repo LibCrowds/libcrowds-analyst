@@ -1,9 +1,9 @@
-USERNAME = 'admin'
-PASSWORD = 'secret'
 SECRET_KEY = 'its-a-secret'
 HOST = '0.0.0.0'
 PORT = 5001
 DEBUG = False
+TRAP_HTTP_EXCEPTIONS = True
 Z3950_DATABASES = {}
 MATCH_PERCENTAGE = 60
 EXCLUDED_KEYS = []
+BRAND = "PyBossa Analyst"

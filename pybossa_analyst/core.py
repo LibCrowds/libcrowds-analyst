@@ -2,7 +2,9 @@
 """Main module for pybossa-analyst."""
 
 import os
-from flask import Flask, request
+from flask import Flask, request, render_template
+from werkzeug.exceptions import HTTPException, InternalServerError
+from requests.exceptions import RequestException
 from pybossa_analyst import default_settings
 from pybossa_analyst.extensions import *
 
@@ -12,10 +14,10 @@ def create_app():
     app = Flask(__name__)
     configure_app(app)
     setup_url_rules(app)
-    setup_auth(app)
     setup_csrf(app)
+    setup_error_handler(app)
+    setup_hooks(app)
     setup_z3950_manager(app)
-    pybossa_client.init_app(app)
     return app
 
 
@@ -32,27 +34,41 @@ def configure_app(app):
 
 def setup_url_rules(app):
     """Setup URL rules."""
-    from pybossa_analyst.view import blueprint as bp
-    app.register_blueprint(bp, url_prefix='')
-
-
-def setup_auth(app):
-    """Setup basic auth for all requests."""
-    from pybossa_analyst import auth
-
-    @app.before_request
-    def requires_auth():
-        if request.endpoint != 'analyse.index':
-            cred = request.authorization
-            if not cred or not auth.check_auth(cred.username, cred.password):
-                return auth.authenticate()
+    from pybossa_analyst.view.home import blueprint as home
+    from pybossa_analyst.view.projects import blueprint as projects
+    from pybossa_analyst.view.download import blueprint as download
+    app.register_blueprint(home, url_prefix='/')
+    app.register_blueprint(projects, url_prefix='/projects')
+    app.register_blueprint(download, url_prefix='/download')
 
 
 def setup_csrf(app):
     """Setup csrf protection."""
-    from pybossa_analyst.view import index
+    from pybossa_analyst.view.home import index
     csrf.init_app(app)
     csrf.exempt(index)
+
+
+def setup_error_handler(app):
+    """Setup error handler."""
+    @app.errorhandler(Exception)
+    def _handle_error(e):  # pragma: no cover
+        if app.debug:
+            raise
+        if isinstance(e, RequestException):
+            endpoint = app.config['ENDPOINT']
+            e.code = 500
+            e.description = "Could not connect to {0}.".format(endpoint)
+        elif not isinstance(e, HTTPException):
+            e = InternalServerError()
+        return render_template('error.html', exception=e), e.code
+
+
+def setup_hooks(app):
+    """Setup hooks."""
+    @app.context_processor
+    def _global_template_context():
+        return dict(brand=app.config['BRAND'])
 
 
 def setup_z3950_manager(app):

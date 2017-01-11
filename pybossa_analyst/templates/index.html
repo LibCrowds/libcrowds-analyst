@@ -1,22 +1,42 @@
 {% extends "base.html" %}
+{% set active_page = 'projects' %}
 
 {% block content %}
-    <p>
-        All webhook payloads should be directed to <strong>{{ request.base_url }}</strong>
-    </p>
-
-    <h3>Endpoints</h3>
-    <ul>
-        <li>To process the next unanalysed result visit:<br>
-        <strong>{{ request.base_url }}&lt;project_short_name&gt;</strong></li><br>
-
-        <li>To process a specific result visit:<br>
-        <strong>{{ request.base_url }}&lt;project_short_name&gt;/&lt;result_id&gt;</strong></li><br>
-
-        <li>To trigger reanalysis for all of a project's results visit:<br>
-        <strong>{{ request.base_url }}&lt;project_short_name&gt;/reanalyse</strong></li><br>
-
-        <li>To download the original input (e.g. the images) associated with a list of tasks:<br>
-        <strong>{{ request.base_url }}&lt;project_short_name&gt;/download</strong></li><br>
-    </ul>
+{% include "_navbar.html" %}
+<div class="container">
+    <div class="row">
+        <div class="col-xs-12">
+            <h1>Projects</h1>
+            <hr>
+            {% if not projects %}
+            <p class="lead">No projects could be retrieved using the current API key.</p>
+            {% else %}
+            <table class="table table-striped">
+                <tr>
+                    <th>Name</th>
+                    <th class="text-center">Receiving Webhooks</th>
+                    <th class="text-center">Actions</th>
+                </tr>
+                {% for project in projects %}
+                <tr>
+                    <td>{{ project.name }}</td>
+                    <td class="text-center">{% if project.webhook == request.url_root %}Yes{% else %}No{% endif %}</td>
+                    <td class="text-center">
+                        <a href="{{ url_for('projects.setup', short_name=project.short_name) }}"
+                           class="btn btn-sm btn-info">Setup
+                        </a>
+                        <a href="{{ url_for('projects.analyse', short_name=project.short_name) }}"
+                           class="btn btn-sm btn-info">Analyse
+                        </a>
+                        <a href="{{ url_for('download.download_input', short_name=project.short_name) }}"
+                           class="btn btn-sm btn-info">Download Input
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+            {% endif %}
+        </div>
+    </div>
+ </div>
 {% endblock %}

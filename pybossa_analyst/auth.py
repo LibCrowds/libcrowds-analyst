@@ -1,18 +1,15 @@
 # -*- coding: utf8 -*-
-"""Basic auth module for pybossa-analyst."""
+"""Auth module for pybossa-analyst."""
 
-from flask import current_app
-from flask import Response
-
-
-def check_auth(username, password):
-    """Check if a username password combination is valid."""
-    pw = current_app.config['PASSWORD']
-    un = current_app.config['USERNAME']
-    return username == un and password == pw
+import pbclient
+from werkzeug.exceptions import Unauthorized, NotFound
 
 
-def authenticate():
-    """Sends a 401 response that enables basic auth."""
-    return Response('You have to login with proper credentials', 401,
-                    {'WWW-Authenticate': 'Basic realm="Login Required"'})
+def ensure_authorized_to_update(short_name):
+    """Ensure that a result can be updated using the current API key."""
+    p = pbclient.find_project(short_name=short_name, all=1)[0]
+    r = pbclient.find_results(p.id, limit=1, all=1)[0]
+    resp = pbclient.update_result(r)
+    if isinstance(resp, dict) and resp.get('status_code') == 401:
+        raise Unauthorized("""You are not authorised to update results for
+                           this project using the API key provided""")
