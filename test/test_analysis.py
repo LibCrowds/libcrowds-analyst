@@ -68,7 +68,7 @@ class TestAnalysis(object):
         assert info == {'n': '42'}
 
     def test_correct_result_analysed(self, create_task_run_df, mocker,
-                                       project, result, task):
+                                     project, result, task):
         """Test that the correct result is analysed."""
         mock_enki = mocker.patch('pybossa_analyst.analysis.enki')
         kwargs = {

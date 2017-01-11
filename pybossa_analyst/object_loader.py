@@ -16,5 +16,6 @@ def load(func, **kwargs):
         items += last_fetched
     return items
 
+
 def _not_exhausted(last_fetched, query):
     return (len(last_fetched) != 0 and len(last_fetched) == query['limit'])

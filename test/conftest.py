@@ -34,6 +34,7 @@ def login(test_client, app):
         c.post('/login', data=data)
         yield c
 
+
 @pytest.fixture
 def project():
     return enki.pbclient.DomainObject({

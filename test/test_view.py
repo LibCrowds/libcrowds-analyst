@@ -91,8 +91,7 @@ class TestView(object):
         err_msg = 'Invalid task IDs: {0}'.format(bad_task_id)
         mock_flash.assert_called_with(err_msg, 'danger')
 
-    def test_zip_file_response_headers(self, test_client, login, mocker, task,
-                                       project):
+    def test_zip_headers(self, test_client, login, mocker, task, project):
         """Test the correct headers are returned with a zip file response."""
         mock_pbclient = mocker.patch('pybossa_analyst.view.download.pbclient')
         mock_pbclient.find_tasks.return_value = [task]
@@ -106,7 +105,7 @@ class TestView(object):
         assert resp.headers['Content-Type'] == "application/zip"
         assert resp.headers['Content-Disposition'] == content_disposition
 
-    def test_zip_file_generated(self, test_client, login, project, mocker, task):
+    def test_zip_generated(self, test_client, login, project, mocker, task):
         """Test that a zip file is generated on download."""
         mock_pbclient = mocker.patch('pybossa_analyst.view.download.pbclient')
         mock_pbclient.find_tasks.return_value = [task]
