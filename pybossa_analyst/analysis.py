@@ -89,7 +89,7 @@ def analyse_multiple(api_key, endpoint, project_id, project_short_name,
     """Analyse multiple results."""
     enki.pbclient.set('api_key', api_key)
     enki.pbclient.set('endpoint', endpoint)
-    time.sleep(2)  # To handle API rate limit when analysing many results
+    time.sleep(2)  # To handle API rate limit
     results = object_loader.load(enki.pbclient.find_results,
                                  project_id=project_id, all=1)
     results = _filter_results(results, info_filter)
