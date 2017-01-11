@@ -9,6 +9,7 @@ from flask import render_template, request, abort, flash, redirect, url_for
 from flask import current_app, session
 from pybossa_analyst import analysis, forms, object_loader
 from pybossa_analyst.login import login_required
+from pybossa_analyst.auth import ensure_authorized_to_update
 
 
 blueprint = Blueprint('projects', __name__)
