@@ -15,8 +15,8 @@ def _generate_flickr_zip(tasks):
         title = t.info['title']
         img = requests.get(url).content
         z.write_iter(title, img)
-    for chunk in z:
-        yield chunk
+        for chunk in z:
+            yield chunk
 
 
 def generate(tasks, importer):
