@@ -50,7 +50,7 @@ def task(project):
     return enki.pbclient.DomainObject({
         "id": 42,
         "project_id": project.id,
-        "info": {"url": "example.com", "title": "img"},
+        "info": {"url": "example.com", "title": "img.jpg"},
         "n_answers": 10,
         "quorum": 0,
         "calibration": 0,
