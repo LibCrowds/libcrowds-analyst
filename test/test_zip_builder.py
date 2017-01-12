@@ -7,36 +7,28 @@ from pybossa_analyst import zip_builder
 
 class TestZipBuilder(object):
 
-    def test_invalid_importer_identified(self, app):
+    def test_invalid_importer_identified(self):
         """Test error raised when attempting to build with invalid importer."""
         with pytest.raises(ValueError) as excinfo:
             zip_builder.generate([], 'unknown_importer')
         assert excinfo.value.message == 'Unknown importer type'
 
-    def test_flickr_importer_identified(self, app):
+    def test_flickr_importer_identified(self, mocker, task):
         """Test Flickr importer identified."""
-        gen = zip_builder.generate([], 'flickr')
-        assert gen.__name__ == '_generate_flickr_zip'
+        mock_gen = mocker.patch('pybossa_analyst.zip_builder._generate_zip')
+        zip_builder.generate([task], 'flickr')
+        mock_gen.assert_called_with([task], "title", "url")
 
-    def test_correct_image_downloaded_from_flickr(self, app, task, mocker):
-        """Test filckr zip file is built with the correct tasks."""
-        mock_requests = mocker.patch('pybossa_analyst.zip_builder.requests')
-        gen = zip_builder._generate_flickr_zip([task])
-        gen.next()
-        mock_requests.get.assert_called_once_with(task.info['url'])
+    def test_dropbox_importer_identified(self, mocker, task):
+        """Test Dropbox importer identified."""
+        mock_gen = mocker.patch('pybossa_analyst.zip_builder._generate_zip')
+        zip_builder.generate([task], 'dropbox')
+        mock_gen.assert_called_with([task], "filename", "link_raw")
 
-    def test_error_when_flickr_url_not_in_task_info(self, app, task):
-        """Test error raised when url not in task info."""
-        task.info.pop("url")
-        gen = zip_builder._generate_flickr_zip([task])
-        with pytest.raises(ValueError) as excinfo:
-            gen.next()
-        assert excinfo.value.message == 'Invalid Flickr task'
-
-    def test_error_when_title_not_in_task_info(self, app, task):
-        """Test error raised when title not in task info."""
-        task.info.pop("title")
-        gen = zip_builder._generate_flickr_zip([task])
-        with pytest.raises(ValueError) as excinfo:
-            gen.next()
-        assert excinfo.value.message == 'Invalid Flickr task'
+    def test_correct_file_downloaded(self, mocker, task):
+        """Test zip file is built with the correct task input."""
+        mock_download = mocker.patch('pybossa_analyst.zip_builder._download')
+        gen = zip_builder._generate_zip([task], 'title', 'url')
+        [x for x in gen]
+        url = task.info['url']
+        mock_download.assert_called_once_with(url)

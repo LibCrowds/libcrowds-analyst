@@ -2,7 +2,7 @@
 """Auth module for pybossa-analyst."""
 
 import pbclient
-from werkzeug.exceptions import Unauthorized, NotFound
+from werkzeug.exceptions import Unauthorized
 
 
 def ensure_authorized_to_update(short_name):
@@ -11,5 +11,6 @@ def ensure_authorized_to_update(short_name):
     r = pbclient.find_results(p.id, limit=1, all=1)[0]
     resp = pbclient.update_result(r)
     if isinstance(resp, dict) and resp.get('status_code') == 401:
-        raise Unauthorized("""You are not authorised to update results for
-                           this project using the API key provided""")
+        err_msg = ("You are not authorised to update results for this project",
+                   "using the API key provided.")
+        raise Unauthorized(err_msg)

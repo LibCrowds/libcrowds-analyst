@@ -17,7 +17,9 @@ class SetupForm(FlaskForm):
 class DownloadForm(FlaskForm):
     """Form for downloading original task input."""
     task_ids = TextAreaField('Task IDs:', validators=[required()])
-    importer = SelectField('Importer Type:', choices=[('flickr', 'Flickr')])
+    importer = SelectField('Importer Type:',
+                           choices=[('flickr', 'Flickr'),
+                                    ('dropbox', 'Dropbox')])
 
 
 class LoginForm(FlaskForm):
