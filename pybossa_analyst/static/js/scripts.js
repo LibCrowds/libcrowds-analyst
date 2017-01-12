@@ -46,7 +46,7 @@ function handleResult(results, oclcNumber) {
         html   = '<html>' + results + '</html>',
         doc    = parser.parseFromString(html, "text/xml"),
         record = $(doc).find('#' + oclcNumber + ' p')[0],
-        link   = getWorldCatLink(record, oclcNumber);
+        link   = getWorldCatLink(oclcNumber);
     $('#oclc-' + oclcNumber).append(record);
     $('#oclc-' + oclcNumber).append(link);
 }
