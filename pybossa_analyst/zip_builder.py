@@ -24,6 +24,8 @@ def _generate_zip(tasks, fn_key, url_key):
 def generate(tasks, importer):
     """Generate a zip file containing original task input."""
     if importer == 'flickr':
+        for t in tasks:
+            t.info["title"] = "{0}.{1}".format(t.info["title"], "jpg")
         return _generate_zip(tasks, "title", "url")
     else:
         raise ValueError("Unknown importer type")
