@@ -33,22 +33,22 @@ $('label input[name="oclc-option"]').each(function() {
 });
 
 
-/** Add a record to the form. */
-function addWorldCatLink(oclcNumber) {
-    const oclcUrl = 'https://www.worldcat.org/title/apis/oclc/' + oclcNumber,
-          link    = '<a href="' + oclcUrl + '" target="_blank" />';
-    $('#oclc-' + oclcNumber).find('.title').wrapInner(link);
+/** Return a link to a WorldCat record. */
+function getWorldCatLink(oclcNumber) {
+    const url = 'https://www.worldcat.org/title/apis/oclc/' + oclcNumber;
+    return '<a href="' + url + '" target="_blank">View Full Record</a><br/>';
 }
 
 
 /** Handle the results of a Z3950 search. */
 function handleResult(results, oclcNumber) {
     let parser = new DOMParser(),
-          html   = '<html>' + results + '</html>',
-          doc    = parser.parseFromString(html, "text/xml"),
-          record = $(doc).find('#' + oclcNumber + ' p')[0];
+        html   = '<html>' + results + '</html>',
+        doc    = parser.parseFromString(html, "text/xml"),
+        record = $(doc).find('#' + oclcNumber + ' p')[0],
+        link   = getWorldCatLink(record, oclcNumber);
     $('#oclc-' + oclcNumber).append(record);
-    addWorldCatLink(oclcNumber);
+    $('#oclc-' + oclcNumber).append(link);
 }
 
 
