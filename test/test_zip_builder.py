@@ -19,12 +19,6 @@ class TestZipBuilder(object):
         zip_builder.generate([task], 'flickr')
         mock_gen.assert_called_with([task], "title", "url")
 
-    def test_dropbox_importer_identified(self, mocker, task):
-        """Test Dropbox importer identified."""
-        mock_gen = mocker.patch('pybossa_analyst.zip_builder._generate_zip')
-        zip_builder.generate([task], 'dropbox')
-        mock_gen.assert_called_with([task], "filename", "link_raw")
-
     def test_correct_file_downloaded(self, mocker, task):
         """Test zip file is built with the correct task input."""
         mock_download = mocker.patch('pybossa_analyst.zip_builder._download')
