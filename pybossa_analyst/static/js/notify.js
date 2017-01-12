@@ -4,11 +4,11 @@ function notify(msg, category){
         title = 'Error';
     }
 
-    let html = $(`<div class="alert alert-${category} fade">
-                 <a class="close" data-dismiss="alert" href="#">&times;</a>
-                 <h4>${title}</h4>
-                 <p>${msg}</p>
-                 </div>`);
+    let html = $('<div class="alert alert-' + category + ' fade">' +
+                 '<a class="close" data-dismiss="alert" href="#">&times;</a>' +
+                 '<h4>' + title + '</h4>' +
+                 '<p>' + msg + '</p>' +
+                 '</div>');
     $('#alert-messages').append(html);
 
     window.setTimeout(function () {
