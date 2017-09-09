@@ -3,14 +3,11 @@
 [![Build Status](https://travis-ci.org/alexandermendes/libcrowds-analyst.svg?branch=master)](https://travis-ci.org/alexandermendes/libcrowds-analyst)
 [![Coverage Status](https://coveralls.io/repos/github/alexandermendes/libcrowds-analyst/badge.svg?branch=master)](https://coveralls.io/github/alexandermendes/libcrowds-analyst?branch=master)
 
-Headless web application to help with real-time analysis of LibCrowds results.
+A headless web application to help with real-time analysis of LibCrowds results.
 
-When a webhook is received from the PyBossa server to indicate that a task has
-been completed the LibCrowds Analyst server pulls in all task runs associated
-with that task and analyses them according to the rules set out for that
-project (see [Analysis](README.md#Analysis)) and the task's result updated
-accordingly.
-
+Recieves webhooks from a PyBossa server and analyses task runs according to the
+rules set out for that project (see [Analysis](README.md#Analysis)). The  task's
+result is updated accordingly.
 
 ## Requirements
 
@@ -20,7 +17,7 @@ accordingly.
 
 ## Build setup
 
-```
+```bash
 # Install dev packages
 sudo apt-get install libxml2-dev libxslt-dev python-dev lib32z1-dev
 
@@ -43,7 +40,7 @@ provided in the [contrib](./contrib) folder.
 
 Make a local copy of the configuration file to change the default settings:
 
-```
+```bash
 cp settings.py.tmpl settings.py
 ```
 
@@ -72,7 +69,7 @@ For all other cases, `analysis_complete` will be set to `false` and
 be checked manually, after which `check_required` should be set to `false`.
 
 #### Example result
-```
+```json
 {
   "info": {
     "comments": "",
