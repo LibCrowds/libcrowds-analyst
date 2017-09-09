@@ -1,15 +1,24 @@
-# pybossa-analyst
+# libcrowds-analyst
 
-[![Build Status](https://travis-ci.org/alexandermendes/pybossa-analyst.svg?branch=master)]
-(https://travis-ci.org/alexandermendes/pybossa-analyst)
-[![Coverage Status](https://coveralls.io/repos/github/alexandermendes/pybossa-analyst/badge.svg?branch=master)]
-(https://coveralls.io/github/alexandermendes/pybossa-analyst?branch=master)
+[![Build Status](https://travis-ci.org/alexandermendes/libcrowds-analyst.svg?branch=master)](https://travis-ci.org/alexandermendes/libcrowds-analyst)
+[![Coverage Status](https://coveralls.io/repos/github/alexandermendes/libcrowds-analyst/badge.svg?branch=master)](https://coveralls.io/github/alexandermendes/libcrowds-analyst?branch=master)
 
 
-A web application to help with real-time analysis and verification of PyBossa results.
+A web application to help with real-time analysis and verification of LibCrowds results.
+
+# How it works
+
+When a webhook is received from your PyBossa server to indicate that a task has
+been completed the LibCrowds Analyst server pulls in all task runs associated
+with that task and compares them according to the rules set out for the
+project collection (see below).
+
+
+
+## Convert-a-Card
 
 When a webhook is received from your PyBossa server to indicate that a task has been completed
-PyBossa Analyst analyses all task runs associated with that task, looking for a specified
+the LibCrowds Analyst server analyses all task runs associated with that task, looking for a specified
 match rate for each answer key (disregarding task runs where all answer fields have been left
 blank). If a match is found the result associated with the task is updated to the matched answer
 for each key. If all keys for all answers have been left blank the result will be set to the
