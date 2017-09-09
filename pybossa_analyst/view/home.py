@@ -5,11 +5,11 @@ from redis import Redis
 from flask import Blueprint
 from flask import render_template, request, session, flash, redirect, url_for
 from flask import current_app, send_file, Response
-from pybossa_analyst import forms, analysis
+from libcrowds_analyst import forms, analysis
 
 
 blueprint = Blueprint('home', __name__)
-queue = Queue('pybossa_analyst', connection=Redis())
+queue = Queue('libcrowds_analyst', connection=Redis())
 MINUTE = 60
 
 

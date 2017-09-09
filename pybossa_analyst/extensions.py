@@ -1,5 +1,5 @@
 # -*- coding: utf8 -*-
-"""Extensions module for pybossa-analyst."""
+"""Extensions module for libcrowds-analyst."""
 
 from flask_wtf.csrf import CsrfProtect
 from flask.ext.z3950 import Z3950Manager

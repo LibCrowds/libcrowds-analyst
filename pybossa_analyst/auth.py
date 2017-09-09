@@ -1,5 +1,5 @@
 # -*- coding: utf8 -*-
-"""Auth module for pybossa-analyst."""
+"""Auth module for libcrowds-analyst."""
 
 import pbclient
 from werkzeug.exceptions import Unauthorized

@@ -1,5 +1,5 @@
 # -*- coding: utf8 -*-
-"""Download view module for pybossa-analyst."""
+"""Download view module for libcrowds-analyst."""
 
 import time
 import pbclient
@@ -7,9 +7,9 @@ from flask import Blueprint
 from flask import render_template, request, abort, flash
 from flask import current_app, Response, session
 from werkzeug.utils import secure_filename
-from pybossa_analyst import zip_builder, object_loader
-from pybossa_analyst.forms import DownloadForm
-from pybossa_analyst.login import login_required
+from libcrowds_analyst import zip_builder, object_loader
+from libcrowds_analyst.forms import DownloadForm
+from libcrowds_analyst.login import login_required
 
 
 blueprint = Blueprint('download', __name__)

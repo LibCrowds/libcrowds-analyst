@@ -73,7 +73,7 @@
                     (such as updating their results).
                 </p>
                 <p>
-                    You can login by visiting <strong>http://{your-pybossa-analyst-domain}/login</strong> or
+                    You can login by visiting <strong>http://{your-libcrowds-analyst-domain}/login</strong> or
                     by passing the <strong>api_key={your-api-key}</strong> parameter along with any request
                     to the {{ brand }} server. Only the project owner or a PyBossa administrator will be able to
                     update results for a project.
@@ -88,13 +88,13 @@
                 <h3>Setup</h3>
                 <p>
                     To trigger real-time analysis visit the update page of your project within your PyBossa
-                    application and enter the webhook <strong>http://{your-pybossa-analyst-domain}</strong>.
+                    application and enter the webhook <strong>http://{your-libcrowds-analyst-domain}</strong>.
                     Any tasks subsequently completed will send a webhook to the {{ brand }} server, triggering
                     result analysis.
                 </p>
                 <p>
                     If the project had completed tasks before you setup the webhooks you can visit
-                    <strong>http://{your-pybossa-analyst-domain}/projects/{project-short-name}/setup</strong>
+                    <strong>http://{your-libcrowds-analyst-domain}/projects/{project-short-name}/setup</strong>
                     and select "New" from the dropdown menu to trigger analysis of all new results.
                 </p>
             </div>
@@ -107,7 +107,7 @@
                 <h3>Verification</h3>
                 <p>
                     To verify the results for a project that could not be verified automatically you can visit
-                    <strong>http://{your-pybossa-analyst-domain}/projects/{project-short-name}</strong>.
+                    <strong>http://{your-libcrowds-analyst-domain}/projects/{project-short-name}</strong>.
                     The next "Unverified" result will be presented as a group of radio buttons for each
                     answer field allowing you to select the correct option for each field. If an appropriate
                     option does not exist, or you wish to enter an alternative, just click the
@@ -128,7 +128,7 @@
                 <h3>Editing results</h3>
                 <p>
                     You can edit a specific result by visiting
-                    <strong>http://{your-pybossa-analyst-domain}/projects/{project-short-name}/{result-id}</strong>,
+                    <strong>http://{your-libcrowds-analyst-domain}/projects/{project-short-name}/{result-id}</strong>,
                     the process is the same as for verification (above).
                 </p>
             </div>
@@ -143,7 +143,7 @@
                     Once you have a set of final results for a project you may want to separate your original task
                     input based on these results. For example, you may want to identify a set of images for which
                     a particular answer field was not populated. To do this you can visit
-                    <strong>http://{your-pybossa-analyst-domain}/download/{project-short-name}</strong> and enter a
+                    <strong>http://{your-libcrowds-analyst-domain}/download/{project-short-name}</strong> and enter a
                     list of task IDs, the original input for these tasks will be returned as a zip file.
                 </p>
             </div>
@@ -161,9 +161,9 @@
                 </p>
                 <div class="well">
                     {% raw %}
-                    {% if config.get('PYBOSSA_ANALYST_URL') %}
+                    {% if config.get('libcrowds_analyst_URL') %}
                         <br>
-                        &nbsp;&nbsp;&nbsp;&nbsp;&lt;a href="{{ config['PYBOSSA_ANALYST_URL'] }}/projects/{{ project.short_name }}?api_key={{ current_user.api_key }}">Analysis&lt;/a>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&lt;a href="{{ config['libcrowds_analyst_URL'] }}/projects/{{ project.short_name }}?api_key={{ current_user.api_key }}">Analysis&lt;/a>
                         <br>
                     {% endif %}
                     {% endraw %}

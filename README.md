@@ -3,28 +3,13 @@
 [![Build Status](https://travis-ci.org/alexandermendes/libcrowds-analyst.svg?branch=master)](https://travis-ci.org/alexandermendes/libcrowds-analyst)
 [![Coverage Status](https://coveralls.io/repos/github/alexandermendes/libcrowds-analyst/badge.svg?branch=master)](https://coveralls.io/github/alexandermendes/libcrowds-analyst?branch=master)
 
+Headless web application to help with real-time analysis of LibCrowds results.
 
-A web application to help with real-time analysis and verification of LibCrowds results.
-
-# How it works
-
-When a webhook is received from your PyBossa server to indicate that a task has
+When a webhook is received from the PyBossa server to indicate that a task has
 been completed the LibCrowds Analyst server pulls in all task runs associated
-with that task and compares them according to the rules set out for the
-project collection (see below).
-
-
-
-## Convert-a-Card
-
-When a webhook is received from your PyBossa server to indicate that a task has been completed
-the LibCrowds Analyst server analyses all task runs associated with that task, looking for a specified
-match rate for each answer key (disregarding task runs where all answer fields have been left
-blank). If a match is found the result associated with the task is updated to the matched answer
-for each key. If all keys for all answers have been left blank the result will be set to the
-empty string for each key.For tasks where a match cannot be found the result will be set to
-"Unverified" and the application provides templates to check each of these unverified answers
-and manually set the final result.
+with that task and analyses them according to the rules set out for that
+project (see [Analysis](README.md#Analysis)) and the task's result updated
+accordingly.
 
 
 ## Requirements
@@ -33,45 +18,84 @@ and manually set the final result.
 - A running [Redis](https://github.com/antirez/redis) server.
 
 
-## Installation
-
-Install the required development packages:
+## Build setup
 
 ```
+# Install dev packages
 sudo apt-get install libxml2-dev libxslt-dev python-dev lib32z1-dev
-```
 
-Install pybossa-analyst to a virtual environment:
-
-```
-git clone https://github.com/alexandermendes/pybossa-analyst
-cd pybossa-analyst
+# Install LibCrowds Analyst
 virtualenv env
 source env/bin/activate
 python setup.py install
+
+# Run
+python run.py
+
+# Test
+python setup.py test
 ```
 
+For deployment using nginx, uwsgi and supervisor some basic templates are
+provided in the [contrib](./contrib) folder.
 
 ## Configuration
 
-Copy the template settings file and edit according to the comments contained within:
+Make a local copy of the configuration file to change the default settings:
 
 ```
 cp settings.py.tmpl settings.py
-vim settings.py
 ```
 
+## Analysis
 
-## Deploying with nginx and uwsgi
+Following is the analysis procudure for each project.
 
-For deployment using nginx, uwsgi and supervisor a number of template files are
-provided in the [contrib](./contrib) folder.
+### Convert-a-Card
 
+**WEBHOOK ENDPOINT:** `/convert-a-card`
 
-## Testing
+All task runs are compared looking a match rate of at least 70% for the answer
+keys `oclc` and `shelfmark` (disregarding task runs where all answer fields
+have been left blank).
 
-To run tests:
+If a match is found the result associated with the task is updated to the
+matched answer for each key, `analysis_complete` will be set to `true` and
+`check_required` will be set to `false`.
 
+If all keys for all answers have been left blank the result will be set to the
+empty string for each key, `analysis_complete` will be set to `true` and
+`check_required` will be set to `false`.
+
+For all other cases, `analysis_complete` will be set to `false` and
+`check_required` will be set to `true`. These are the results that will have to
+be checked manually, after which `check_required` should be set to `false`.
+
+#### Example result
 ```
-python setup.py test
+{
+  "info": {
+    "comments": "",
+    "shelfmark": "15673.d.13",
+    "oclc": "865706215",
+    "analysis": "https://github.com/LibCrowds/libcrowds-analyst/releases/tag/v3.0.0",
+    "analysis_complete": true,
+    "check_required": false
+  },
+  "links ": [
+    "<link rel='parent' title='project' href='https://backend.libcrowds.com/api/project/3'/>",
+    "<link rel='parent' title='task' href='https://backend.libcrowds.com/api/task/2298'/>"
+  ],
+  "task_id": 2298,
+  "created": "2016-06-14T17:45:06.171456",
+  "last_version": true,
+  "link":"<link rel='self' title='result' href='https://backend.libcrowds.com/api/result/49225'/>",
+  "task_run_ids": [
+    537,
+    551,
+    578
+  ],
+  "project_id": 3,
+  "id": 49225
+}
 ```

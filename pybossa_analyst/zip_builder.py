@@ -1,5 +1,5 @@
 # -*- coding: utf8 -*-
-"""Zip builder module for pybossa-analyst."""
+"""Zip builder module for libcrowds-analyst."""
 
 import requests
 import zipstream

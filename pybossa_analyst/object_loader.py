@@ -1,5 +1,5 @@
 # -*- coding: utf8 -*-
-"""Object loader module for pybossa-analyst."""
+"""Object loader module for libcrowds-analyst."""
 
 import pbclient
 

@@ -1,10 +1,10 @@
 # -*- coding: utf8 -*-
-"""Analysis module for pybossa-analyst."""
+"""Analysis module for libcrowds-analyst."""
 
 import time
 import enki
 import numpy
-from pybossa_analyst import object_loader
+from libcrowds_analyst import object_loader
 
 
 def _drop_excluded_keys(df, excluded_keys):

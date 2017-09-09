@@ -2,7 +2,7 @@
 
 import pytest
 from pytest_mock import mocker
-from pybossa_analyst import zip_builder
+from libcrowds_analyst import zip_builder
 
 
 class TestZipBuilder(object):
@@ -15,13 +15,13 @@ class TestZipBuilder(object):
 
     def test_flickr_importer_identified(self, mocker, task):
         """Test Flickr importer identified."""
-        mock_gen = mocker.patch('pybossa_analyst.zip_builder._generate_zip')
+        mock_gen = mocker.patch('libcrowds_analyst.zip_builder._generate_zip')
         zip_builder.generate([task], 'flickr')
         mock_gen.assert_called_with([task], "title", "url")
 
     def test_correct_file_downloaded(self, mocker, task):
         """Test zip file is built with the correct task input."""
-        mock_download = mocker.patch('pybossa_analyst.zip_builder._download')
+        mock_download = mocker.patch('libcrowds_analyst.zip_builder._download')
         gen = zip_builder._generate_zip([task], 'title', 'url')
         [x for x in gen]
         url = task.info['url']

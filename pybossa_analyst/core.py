@@ -1,12 +1,12 @@
 # -*- coding: utf8 -*-
-"""Main module for pybossa-analyst."""
+"""Main module for libcrowds-analyst."""
 
 import os
 from flask import Flask, request, render_template
 from werkzeug.exceptions import HTTPException, InternalServerError
 from requests.exceptions import RequestException
-from pybossa_analyst import default_settings
-from pybossa_analyst.extensions import *
+from libcrowds_analyst import default_settings
+from libcrowds_analyst.extensions import *
 
 
 def create_app():
@@ -24,8 +24,8 @@ def create_app():
 def configure_app(app):
     """Configure the app."""
     app.config.from_object(default_settings)
-    app.config.from_envvar('PYBOSSA_ANALYST_SETTINGS', silent=True)
-    if not os.environ.get('PYBOSSA_ANALYST_SETTINGS'):  # pragma: no cover
+    app.config.from_envvar('libcrowds_analyst_SETTINGS', silent=True)
+    if not os.environ.get('libcrowds_analyst_SETTINGS'):  # pragma: no cover
         here = os.path.dirname(os.path.abspath(__file__))
         config_path = os.path.join(os.path.dirname(here), 'settings.py')
         if os.path.exists(config_path):
@@ -34,9 +34,9 @@ def configure_app(app):
 
 def setup_url_rules(app):
     """Setup URL rules."""
-    from pybossa_analyst.view.home import blueprint as home
-    from pybossa_analyst.view.projects import blueprint as projects
-    from pybossa_analyst.view.download import blueprint as download
+    from libcrowds_analyst.view.home import blueprint as home
+    from libcrowds_analyst.view.projects import blueprint as projects
+    from libcrowds_analyst.view.download import blueprint as download
     app.register_blueprint(home, url_prefix='/')
     app.register_blueprint(projects, url_prefix='/projects')
     app.register_blueprint(download, url_prefix='/download')
@@ -44,7 +44,7 @@ def setup_url_rules(app):
 
 def setup_csrf(app):
     """Setup csrf protection."""
-    from pybossa_analyst.view.home import index
+    from libcrowds_analyst.view.home import index
     csrf.init_app(app)
     csrf.exempt(index)
 

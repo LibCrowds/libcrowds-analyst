@@ -1,5 +1,5 @@
 # -*- coding: utf8 -*-
-"""View module for pybossa-analyst."""
+"""View module for libcrowds-analyst."""
 
 import pbclient
 from redis import Redis
@@ -7,13 +7,13 @@ from rq import Queue
 from flask import Blueprint
 from flask import render_template, request, abort, flash, redirect, url_for
 from flask import current_app, session
-from pybossa_analyst import analysis, forms, object_loader, auth
-from pybossa_analyst.login import login_required
+from libcrowds_analyst import analysis, forms, object_loader, auth
+from libcrowds_analyst.login import login_required
 
 
 blueprint = Blueprint('projects', __name__)
 
-queue = Queue('pybossa_analyst', connection=Redis())
+queue = Queue('libcrowds_analyst', connection=Redis())
 MINUTE = 60
 
 

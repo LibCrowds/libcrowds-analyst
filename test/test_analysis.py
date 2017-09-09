@@ -2,7 +2,7 @@
 
 import numpy
 from pytest_mock import mocker
-from pybossa_analyst import analysis
+from libcrowds_analyst import analysis
 
 
 class TestAnalysis(object):
@@ -70,7 +70,7 @@ class TestAnalysis(object):
     def test_correct_result_analysed(self, create_task_run_df, mocker,
                                      project, result, task):
         """Test that the correct result is analysed."""
-        mock_enki = mocker.patch('pybossa_analyst.analysis.enki')
+        mock_enki = mocker.patch('libcrowds_analyst.analysis.enki')
         kwargs = {
             'api_key': 'api_key',
             'endpoint': 'endpoint',
@@ -87,7 +87,7 @@ class TestAnalysis(object):
     def test_empty_result_updated(self, create_task_run_df, mocker, project,
                                   result, task):
         """Test that an empty result is updated correctly."""
-        mock_enki = mocker.patch('pybossa_analyst.analysis.enki')
+        mock_enki = mocker.patch('libcrowds_analyst.analysis.enki')
         tr_info = [{'n': ''}]
         df = create_task_run_df(tr_info)
         mock_enki.pbclient.find_results.return_value = [result]
@@ -108,7 +108,7 @@ class TestAnalysis(object):
     def test_unverified_result_updated(self, create_task_run_df, mocker,
                                        project, result, task):
         """Test that an 'Unverified' result is updated correctly."""
-        mock_enki = mocker.patch('pybossa_analyst.analysis.enki')
+        mock_enki = mocker.patch('libcrowds_analyst.analysis.enki')
         tr_info = [{'n': '42'}, {'n': ''}]
         df = create_task_run_df(tr_info)
         mock_enki.pbclient.find_results.return_value = [result]
@@ -129,7 +129,7 @@ class TestAnalysis(object):
     def test_matched_result_updated(self, create_task_run_df, mocker,
                                     project, result, task):
         """Test that a matched result is updated correctly."""
-        mock_enki = mocker.patch('pybossa_analyst.analysis.enki')
+        mock_enki = mocker.patch('libcrowds_analyst.analysis.enki')
         tr_info = [{'n': '42'}, {'n': '42'}]
         df = create_task_run_df(tr_info)
         mock_enki.pbclient.find_results.return_value = [result]
@@ -156,7 +156,7 @@ class TestAnalysis(object):
     def test_multiple_results_analysed(self, mocker, create_task_run_df,
                                        project, result):
         """Test multiple results analysed and updated."""
-        mock_enki = mocker.patch('pybossa_analyst.analysis.enki')
+        mock_enki = mocker.patch('libcrowds_analyst.analysis.enki')
         mock_enki.pbclient.find_results.return_value = [result]
         tr_info = [{'n': '42'}]
         df = create_task_run_df(tr_info)

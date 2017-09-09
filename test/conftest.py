@@ -4,9 +4,9 @@ import os
 import json
 import enki
 import pytest
-from pybossa_analyst.core import create_app
+from libcrowds_analyst.core import create_app
 
-os.environ['PYBOSSA_ANALYST_SETTINGS'] = '../settings_test.py'
+os.environ['libcrowds_analyst_SETTINGS'] = '../settings_test.py'
 flask_app = create_app()
 
 

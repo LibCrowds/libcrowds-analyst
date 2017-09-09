@@ -1,9 +1,9 @@
 [uwsgi]
-socket = /tmp/pybossa-analyst.sock
+socket = /tmp/libcrowds-analyst.sock
 chmod-socket = 666
-chdir = /home/pybossa-analyst
+chdir = /home/libcrowds-analyst
 pythonpath = ..
-virtualenv = /home/pybossa-analyst/env
+virtualenv = /home/libcrowds-analyst/env
 module = run:app
 cpu-affinity = 1
 processes = 2
