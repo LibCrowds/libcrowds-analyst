@@ -6,7 +6,6 @@ from flask import Flask
 from werkzeug.exceptions import HTTPException, InternalServerError
 from requests.exceptions import RequestException
 from libcrowds_analyst import default_settings
-from libcrowds_analyst.extensions import z3950_manager
 
 
 def create_app():
@@ -14,7 +13,6 @@ def create_app():
     app = Flask(__name__)
     configure_app(app)
     setup_error_handler(app)
-    setup_z3950_manager(app)
     return app
 
 
@@ -48,9 +46,3 @@ def setup_error_handler(app):
         elif not isinstance(e, HTTPException):
             e = InternalServerError()
         return render_template('error.html', exception=e), e.code
-
-
-def setup_z3950_manager(app):
-    """Setup Flask-Z3950."""
-    z3950_manager.init_app(app)
-    z3950_manager.register_blueprint(url_prefix='/z3950')
