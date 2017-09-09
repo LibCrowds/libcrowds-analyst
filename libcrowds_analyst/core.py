@@ -2,7 +2,7 @@
 """Main module for libcrowds-analyst."""
 
 import os
-from flask import Flask, request
+from flask import Flask
 from werkzeug.exceptions import HTTPException, InternalServerError
 from requests.exceptions import RequestException
 from libcrowds_analyst import default_settings
