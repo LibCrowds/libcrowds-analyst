@@ -21,8 +21,8 @@ def create_app():
 def configure_app(app):
     """Configure the app."""
     app.config.from_object(default_settings)
-    app.config.from_envvar('libcrowds_analyst_SETTINGS', silent=True)
-    if not os.environ.get('libcrowds_analyst_SETTINGS'):  # pragma: no cover
+    app.config.from_envvar('LIBCROWDS_ANALYST_SETTINGS', silent=True)
+    if not os.environ.get('LIBCROWDS_ANALYST_SETTINGS'):  # pragma: no cover
         here = os.path.dirname(os.path.abspath(__file__))
         config_path = os.path.join(os.path.dirname(here), 'settings.py')
         if os.path.exists(config_path):
@@ -31,8 +31,8 @@ def configure_app(app):
 
 def setup_url_rules(app):
     """Setup URL rules."""
-    from libcrowds_analyst.api import blueprint as api
-    app.register_blueprint(api, url_prefix='/')
+    from libcrowds_analyst.api import BP as api_bp
+    app.register_blueprint(api_bp, url_prefix='/')
 
 
 def setup_error_handler(app):

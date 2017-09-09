@@ -57,16 +57,16 @@ keys `oclc` and `shelfmark` (disregarding task runs where all answer fields
 have been left blank).
 
 If a match is found the result associated with the task is updated to the
-matched answer for each key, `analysis_complete` will be set to `true` and
-`check_required` will be set to `false`.
+matched answer for each key, `analysis_complete` will be set to `True` and
+`check_required` will be set to `False`.
 
 If all keys for all answers have been left blank the result will be set to the
-empty string for each key, `analysis_complete` will be set to `true` and
-`check_required` will be set to `false`.
+empty string for each key, `analysis_complete` will be set to `True` and
+`check_required` will be set to `False`.
 
-For all other cases, `analysis_complete` will be set to `false` and
-`check_required` will be set to `true`. These are the results that will have to
-be checked manually, after which `check_required` should be set to `false`.
+For all other cases, `analysis_complete` will be set to `False` and
+`check_required` will be set to `True`. These are the results that will have to
+be checked manually, after which `analysis_complete` should be set to `True`.
 
 #### Example result
 ```json
