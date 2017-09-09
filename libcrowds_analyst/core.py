@@ -2,19 +2,17 @@
 """Main module for libcrowds-analyst."""
 
 import os
-from flask import Flask, request, render_template
+from flask import Flask, request
 from werkzeug.exceptions import HTTPException, InternalServerError
 from requests.exceptions import RequestException
 from libcrowds_analyst import default_settings
-from libcrowds_analyst.extensions import *
+from libcrowds_analyst.extensions import z3950_manager
 
 
 def create_app():
     """Application factory."""
     app = Flask(__name__)
     configure_app(app)
-    setup_url_rules(app)
-    setup_csrf(app)
     setup_error_handler(app)
     setup_hooks(app)
     setup_z3950_manager(app)
