@@ -3,7 +3,7 @@
 from rq import Queue
 from redis import Redis
 from flask import Blueprint, request, current_app, jsonify
-from pybossa_analyst import analysis
+from libcrowds_analyst import analysis
 
 
 BP = Blueprint('api', __name__)
@@ -33,4 +33,4 @@ def analyse(func):
 def convert_a_card():
     """Endpoint for Convert-a-Card webhooks."""
     print 'convert-a-card'
-    return analyse(analysis.analyse)
+    return analyse(analysis.convert_a_card.analyse)
