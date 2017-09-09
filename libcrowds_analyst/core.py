@@ -35,13 +35,6 @@ def setup_url_rules(app):
     app.register_blueprint(api, url_prefix='/')
 
 
-def setup_csrf(app):
-    """Setup csrf protection."""
-    from libcrowds_analyst.view.home import index
-    csrf.init_app(app)
-    csrf.exempt(index)
-
-
 def setup_error_handler(app):
     """Setup error handler."""
     @app.errorhandler(Exception)
