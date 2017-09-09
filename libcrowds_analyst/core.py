@@ -14,7 +14,6 @@ def create_app():
     app = Flask(__name__)
     configure_app(app)
     setup_error_handler(app)
-    setup_hooks(app)
     setup_z3950_manager(app)
     return app
 
@@ -32,12 +31,8 @@ def configure_app(app):
 
 def setup_url_rules(app):
     """Setup URL rules."""
-    from libcrowds_analyst.view.home import blueprint as home
-    from libcrowds_analyst.view.projects import blueprint as projects
-    from libcrowds_analyst.view.download import blueprint as download
-    app.register_blueprint(home, url_prefix='/')
-    app.register_blueprint(projects, url_prefix='/projects')
-    app.register_blueprint(download, url_prefix='/download')
+    from libcrowds_analyst.api import blueprint as api
+    app.register_blueprint(api, url_prefix='/')
 
 
 def setup_csrf(app):
@@ -60,13 +55,6 @@ def setup_error_handler(app):
         elif not isinstance(e, HTTPException):
             e = InternalServerError()
         return render_template('error.html', exception=e), e.code
-
-
-def setup_hooks(app):
-    """Setup hooks."""
-    @app.context_processor
-    def _global_template_context():
-        return dict(brand=app.config['BRAND'])
 
 
 def setup_z3950_manager(app):
