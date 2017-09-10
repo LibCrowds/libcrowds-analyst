@@ -1,7 +1,6 @@
 # -*- coding: utf8 -*-
 """Analysis helpers module."""
 
-import enki
 import numpy
 
 
@@ -35,10 +34,9 @@ def has_n_matches(task_run_df, n_task_runs, match_percentage):
     return True
 
 
-def get_task_run_df(api_key, endpoint, project_short_name, task_id):
+def get_task_run_df(enki, task_id):
     """Return a dataframe containing all task run info for a task."""
-    e = enki.Enki(api_key, endpoint, project_short_name, all=1)
-    e.get_tasks(task_id=task_id)
-    e.get_task_runs()
-    task = e.tasks[0]
-    return e.task_runs_df[task.id]
+    enki.get_tasks(task_id=task_id)
+    enki.get_task_runs()
+    task = enki.tasks[0]
+    return enki.task_runs_df[task.id]
