@@ -49,7 +49,7 @@ class TestAnalysisHelpers(object):
         assert tr_info == df['info'].tolist()
 
     def test_match_fails_when_percentage_not_met(self, create_task_run_df):
-        """False should be returned."""
+        """Test False is returned when match percentage not met."""
         tr_info = [
             {'n': '42'},
             {'n': ''}
@@ -59,7 +59,7 @@ class TestAnalysisHelpers(object):
         assert not has_matches
 
     def test_match_fails_when_nan_cols(self, create_task_run_df):
-        """False should be returned."""
+        """Test False is returned when NaN columns."""
         tr_info = [
             {'n': '', 'comment': ''}
         ]
@@ -69,7 +69,7 @@ class TestAnalysisHelpers(object):
         assert not has_matches
 
     def test_match_succeeds_when_percentage_met(self, create_task_run_df):
-        """True should be returned when match percentage met."""
+        """Test True returned when match percentage met."""
         tr_info = [
             {'n': '42'},
             {'n': '42'}
