@@ -10,7 +10,7 @@ rules set out for that project (see [Analysis](README.md#Analysis)). The  task's
 result is updated accordingly.
 
 To facilitate reproducible research, since v3.0.0 the DOI of the version of
-LibCrowds Analyst used is added to each result.
+LibCrowds Analyst used for analysis is added to each result.
 
 ## Requirements
 
@@ -47,7 +47,18 @@ Make a local copy of the configuration file to change the default settings:
 cp settings.py.tmpl settings.py
 ```
 
-The important settings to maintain are `DOI` and `PYBOSSA_HOST`.
+The important settings to maintain are:
+
+```
+# PyBossa API key for an admin user, used to update all results
+API_KEY = ''
+
+# URL of the PyBossa server
+ENDPOINT = 'http://{your-pybossa-server}'
+
+# DOI of the current LibCrowds Analyst version
+DOI = ''
+```
 
 ## Analysis
 
@@ -72,31 +83,28 @@ and `analysis_complete` will be set to `False`. These are the  results that will
 have to be checked manually, after which `analysis_complete` should be set to
 `True`.
 
-#### Example result
+#### Example result info
 ```json
 {
   "info": {
     "comments": "",
     "shelfmark": "15673.d.13",
     "oclc": "865706215",
-    "analysis": "https://github.com/LibCrowds/libcrowds-analyst/releases/tag/v3.0.0",
+    "doi": "10.5281/zenodo.888152",
     "analysis_complete": true,
     "check_required": false
-  },
-  "links ": [
-    "<link rel='parent' title='project' href='https://backend.libcrowds.com/api/project/3'/>",
-    "<link rel='parent' title='task' href='https://backend.libcrowds.com/api/task/2298'/>"
-  ],
-  "task_id": 2298,
-  "created": "2016-06-14T17:45:06.171456",
-  "last_version": true,
-  "link":"<link rel='self' title='result' href='https://backend.libcrowds.com/api/result/49225'/>",
-  "task_run_ids": [
-    537,
-    551,
-    578
-  ],
-  "project_id": 3,
-  "id": 49225
+  }
+  ...
 }
+```
+
+### In the Spotlight: Selections
+
+**WEBHOOK ENDPOINT:** `/playbills/selections`
+
+
+
+#### Example result
+```json
+
 ```

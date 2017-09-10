@@ -77,3 +77,17 @@ class TestAnalysisHelpers(object):
         df = create_task_run_df(tr_info)[['n']]
         has_matches = helpers.has_n_matches(df, 2, 100)
         assert has_matches
+
+    def test_doi_added_to_result_info(self):
+        doi = '10.5281/zenodo.888152'
+        info = helpers.init_result_info(doi)
+        assert info['doi'] == doi
+
+    def test_analysis_complete_true_added_to_result_info(self):
+        info = helpers.init_result_info(None)
+        assert info['analysis_complete'] == True
+
+    def test_defaults_added_to_result_info(self):
+        defaults = {'some_key': 'some_value'}
+        info = helpers.init_result_info(None, defaults)
+        assert info['some_key'] == 'some_value'

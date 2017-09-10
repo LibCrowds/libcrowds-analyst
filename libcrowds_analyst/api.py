@@ -18,6 +18,7 @@ def analyse(func):
     if payload['event'] == 'task_completed':
         payload['api_key'] = current_app.config['API_KEY']
         payload['endpoint'] = current_app.config['ENDPOINT']
+        payload['doi'] = current_app.config['DOI']
         QUEUE.enqueue_call(func=func, kwargs=payload, timeout=10*MINUTE)
         return jsonify({
             "message": "Accepted",
