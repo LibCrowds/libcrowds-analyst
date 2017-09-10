@@ -15,7 +15,6 @@ def analyse(func):
     """Analyse a webhook."""
     payload = request.json or {}
     if payload['event'] == 'task_completed':
-        print payload
         payload['api_key'] = current_app.config['API_KEY']
         payload['endpoint'] = current_app.config['ENDPOINT']
         QUEUE.enqueue_call(func=func, kwargs=payload, timeout=10*MINUTE)
@@ -32,5 +31,4 @@ def analyse(func):
 @BP.route('/convert-a-card', methods=['POST'])
 def convert_a_card():
     """Endpoint for Convert-a-Card webhooks."""
-    print 'convert-a-card'
     return analyse(analysis.convert_a_card.analyse)
