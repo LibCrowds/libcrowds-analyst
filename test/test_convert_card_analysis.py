@@ -46,7 +46,8 @@ class TestConvertACardAnalysis(object):
         assert result.info == {
             'oclc': '',
             'shelfmark': '',
-            'analysis_complete': True
+            'analysis_complete': True,
+            'doi': '123/456'
         }
 
     def test_varied_answers_identified(self, create_task_run_df, mocker,
@@ -73,7 +74,8 @@ class TestConvertACardAnalysis(object):
         assert result.info == {
             'oclc': '',
             'shelfmark': '',
-            'analysis_complete': False
+            'analysis_complete': False,
+            'doi': '123/456'
         }
 
 
@@ -101,5 +103,6 @@ class TestConvertACardAnalysis(object):
         assert result.info == {
             'oclc': '123',
             'shelfmark': '456',
-            'analysis_complete': True
+            'analysis_complete': True,
+            'doi': '123/456'
         }
