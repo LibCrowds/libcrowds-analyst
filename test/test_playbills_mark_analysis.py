@@ -13,10 +13,10 @@ class TestPlaybillsMarkAnalysis(object):
             'libcrowds_analyst.analysis.playbills.enki'
         )
 
-        payload_dict = json.loads(payload)
-        payload_dict['api_key'] = 'token'
-        payload_dict['endpoint'] = 'example.com'
-        playbills.analyse_selections(payload_dict)
+        kwargs = json.loads(payload)
+        kwargs['api_key'] = 'token'
+        kwargs['endpoint'] = 'example.com'
+        playbills.analyse_selections(**kwargs)
 
         mock_enki.pbclient.find_results.assert_called_with(project.id, limit=1,
                                                            id=result.id, all=1)
@@ -35,10 +35,10 @@ class TestPlaybillsMarkAnalysis(object):
         mock_enki.pbclient.find_results.return_value = [result]
         mock_enki.Enki().task_runs_df.__getitem__.return_value = df
 
-        payload_dict = json.loads(payload)
-        payload_dict['api_key'] = 'token'
-        payload_dict['endpoint'] = 'example.com'
-        playbills.analyse_selections(payload_dict)
+        kwargs = json.loads(payload)
+        kwargs['api_key'] = 'token'
+        kwargs['endpoint'] = 'example.com'
+        playbills.analyse_selections(**kwargs)
 
         mock_enki.pbclient.update_result.assert_called_with(result)
         assert result.info == {
@@ -46,12 +46,13 @@ class TestPlaybillsMarkAnalysis(object):
             'analysis_complete': True
         }
 
-    def test_similar_regionscombined(self, create_task_run_df, mocker,
-                                     result, payload):
-        """Test that a result with varied answers is updated correctly."""
+    def test_similar_regions_combined(self, create_task_run_df, mocker,
+                                      result, payload):
+        """Test that regions with an intersection of >= 80% are combined."""
         mock_enki = mocker.patch(
             'libcrowds_analyst.analysis.convert_a_card.enki'
         )
+
         tr_info = [
             [
                 {
@@ -64,21 +65,52 @@ class TestPlaybillsMarkAnalysis(object):
                     "target": {
                         "source": "http://example.org/iiif/book1/canvas/p1",
                         "selector": {
-                        "conformsTo": "http://www.w3.org/TR/media-frags/",
-                        "type": "FragmentSelector",
-                        "value": "?xywh=100,100,100,100"
+                            "conformsTo": "http://www.w3.org/TR/media-frags/",
+                            "type": "FragmentSelector",
+                            "value": "?xywh=100,100,100,100"
                         }
                     },
                     "body": [
                         {
-                        "type": "TextualBody",
-                        "purpose": "tagging",
-                        "value": "title"
+                            "type": "TextualBody",
+                            "purpose": "tagging",
+                            "value": "title"
                         },
                         {
-                        "type": "SpecificResource",
-                        "purpose": "classifying",
-                        "source": "http://purl.org/dc/terms/title"
+                            "type": "SpecificResource",
+                            "purpose": "classifying",
+                            "source": "http://purl.org/dc/terms/title"
+                        }
+                    ],
+                    "modified": "2017-07-16T13:53:18.795Z"
+                }
+            ],
+            [
+                {
+                    "@context": "http://www.w3.org/ns/anno.jsonld",
+                    "id": "d008efa2-42e5-494e-b463-c7b9b6744b67",
+                    "type": "Annotation",
+                    "motivation": "tagging",
+                    "created": "2017-07-16T00:44:28.454Z",
+                    "generated": "2017-07-16T00:44:28.454Z",
+                    "target": {
+                        "source": "http://example.org/iiif/book1/canvas/p1",
+                        "selector": {
+                            "conformsTo": "http://www.w3.org/TR/media-frags/",
+                            "type": "FragmentSelector",
+                            "value": "?xywh=150,100,100,100"
+                        }
+                    },
+                    "body": [
+                        {
+                            "type": "TextualBody",
+                            "purpose": "tagging",
+                            "value": "title"
+                        },
+                        {
+                            "type": "SpecificResource",
+                            "purpose": "classifying",
+                            "source": "http://purl.org/dc/terms/title"
                         }
                     ],
                     "modified": "2017-07-16T13:53:18.795Z"
@@ -89,18 +121,103 @@ class TestPlaybillsMarkAnalysis(object):
         mock_enki.pbclient.find_results.return_value = [result]
         mock_enki.Enki().task_runs_df.__getitem__.return_value = df
 
-        payload_dict = json.loads(payload)
-        payload_dict['api_key'] = 'token'
-        payload_dict['endpoint'] = 'example.com'
-        playbills.analyse_selections(payload_dict)
-        print payload_dict
+        kwargs = json.loads(payload)
+        kwargs['api_key'] = 'token'
+        kwargs['endpoint'] = 'example.com'
+        playbills.analyse_selections(**kwargs)
 
         mock_enki.pbclient.update_result.assert_called_with(result)
         assert result.info == {
-            'oclc': '',
+            'annotations': [],
             'shelfmark': '',
             'analysis_complete': False
         }
+
+    # def test_dissimilar_regions_not_combined(self, create_task_run_df, mocker,
+    #                                          result, payload):
+    #     """Test that regions with an intersection of < 80% are not combined."""
+    #     mock_enki = mocker.patch(
+    #         'libcrowds_analyst.analysis.convert_a_card.enki'
+    #     )
+    #     tr_info = [
+    #         [
+    #             {
+    #                 "@context": "http://www.w3.org/ns/anno.jsonld",
+    #                 "id": "d008efa2-42e5-494e-b463-c7b9b6744b67",
+    #                 "type": "Annotation",
+    #                 "motivation": "tagging",
+    #                 "created": "2017-07-16T00:44:28.454Z",
+    #                 "generated": "2017-07-16T00:44:28.454Z",
+    #                 "target": {
+    #                     "source": "http://example.org/iiif/book1/canvas/p1",
+    #                     "selector": {
+    #                         "conformsTo": "http://www.w3.org/TR/media-frags/",
+    #                         "type": "FragmentSelector",
+    #                         "value": "?xywh=1000,400,100,100"
+    #                     }
+    #                 },
+    #                 "body": [
+    #                     {
+    #                     "type": "TextualBody",
+    #                     "purpose": "tagging",
+    #                     "value": "title"
+    #                     },
+    #                     {
+    #                     "type": "SpecificResource",
+    #                     "purpose": "classifying",
+    #                     "source": "http://purl.org/dc/terms/title"
+    #                     }
+    #                 ],
+    #                 "modified": "2017-07-16T13:53:18.795Z"
+    #             }
+    #         ],
+    #         [
+    #             {
+    #                 "@context": "http://www.w3.org/ns/anno.jsonld",
+    #                 "id": "d008efa2-42e5-494e-b463-c7b9b6744b67",
+    #                 "type": "Annotation",
+    #                 "motivation": "tagging",
+    #                 "created": "2017-07-16T00:44:28.454Z",
+    #                 "generated": "2017-07-16T00:44:28.454Z",
+    #                 "target": {
+    #                     "source": "http://example.org/iiif/book1/canvas/p1",
+    #                     "selector": {
+    #                     "conformsTo": "http://www.w3.org/TR/media-frags/",
+    #                     "type": "FragmentSelector",
+    #                     "value": "?xywh=150,100,100,100"
+    #                     }
+    #                 },
+    #                 "body": [
+    #                     {
+    #                     "type": "TextualBody",
+    #                     "purpose": "tagging",
+    #                     "value": "title"
+    #                     },
+    #                     {
+    #                     "type": "SpecificResource",
+    #                     "purpose": "classifying",
+    #                     "source": "http://purl.org/dc/terms/title"
+    #                     }
+    #                 ],
+    #                 "modified": "2017-07-16T13:53:18.795Z"
+    #             }
+    #         ]
+    #     ]
+    #     df = create_task_run_df(tr_info)
+    #     mock_enki.pbclient.find_results.return_value = [result]
+    #     mock_enki.Enki().task_runs_df.__getitem__.return_value = df
+
+    #     kwargs = json.loads(payload)
+    #     kwargs['api_key'] = 'token'
+    #     kwargs['endpoint'] = 'example.com'
+    #     playbills.analyse_selections(**kwargs)
+
+    #     mock_enki.pbclient.update_result.assert_called_with(result)
+    #     assert result.info == {
+    #         'oclc': '',
+    #         'shelfmark': '',
+    #         'analysis_complete': False
+    #     }
 
 
     # def test_matched_result_updated(self, create_task_run_df, mocker,
