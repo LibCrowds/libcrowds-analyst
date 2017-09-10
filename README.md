@@ -9,6 +9,9 @@ Recieves webhooks from a PyBossa server and analyses task runs according to the
 rules set out for that project (see [Analysis](README.md#Analysis)). The  task's
 result is updated accordingly.
 
+To facilitate reproducible research, since v3.0.0 the DOI of the version of
+LibCrowds Analyst used is added to each result.
+
 ## Requirements
 
 - [PyBossa](https://github.com/PyBossa/pybossa) >= 1.2.0.
@@ -43,6 +46,8 @@ Make a local copy of the configuration file to change the default settings:
 ```bash
 cp settings.py.tmpl settings.py
 ```
+
+The important settings to maintain are `DOI` and `PYBOSSA_HOST`.
 
 ## Analysis
 
