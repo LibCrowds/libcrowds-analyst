@@ -5,6 +5,14 @@ import math
 import numpy
 
 
+def init_result_info(doi, defaults=None):
+    """Initialise result info."""
+    info = defaults or {}
+    info['analysis_complete'] = True
+    info['doi'] = doi
+    return info
+
+
 def drop_keys(task_run_df, keys):
     """Drop keys from the info fields of a task run dataframe."""
     keyset = set()
