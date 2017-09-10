@@ -1,18 +1,17 @@
 # -*- coding: utf8 -*-
+"""Test analysis helpers."""
 
 import numpy
-from pytest_mock import mocker
 from libcrowds_analyst.analysis import helpers
 
 
 class TestAnalysisHelpers(object):
-    """Test analysis module."""
 
     def test_all_keys_returned(self, create_task_run_df):
         """Test all task run keys are returned when none are dropped."""
         tr_info = [
-          {'n': '42'},
-          {'comment': 'hello'}
+            {'n': '42'},
+            {'comment': 'hello'}
         ]
         excluded = []
         df = create_task_run_df(tr_info)
@@ -22,8 +21,8 @@ class TestAnalysisHelpers(object):
     def test_keys_excluded(self, create_task_run_df):
         """Test excluded keys are not returned."""
         tr_info = [
-          {'n': '42'},
-          {'comment': 'hello'}
+            {'n': '42'},
+            {'comment': 'hello'}
         ]
         excluded = ['comment']
         df = create_task_run_df(tr_info)
@@ -33,8 +32,8 @@ class TestAnalysisHelpers(object):
     def test_empty_rows_dropped(self, create_task_run_df):
         """Test empty rows are dropped."""
         tr_info = [
-          {'n': '42'},
-          {'n': ''}
+            {'n': '42'},
+            {'n': ''}
         ]
         df = create_task_run_df(tr_info)[['n']]
         df = helpers.drop_empty_rows(df)
@@ -43,7 +42,7 @@ class TestAnalysisHelpers(object):
     def test_partial_rows_not_dropped(self, create_task_run_df):
         """Test partial rows are not dropped."""
         tr_info = [
-          {'n': '42', 'comment': ''}
+            {'n': '42', 'comment': ''}
         ]
         df = create_task_run_df(tr_info)
         df = helpers.drop_empty_rows(df)
@@ -52,8 +51,8 @@ class TestAnalysisHelpers(object):
     def test_match_fails_when_percentage_not_met(self, create_task_run_df):
         """False should be returned."""
         tr_info = [
-          {'n': '42'},
-          {'n': ''}
+            {'n': '42'},
+            {'n': ''}
         ]
         df = create_task_run_df(tr_info)[['n']]
         has_matches = helpers.has_n_matches(df, 2, 100)
@@ -62,7 +61,7 @@ class TestAnalysisHelpers(object):
     def test_match_fails_when_nan_cols(self, create_task_run_df):
         """False should be returned."""
         tr_info = [
-          {'n': '', 'comment': ''}
+            {'n': '', 'comment': ''}
         ]
         df = create_task_run_df(tr_info)[['n', 'comment']]
         df = df.replace('', numpy.nan)
@@ -72,8 +71,8 @@ class TestAnalysisHelpers(object):
     def test_match_succeeds_when_percentage_met(self, create_task_run_df):
         """True should be returned when match percentage met."""
         tr_info = [
-          {'n': '42'},
-          {'n': '42'}
+            {'n': '42'},
+            {'n': '42'}
         ]
         df = create_task_run_df(tr_info)[['n']]
         has_matches = helpers.has_n_matches(df, 2, 100)
