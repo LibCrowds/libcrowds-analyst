@@ -9,7 +9,7 @@ MATCH_PERCENTAGE = 60
 VALID_KEYS = ['oclc', 'shelfmark', 'comments']
 
 
-def analyse(api_key, endpoint, project_id, result_id, project_short_name,
+def analyse(api_key, endpoint, doi, project_id, result_id, project_short_name,
             **kwargs):
     """Analyse Convert-a-Card results."""
     e = enki.Enki(api_key, endpoint, project_short_name, all=1)
@@ -19,20 +19,20 @@ def analyse(api_key, endpoint, project_id, result_id, project_short_name,
     df = df.loc[:, df.columns.isin(VALID_KEYS)]
     df = helpers.drop_empty_rows(df)
     n_task_runs = len(df.index)
-    result.info = {k: "" for k in df.keys()}
 
-    # No answers
-    if df.empty:
-        result.info['analysis_complete'] = True
+    # Initialise the result
+    defaults = {k: "" for k in df.keys()}
+    result.info = helpers.init_result_info(doi, defaults)
+
+    has_answers = not df.empty
+    has_matches = helpers.has_n_matches(df, n_task_runs, MATCH_PERCENTAGE)
 
     # Matching answers
-    elif helpers.has_n_matches(df, n_task_runs, MATCH_PERCENTAGE):
-        print 'matched'
-        result.info['analysis_complete'] = True
+    if has_answers and has_matches:
         for k in df.keys():
             result.info[k] = df[k].value_counts().idxmax()
 
     # Varied answers
-    else:
+    elif has_answers:
         result.info['analysis_complete'] = False
     enki.pbclient.update_result(result)
