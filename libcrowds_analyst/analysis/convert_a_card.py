@@ -16,11 +16,10 @@ def analyse(api_key, endpoint, project_id, result_id, project_short_name,
     result = enki.pbclient.find_results(project_id, id=result_id, limit=1,
                                         all=1)[0]
     df = helpers.get_task_run_df(e, result.task_id)
-    df = df[VALID_KEYS]
+    df = df.loc[:, df.columns.isin(VALID_KEYS)]
     df = helpers.drop_empty_rows(df)
     n_task_runs = len(df.index)
     result.info = {k: "" for k in df.keys()}
-    result.info['']
 
     # No answers
     if df.empty:
@@ -28,6 +27,7 @@ def analyse(api_key, endpoint, project_id, result_id, project_short_name,
 
     # Matching answers
     elif helpers.has_n_matches(df, n_task_runs, MATCH_PERCENTAGE):
+        print 'matched'
         result.info['analysis_complete'] = True
         for k in df.keys():
             result.info[k] = df[k].value_counts().idxmax()
