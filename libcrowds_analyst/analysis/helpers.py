@@ -1,6 +1,7 @@
 # -*- coding: utf8 -*-
 """Analysis helpers module."""
 
+import math
 import numpy
 
 
@@ -23,7 +24,7 @@ def drop_empty_rows(task_run_df):
 
 def has_n_matches(task_run_df, n_task_runs, match_percentage):
     """Check if n percent of answers match for each key."""
-    required_matches = int(round(n_task_runs * (match_percentage / 100.0)))
+    required_matches = int(math.ceil(n_task_runs * (match_percentage / 100.0)))
 
     # Replace NaN with the empty string
     task_run_df = task_run_df.replace(numpy.nan, '')
