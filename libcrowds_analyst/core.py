@@ -36,12 +36,12 @@ def setup_url_rules(app):
 def setup_error_handler(app):
     """Setup error handlers."""
     def error_response(status_code):
-      response = jsonify({
-          'status': status_code,
-          'message': HTTP_STATUS_CODES.get(status_code),
-      })
-      response.status_code = status_code
-      return response
+        response = jsonify({
+            'status': status_code,
+            'message': HTTP_STATUS_CODES.get(status_code),
+        })
+        response.status_code = status_code
+        return response
 
     @app.errorhandler(400)
     def _400_error(e):  # pragma: no cover
