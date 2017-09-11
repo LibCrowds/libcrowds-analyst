@@ -10,6 +10,7 @@ def create_app():
     """Application factory."""
     app = Flask(__name__)
     configure_app(app)
+    setup_url_rules(app)
     setup_error_handler(app)
     return app
 
