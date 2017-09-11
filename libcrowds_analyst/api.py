@@ -20,10 +20,12 @@ def analyse(func):
         payload['endpoint'] = current_app.config['ENDPOINT']
         payload['doi'] = current_app.config['DOI']
         QUEUE.enqueue_call(func=func, kwargs=payload, timeout=10*MINUTE)
-        return jsonify({
+        response = jsonify({
             "message": "Accepted",
             "status": 202
         })
+        response.status_code = 202
+        return response
     abort(400)
 
 
