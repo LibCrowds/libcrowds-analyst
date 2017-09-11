@@ -92,6 +92,4 @@ def analyse_selections(api_key, endpoint, project_id, result_id,
 
         result.info['annotations'] = clusters
 
-    print clusters
-
     enki.pbclient.update_result(result)
