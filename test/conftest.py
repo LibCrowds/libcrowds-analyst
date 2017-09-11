@@ -106,3 +106,37 @@ def payload(project, task, result):
                 result_id=result.id,
                 event=u'task_completed')
     return json.dumps(load)
+
+@pytest.fixture
+def select_annotation():
+    def create(x, y, w, h):
+        return {
+            "@context": "http://www.w3.org/ns/anno.jsonld",
+            "id": "d008efa2-42e5-494e-b463-c7b9b6744b67",
+            "type": "Annotation",
+            "motivation": "tagging",
+            "created": "2017-07-16T00:44:28.454Z",
+            "generated": "2017-07-16T00:44:28.454Z",
+            "target": {
+                "source": "http://example.org/iiif/book1/canvas/p1",
+                "selector": {
+                    "conformsTo": "http://www.w3.org/TR/media-frags/",
+                    "type": "FragmentSelector",
+                    "value": "?xywh={0},{1},{2},{3}".format(x, y, w, h)
+                }
+            },
+            "body": [
+                {
+                    "type": "TextualBody",
+                    "purpose": "tagging",
+                    "value": "title"
+                },
+                {
+                    "type": "SpecificResource",
+                    "purpose": "classifying",
+                    "source": "http://purl.org/dc/terms/title"
+                }
+            ],
+            "modified": "2017-07-16T13:53:18.795Z"
+        }
+    return create
