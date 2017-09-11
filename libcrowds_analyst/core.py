@@ -4,6 +4,7 @@
 import os
 from flask import Flask, jsonify
 from libcrowds_analyst import default_settings
+from werkzeug.http import HTTP_STATUS_CODES
 
 
 def create_app():
@@ -33,9 +34,27 @@ def setup_url_rules(app):
 
 
 def setup_error_handler(app):
-    """Setup error handler."""
-    @app.errorhandler(Exception)
-    def _handle_error(error):  # pragma: no cover
-        response = jsonify(error.to_dict())
-        response.status_code = error.status_code
-        return response
+    """Setup error handlers."""
+    def error_response(status_code):
+      response = jsonify({
+          'status': status_code,
+          'message': HTTP_STATUS_CODES.get(status_code),
+      })
+      response.status_code = status_code
+      return response
+
+    @app.errorhandler(400)
+    def _400_error(e):  # pragma: no cover
+        return error_response(400)
+
+    @app.errorhandler(404)
+    def _404_error(e):  # pragma: no cover
+        return error_response(404)
+
+    @app.errorhandler(405)
+    def _405_error(e):  # pragma: no cover
+        return error_response(405)
+
+    @app.errorhandler(500)
+    def _500_error(e):  # pragma: no cover
+        return error_response(500)
