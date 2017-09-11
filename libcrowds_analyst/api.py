@@ -14,10 +14,10 @@ MINUTE = 60
 
 def analyse(func):
     """Analyse a webhook."""
+    payload = json.loads(request.json) or {}
     if request.method == 'POST' and payload['event'] != 'task_completed':
         abort(400)
     elif request.method == 'POST' and payload['event'] == 'task_completed':
-        payload = json.loads(request.json) or {}
         payload['api_key'] = current_app.config['API_KEY']
         payload['endpoint'] = current_app.config['ENDPOINT']
         payload['doi'] = current_app.config['DOI']
