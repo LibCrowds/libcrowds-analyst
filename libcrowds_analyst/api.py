@@ -3,7 +3,7 @@
 import json
 from rq import Queue
 from redis import Redis
-from flask import Blueprint, request, current_app, jsonify
+from flask import Blueprint, request, current_app, jsonify, abort
 from libcrowds_analyst import analysis
 
 
@@ -24,19 +24,20 @@ def analyse(func):
             "message": "Accepted",
             "status": 202
         })
-    return jsonify({
-        "message": "Bad Request",
-        "status": 400
-    })
+    abort(400)
 
 
-@BP.route('/convert-a-card', methods=['POST'])
+@BP.route('/convert-a-card', methods=['GET', 'POST'])
 def convert_a_card():
     """Endpoint for Convert-a-Card webhooks."""
+    if request.method != 'POST':
+        abort(405)
     return analyse(analysis.convert_a_card.analyse)
 
 
-@BP.route('/playbills/select', methods=['POST'])
+@BP.route('/playbills/select', methods=['GET', 'POST'])
 def playbills_mark():
     """Endpoint for In the Spotlight select task webhooks."""
+    if request.method != 'POST':
+        abort(405)
     return analyse(analysis.playbills.analyse_selections)

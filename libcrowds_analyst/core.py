@@ -2,9 +2,7 @@
 """Main module for libcrowds-analyst."""
 
 import os
-from flask import Flask
-from werkzeug.exceptions import HTTPException, InternalServerError
-from requests.exceptions import RequestException
+from flask import Flask, jsonify
 from libcrowds_analyst import default_settings
 
 
@@ -36,13 +34,7 @@ def setup_url_rules(app):
 def setup_error_handler(app):
     """Setup error handler."""
     @app.errorhandler(Exception)
-    def _handle_error(e):  # pragma: no cover
-        if app.debug:
-            raise
-        if isinstance(e, RequestException):
-            endpoint = app.config['ENDPOINT']
-            e.code = 500
-            e.description = "Could not connect to {0}.".format(endpoint)
-        elif not isinstance(e, HTTPException):
-            e = InternalServerError()
-        return render_template('error.html', exception=e), e.code
+    def _handle_error(error):  # pragma: no cover
+        response = jsonify(error.to_dict())
+        response.status_code = error.status_code
+        return response
