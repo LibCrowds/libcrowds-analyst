@@ -78,7 +78,6 @@ class TestConvertACardAnalysis(object):
             'doi': '123/456'
         }
 
-
     def test_matched_result_updated(self, create_task_run_df, mocker, result,
                                     payload):
         """Test that a matched result is updated correctly."""

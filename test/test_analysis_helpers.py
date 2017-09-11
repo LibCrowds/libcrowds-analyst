@@ -85,7 +85,7 @@ class TestAnalysisHelpers(object):
 
     def test_analysis_complete_true_added_to_result_info(self):
         info = helpers.init_result_info(None)
-        assert info['analysis_complete'] == True
+        assert info['analysis_complete']
 
     def test_defaults_added_to_result_info(self):
         defaults = {'some_key': 'some_value'}

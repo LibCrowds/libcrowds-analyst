@@ -35,6 +35,7 @@ def convert_a_card():
     """Endpoint for Convert-a-Card webhooks."""
     return analyse(analysis.convert_a_card.analyse)
 
+
 @BP.route('/playbills/select', methods=['POST'])
 def playbills_mark():
     """Endpoint for In the Spotlight select task webhooks."""

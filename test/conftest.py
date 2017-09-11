@@ -107,6 +107,7 @@ def payload(project, task, result):
                 event=u'task_completed')
     return json.dumps(load)
 
+
 @pytest.fixture
 def select_annotation():
     def create(x, y, w, h):
