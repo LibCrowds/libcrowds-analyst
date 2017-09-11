@@ -28,6 +28,19 @@ def analyse(func):
         return response
     abort(400)
 
+@BP.route('/', methods=['GET'])
+def index():
+    """Display the endpoints available on the server."""
+    response = jsonify({
+        "message": "LibCrowds Analyst",
+        "endpoints": {
+            "/convert-a-card": "For Convert-a-Card webhooks.",
+            "/playbills/select": "For In the Spotlight select task webhooks."
+        },
+        "status": 200
+    })
+    response.status_code = 200
+    return response
 
 @BP.route('convert-a-card', methods=['GET', 'POST'])
 def convert_a_card():
