@@ -86,15 +86,11 @@ have to be checked manually, after which `analysis_complete` should be set to
 #### Example result info
 ```json
 {
-  "info": {
-    "comments": "",
-    "shelfmark": "15673.d.13",
-    "oclc": "865706215",
-    "doi": "10.5281/zenodo.888152",
-    "analysis_complete": true,
-    "check_required": false
-  }
-  ...
+  "comments": "",
+  "shelfmark": "15673.d.13",
+  "oclc": "865706215",
+  "doi": "10.5281/zenodo.888152",
+  "analysis_complete": true
 }
 ```
 
@@ -102,9 +98,14 @@ have to be checked manually, after which `analysis_complete` should be set to
 
 **WEBHOOK ENDPOINT:** `/playbills/selections`
 
+The annotations for all task runs are compared. Those with similar selection
+rectangles are clustered and `analysis_complete` is set to `True`.
 
-
-#### Example result
+#### Example result info
 ```json
-
+{
+  "annotations": [],
+  "doi": "10.5281/zenodo.888152",
+  "analysis_complete": true
+}
 ```
