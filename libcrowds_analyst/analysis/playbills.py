@@ -52,7 +52,7 @@ def merge_rects(r1, r2):
     }
 
 
-def analyse_selections(api_key, endpoint, project_id, result_id,
+def analyse_selections(api_key, endpoint, project_id, result_id, url_rule,
                        project_short_name, **kwargs):
     """Analyse In the Spotlight results."""
     e = enki.Enki(api_key, endpoint, project_short_name, all=1)

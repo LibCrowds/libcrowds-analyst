@@ -37,6 +37,7 @@ class TestPlaybillsMarkAnalysis(object):
         kwargs['api_key'] = 'token'
         kwargs['endpoint'] = 'example.com'
         kwargs['doi'] = '123/456'
+        kwargs['url_rule'] = '/example'
         playbills.analyse_selections(**kwargs)
 
         mock_enki.pbclient.find_results.assert_called_with(project.id, limit=1,
@@ -60,6 +61,7 @@ class TestPlaybillsMarkAnalysis(object):
         kwargs['api_key'] = 'token'
         kwargs['endpoint'] = 'example.com'
         kwargs['doi'] = '123/456'
+        kwargs['url_rule'] = '/example'
         playbills.analyse_selections(**kwargs)
 
         mock_enki.pbclient.update_result.assert_called_with(result)
@@ -89,6 +91,7 @@ class TestPlaybillsMarkAnalysis(object):
         kwargs['api_key'] = 'token'
         kwargs['endpoint'] = 'example.com'
         kwargs['doi'] = '123/456'
+        kwargs['url_rule'] = '/example'
         playbills.analyse_selections(**kwargs)
 
         mock_enki.pbclient.update_result.assert_called_with(result)
@@ -119,6 +122,7 @@ class TestPlaybillsMarkAnalysis(object):
         kwargs['api_key'] = 'token'
         kwargs['endpoint'] = 'example.com'
         kwargs['doi'] = '123/456'
+        kwargs['url_rule'] = '/example'
         playbills.analyse_selections(**kwargs)
 
         mock_enki.pbclient.update_result.assert_called_with(result)

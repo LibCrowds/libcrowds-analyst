@@ -21,6 +21,7 @@ def analyse(func):
         payload['api_key'] = current_app.config['API_KEY']
         payload['endpoint'] = current_app.config['ENDPOINT']
         payload['doi'] = current_app.config['DOI']
+        payload['url_rule'] = request.url_rule
         QUEUE.enqueue_call(func=func, kwargs=payload, timeout=10*MINUTE)
     response = jsonify({
         "message": "OK",
@@ -28,6 +29,7 @@ def analyse(func):
     })
     response.status_code = 200
     return response
+
 
 @BP.route('convert-a-card', methods=['GET', 'POST'])
 def convert_a_card():

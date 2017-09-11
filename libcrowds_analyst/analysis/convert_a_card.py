@@ -10,7 +10,7 @@ VALID_KEYS = ['oclc', 'shelfmark', 'comments']
 
 
 def analyse(api_key, endpoint, doi, project_id, result_id, project_short_name,
-            **kwargs):
+            url_rule, **kwargs):
     """Analyse Convert-a-Card results."""
     e = enki.Enki(api_key, endpoint, project_short_name, all=1)
     result = enki.pbclient.find_results(project_id, id=result_id, limit=1,
@@ -22,7 +22,7 @@ def analyse(api_key, endpoint, doi, project_id, result_id, project_short_name,
 
     # Initialise the result
     defaults = {k: "" for k in df.keys()}
-    result.info = helpers.init_result_info(doi, defaults)
+    result.info = helpers.init_result_info(doi, url_rule, defaults)
 
     has_answers = not df.empty
     has_matches = helpers.has_n_matches(df, n_task_runs, MATCH_PERCENTAGE)
