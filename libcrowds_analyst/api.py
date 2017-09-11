@@ -29,7 +29,7 @@ def analyse(func):
     abort(400)
 
 
-@BP.route('/convert-a-card', methods=['GET', 'POST'])
+@BP.route('convert-a-card', methods=['GET', 'POST'])
 def convert_a_card():
     """Endpoint for Convert-a-Card webhooks."""
     if request.method != 'POST':
@@ -37,7 +37,7 @@ def convert_a_card():
     return analyse(analysis.convert_a_card.analyse)
 
 
-@BP.route('/playbills/select', methods=['GET', 'POST'])
+@BP.route('playbills/select', methods=['GET', 'POST'])
 def playbills_mark():
     """Endpoint for In the Spotlight select task webhooks."""
     if request.method != 'POST':
