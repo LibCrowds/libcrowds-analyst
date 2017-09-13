@@ -2,6 +2,7 @@
 
 [![Build Status](https://travis-ci.org/LibCrowds/libcrowds-analyst.svg?branch=master)](https://travis-ci.org/alexandermendes/libcrowds-analyst)
 [![Coverage Status](https://coveralls.io/repos/github/LibCrowds/libcrowds-analyst/badge.svg?branch=master)](https://coveralls.io/github/alexandermendes/libcrowds-analyst?branch=master)
+[![DOI](https://zenodo.org/badge/95394175.svg)](https://zenodo.org/badge/latestdoi/95394175)
 
 A headless web application to help with real-time analysis of LibCrowds results.
 
