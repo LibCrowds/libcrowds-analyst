@@ -19,9 +19,6 @@ def process_payload():
     if request.method != 'POST':
         abort(400)
 
-    if payload.get('event') != 'task_completed':
-        abort(400)
-
     if not request.args.get('api_key'):
         abort(400)
 
@@ -35,6 +32,9 @@ def process_payload():
 def analyse(func):
     """Analyse a webhook."""
     payload = process_payload()
+    if payload.get('event') != 'task_completed':
+        abort(400)
+
     QUEUE.enqueue_call(func=func, kwargs=payload, timeout=10*MINUTE)
     return ok_response()
 
