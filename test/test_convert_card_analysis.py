@@ -17,7 +17,7 @@ class TestConvertACardAnalysis(object):
         kwargs['api_key'] = 'token'
         kwargs['endpoint'] = 'example.com'
         kwargs['doi'] = '123/456'
-        kwargs['url_rule'] = '/example'
+        kwargs['path'] = '/example'
         convert_a_card.analyse(**kwargs)
 
         mock_enki.pbclient.find_results.assert_called_with(project.id, limit=1,
@@ -41,7 +41,7 @@ class TestConvertACardAnalysis(object):
         kwargs['api_key'] = 'token'
         kwargs['endpoint'] = 'example.com'
         kwargs['doi'] = '123/456'
-        kwargs['url_rule'] = '/example'
+        kwargs['path'] = '/example'
         convert_a_card.analyse(**kwargs)
 
         mock_enki.pbclient.update_result.assert_called_with(result)
@@ -49,8 +49,8 @@ class TestConvertACardAnalysis(object):
             'oclc': '',
             'shelfmark': '',
             'analysis_complete': True,
-            'doi': '123/456',
-            'url_rule': '/example'
+            'analysis_doi': '123/456',
+            'analysis_path': '/example'
         }
 
     def test_varied_answers_identified(self, create_task_run_df, mocker,
@@ -71,7 +71,7 @@ class TestConvertACardAnalysis(object):
         kwargs['api_key'] = 'token'
         kwargs['endpoint'] = 'example.com'
         kwargs['doi'] = '123/456'
-        kwargs['url_rule'] = '/example'
+        kwargs['path'] = '/example'
         convert_a_card.analyse(**kwargs)
 
         mock_enki.pbclient.update_result.assert_called_with(result)
@@ -79,8 +79,8 @@ class TestConvertACardAnalysis(object):
             'oclc': '',
             'shelfmark': '',
             'analysis_complete': False,
-            'doi': '123/456',
-            'url_rule': '/example'
+            'analysis_doi': '123/456',
+            'analysis_path': '/example'
         }
 
     def test_matched_result_updated(self, create_task_run_df, mocker, result,
@@ -101,7 +101,7 @@ class TestConvertACardAnalysis(object):
         kwargs['api_key'] = 'token'
         kwargs['endpoint'] = 'example.com'
         kwargs['doi'] = '123/456'
-        kwargs['url_rule'] = '/example'
+        kwargs['path'] = '/example'
         convert_a_card.analyse(**kwargs)
 
         mock_enki.pbclient.update_result.assert_called_with(result)
@@ -109,6 +109,6 @@ class TestConvertACardAnalysis(object):
             'oclc': '123',
             'shelfmark': '456',
             'analysis_complete': True,
-            'doi': '123/456',
-            'url_rule': '/example'
+            'analysis_doi': '123/456',
+            'analysis_path': '/example'
         }

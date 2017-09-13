@@ -52,7 +52,7 @@ def merge_rects(r1, r2):
     }
 
 
-def analyse_selections(api_key, endpoint, project_id, result_id, url_rule,
+def analyse_selections(api_key, endpoint, project_id, result_id, path, doi,
                        project_short_name, **kwargs):
     """Analyse In the Spotlight results."""
     e = enki.Enki(api_key, endpoint, project_short_name, all=1)
@@ -63,11 +63,8 @@ def analyse_selections(api_key, endpoint, project_id, result_id, url_rule,
     # Flatten annotations into a single list
     anno_list = df['info'].tolist()
     anno_list = list(itertools.chain.from_iterable(anno_list))
-
-    result.info = {
-        'annotations': anno_list,
-        'analysis_complete': True
-    }
+    defaults = {'annotations': []}
+    result.info = helpers.init_result_info(doi, path, defaults)
     n_annotations = len(anno_list)
     clusters = []
 

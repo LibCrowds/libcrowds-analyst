@@ -21,7 +21,7 @@ def analyse(func):
     payload['api_key'] = current_app.config['API_KEY']
     payload['endpoint'] = current_app.config['ENDPOINT']
     payload['doi'] = current_app.config['DOI']
-    payload['url_rule'] = request.url_rule
+    payload['path'] = request.path
     QUEUE.enqueue_call(func=func, kwargs=payload, timeout=10*MINUTE)
     return ok_response()
 

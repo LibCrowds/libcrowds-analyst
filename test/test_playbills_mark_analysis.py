@@ -37,7 +37,7 @@ class TestPlaybillsMarkAnalysis(object):
         kwargs['api_key'] = 'token'
         kwargs['endpoint'] = 'example.com'
         kwargs['doi'] = '123/456'
-        kwargs['url_rule'] = '/example'
+        kwargs['path'] = '/example'
         playbills.analyse_selections(**kwargs)
 
         mock_enki.pbclient.find_results.assert_called_with(project.id, limit=1,
@@ -61,13 +61,15 @@ class TestPlaybillsMarkAnalysis(object):
         kwargs['api_key'] = 'token'
         kwargs['endpoint'] = 'example.com'
         kwargs['doi'] = '123/456'
-        kwargs['url_rule'] = '/example'
+        kwargs['path'] = '/example'
         playbills.analyse_selections(**kwargs)
 
         mock_enki.pbclient.update_result.assert_called_with(result)
         assert result.info == {
             'annotations': [],
-            'analysis_complete': True
+            'analysis_complete': True,
+            'analysis_doi': '123/456',
+            'analysis_path': '/example'
         }
 
     def test_equal_regions_combined(self, create_task_run_df, mocker,
@@ -91,7 +93,7 @@ class TestPlaybillsMarkAnalysis(object):
         kwargs['api_key'] = 'token'
         kwargs['endpoint'] = 'example.com'
         kwargs['doi'] = '123/456'
-        kwargs['url_rule'] = '/example'
+        kwargs['path'] = '/example'
         playbills.analyse_selections(**kwargs)
 
         mock_enki.pbclient.update_result.assert_called_with(result)
@@ -122,7 +124,7 @@ class TestPlaybillsMarkAnalysis(object):
         kwargs['api_key'] = 'token'
         kwargs['endpoint'] = 'example.com'
         kwargs['doi'] = '123/456'
-        kwargs['url_rule'] = '/example'
+        kwargs['path'] = '/example'
         playbills.analyse_selections(**kwargs)
 
         mock_enki.pbclient.update_result.assert_called_with(result)

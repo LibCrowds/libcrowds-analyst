@@ -5,12 +5,12 @@ import math
 import numpy
 
 
-def init_result_info(doi, url_rule, defaults=None):
+def init_result_info(doi, path, defaults=None):
     """Initialise result info."""
     info = defaults or {}
     info['analysis_complete'] = True
-    info['doi'] = doi
-    info['url_rule'] = url_rule
+    info['analysis_doi'] = doi
+    info['analysis_path'] = path
     return info
 
 

@@ -81,7 +81,7 @@ class TestAnalysisHelpers(object):
     def test_doi_added_to_result_info(self):
         doi = '10.5281/zenodo.888152'
         info = helpers.init_result_info(doi, None)
-        assert info['doi'] == doi
+        assert info['analysis_doi'] == doi
 
     def test_analysis_complete_true_added_to_result_info(self):
         info = helpers.init_result_info(None, None)
@@ -92,7 +92,7 @@ class TestAnalysisHelpers(object):
         info = helpers.init_result_info(None, None, defaults)
         assert info['some_key'] == 'some_value'
 
-    def test_url_rule_added_to_result_info(self):
-        url_rule = '/example'
-        info = helpers.init_result_info(None, url_rule)
-        assert info['url_rule'] == url_rule
+    def test_path_added_to_result_info(self):
+        path = '/example'
+        info = helpers.init_result_info(None, path)
+        assert info['analysis_path'] == path

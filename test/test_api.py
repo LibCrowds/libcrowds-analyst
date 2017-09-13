@@ -58,3 +58,11 @@ class TestApi(object):
                          content_type='application/json')
         kwargs = mock_enqueue.call_args[1]['kwargs']
         assert kwargs['endpoint'] == app.config['ENDPOINT']
+
+    def test_url_rule_added_to_payload(self, app, test_client, payload, mocker):
+        """Test that the analysis path is added to the payload."""
+        mock_enqueue = mocker.patch('libcrowds_analyst.api.Queue.enqueue_call')
+        path = '/convert-a-card'
+        test_client.post(path, data=payload, content_type='application/json')
+        kwargs = mock_enqueue.call_args[1]['kwargs']
+        assert kwargs['path'] == path
