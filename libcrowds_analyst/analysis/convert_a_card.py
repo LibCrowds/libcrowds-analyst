@@ -3,6 +3,7 @@
 
 import enki
 from libcrowds_analyst.analysis import helpers
+from libcrowds_analyst import object_loader
 
 
 MATCH_PERCENTAGE = 60
@@ -36,3 +37,15 @@ def analyse(api_key, endpoint, doi, project_id, result_id, project_short_name,
     elif has_answers:
         result.info['analysis_complete'] = False
     enki.pbclient.update_result(result)
+
+
+def analyse_all(project_short_name, **kwargs):
+    """Analyse all Convert-a-Card results."""
+    e = enki.Enki(kwargs['api_key'], kwargs['endpoint'], project_short_name,
+                  all=1)
+    results = object_loader.load(enki.pbclient.find_results,
+                                 project_id=e.project.id, all=1)
+    for result in results:
+        kwargs['project_id'] = e.project.id
+        kwargs['result_id'] = result.id
+        analyse(**kwargs.copy())

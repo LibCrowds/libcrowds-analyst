@@ -13,11 +13,15 @@ QUEUE = Queue('libcrowds_analyst', connection=Redis())
 MINUTE = 60
 
 
-def analyse(func):
-    """Analyse a webhook."""
+def process_payload():
+    """Check that a payload is valid and complete it."""
     payload = request.json or {}
-    if request.method != 'POST' or payload.get('event') != 'task_completed':
+    if request.method != 'POST':
         abort(400)
+
+    if payload.get('event') != 'task_completed':
+        abort(400)
+
     if not request.args.get('api_key'):
         abort(400)
 
@@ -25,7 +29,21 @@ def analyse(func):
     payload['endpoint'] = current_app.config['ENDPOINT']
     payload['doi'] = current_app.config['DOI']
     payload['path'] = request.path
+    return payload
+
+
+def analyse(func):
+    """Analyse a webhook."""
+    payload = process_payload()
     QUEUE.enqueue_call(func=func, kwargs=payload, timeout=10*MINUTE)
+    return ok_response()
+
+
+def analyse_all(func):
+    """Analyse all results for a project."""
+    payload = process_payload()
+    payload['project_short_name'] = request.args.get('project_short_name')
+    QUEUE.enqueue_call(func=func, kwargs=payload, timeout=30*MINUTE)
     return ok_response()
 
 
@@ -47,6 +65,10 @@ def convert_a_card():
     """Endpoint for Convert-a-Card webhooks."""
     if request.method == 'GET':
         return ok_response()
+
+    if request.args.get('project_short_name'):
+        return analyse_all(analysis.convert_a_card.analyse_all)
+
     return analyse(analysis.convert_a_card.analyse)
 
 
@@ -55,4 +77,8 @@ def playbills_mark():
     """Endpoint for In the Spotlight select task webhooks."""
     if request.method == 'GET':
         return ok_response()
+
+    if request.args.get('project_short_name'):
+        return analyse_all(analysis.playbills.analyse_all_selections)
+
     return analyse(analysis.playbills.analyse_selections)

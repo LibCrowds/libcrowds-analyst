@@ -5,6 +5,7 @@ import datetime
 import itertools
 import enki
 from libcrowds_analyst.analysis import helpers
+from libcrowds_analyst import object_loader
 
 
 MERGE_RATIO = 0.5
@@ -62,7 +63,7 @@ def update_selector(anno, rect):
 
 def analyse_selections(api_key, endpoint, project_id, result_id, path, doi,
                        project_short_name, **kwargs):
-    """Analyse In the Spotlight results."""
+    """Analyse In the Spotlight selection results."""
     e = enki.Enki(api_key, endpoint, project_short_name, all=1)
     result = enki.pbclient.find_results(project_id, id=result_id, limit=1,
                                         all=1)[0]
@@ -96,3 +97,15 @@ def analyse_selections(api_key, endpoint, project_id, result_id, path, doi,
         result.info['annotations'] = clusters
 
     enki.pbclient.update_result(result)
+
+
+def analyse_all_selections(project_short_name, **kwargs):
+    """Analyse all In the Spotlight selection results."""
+    e = enki.Enki(kwargs['api_key'], kwargs['endpoint'], project_short_name,
+                  all=1)
+    results = object_loader.load(enki.pbclient.find_results,
+                                 project_id=e.project.id, all=1)
+    for result in results:
+        kwargs['project_id'] = e.project.id
+        kwargs['result_id'] = result.id
+        analyse_selections(**kwargs.copy())
