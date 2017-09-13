@@ -16,10 +16,6 @@ MINUTE = 60
 def process_payload():
     """Check that a payload is valid and complete it."""
     payload = request.json or {}
-    if request.method != 'POST':
-        err_msg = '{} is not accepted for this endpoint'.format(request.method)
-        abort(405, err_msg)
-
     if not request.args.get('api_key'):
         err_msg = 'api_key is key missing'
         abort(400, err_msg)
