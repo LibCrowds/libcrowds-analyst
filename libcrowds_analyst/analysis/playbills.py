@@ -99,13 +99,15 @@ def analyse_selections(api_key, endpoint, project_id, result_id, path, doi,
     enki.pbclient.update_result(result)
 
 
-def analyse_all_selections(project_short_name, **kwargs):
+def analyse_all_selections(**kwargs):
     """Analyse all In the Spotlight selection results."""
-    e = enki.Enki(kwargs['api_key'], kwargs['endpoint'], project_short_name,
-                  all=1)
+    print kwargs
+    e = enki.Enki(kwargs['api_key'], kwargs['endpoint'],
+                  kwargs['project_short_name'], all=1)
     results = object_loader.load(enki.pbclient.find_results,
                                  project_id=e.project.id, all=1)
     for result in results:
         kwargs['project_id'] = e.project.id
         kwargs['result_id'] = result.id
+        print kwargs
         analyse_selections(**kwargs.copy())
