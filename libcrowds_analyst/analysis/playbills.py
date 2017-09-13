@@ -52,6 +52,14 @@ def merge_rects(r1, r2):
     }
 
 
+def update_selector(anno, rect):
+    """Update amedia frag selector."""
+    frag = '?xywh={0},{1},{2},{3}'.format(rect['x'], rect['y'], rect['w'],
+                                          rect['h'])
+    anno['target']['selector']['value'] = frag
+    anno['modified'] = datetime.datetime.now().isoformat()
+
+
 def analyse_selections(api_key, endpoint, project_id, result_id, path, doi,
                        project_short_name, **kwargs):
     """Analyse In the Spotlight results."""
@@ -78,13 +86,11 @@ def analyse_selections(api_key, endpoint, project_id, result_id, path, doi,
                 overlap_ratio = get_overlap_ratio(r1, r2)
                 if overlap_ratio > MERGE_RATIO:
                     matched = True
-                    r2 = merge_rects(r1, r2)
-                    frag = '?xywh={0},{1},{2},{3}'.format(r2['x'], r2['y'],
-                                                          r2['w'], r2['h'])
-                    cluster['target']['selector']['value'] = frag
-                    cluster['modified'] = datetime.datetime.now().isoformat()
+                    r3 = merge_rects(r1, r2)
+                    update_selector(cluster, r3)
 
             if not matched:
+                update_selector(anno, r1)  # still update to round rect params
                 clusters.append(anno)
 
         result.info['annotations'] = clusters
