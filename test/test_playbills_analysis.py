@@ -142,6 +142,7 @@ class TestPlaybillsMarkAnalysis(object):
 
     def test_get_rect_from_selection_works_with_floats(self, select_annotation):
         """Test that we can use floats when converting rects."""
-        selection = {'x': 400.123, 'y': 200.456, 'w': 100.789, 'h': 100}
+        selection = {'x': 400.123, 'y': 200.456, 'w': 100.789, 'h': 100.511}
         anno = select_annotation(**selection)
-        playbills.get_rect_from_selection(anno)
+        rect = playbills.get_rect_from_selection(anno)
+        assert rect == {'x': 400, 'y': 200, 'w': 101, 'h': 101}
