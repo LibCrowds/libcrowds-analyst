@@ -24,7 +24,8 @@ class TestApi(object):
         res = test_client.get('/convert-a-card')
         assert res.status_code == 200
 
-    def test_playbills_select_calls_correct_function(self, test_client, mocker):
+    def test_playbills_select_calls_correct_function(self, test_client,
+                                                     mocker):
         """Test that the correct function is used for analysis."""
         mock_analyse = mocker.patch('libcrowds_analyst.api.analyse')
         mock_analyse.return_value = 'OK'
@@ -51,7 +52,8 @@ class TestApi(object):
         kwargs = mock_enqueue.call_args[1]['kwargs']
         assert kwargs['doi'] == app.config['DOI']
 
-    def test_endpoint_added_to_payload(self, app, test_client, payload, mocker):
+    def test_endpoint_added_to_payload(self, app, test_client, payload,
+                                       mocker):
         """Test that the endpoint is added to the payload."""
         mock_enqueue = mocker.patch('libcrowds_analyst.api.Queue.enqueue_call')
         test_client.post('/convert-a-card', data=payload,
@@ -59,7 +61,7 @@ class TestApi(object):
         kwargs = mock_enqueue.call_args[1]['kwargs']
         assert kwargs['endpoint'] == app.config['ENDPOINT']
 
-    def test_url_rule_added_to_payload(self, app, test_client, payload, mocker):
+    def test_url_rule_added_to_payload(self, test_client, payload, mocker):
         """Test that the analysis path is added to the payload."""
         mock_enqueue = mocker.patch('libcrowds_analyst.api.Queue.enqueue_call')
         path = '/convert-a-card'

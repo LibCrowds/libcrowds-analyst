@@ -133,14 +133,14 @@ class TestPlaybillsMarkAnalysis(object):
         assert len(annotations) == 1
         assert annotations[0]['target']['selector']['value'] == expected
 
-    def test_get_rect_from_selection(self, select_annotation):
+    def test_rect_from_selection(self, select_annotation):
         """Test that we get the correct rect."""
         selection = {'x': 400, 'y': 200, 'w': 100, 'h': 100}
         anno = select_annotation(**selection)
         rect = playbills.get_rect_from_selection(anno)
         assert rect == selection
 
-    def test_get_rect_from_selection_works_with_floats(self, select_annotation):
+    def test_rect_from_selection_works_with_floats(self, select_annotation):
         """Test that we can use floats when converting rects."""
         selection = {'x': 400.123, 'y': 200.456, 'w': 100.789, 'h': 100.511}
         anno = select_annotation(**selection)
