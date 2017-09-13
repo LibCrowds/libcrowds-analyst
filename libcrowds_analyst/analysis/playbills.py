@@ -35,10 +35,10 @@ def get_rect_from_selection(anno):
     media_frag = anno['target']['selector']['value']
     regions = media_frag.split('=')[1].split(',')
     return {
-        'x': int(regions[0]),
-        'y': int(regions[1]),
-        'w': int(regions[2]),
-        'h': int(regions[3])
+        'x': int(round(float(regions[0]))),
+        'y': int(round(float(regions[1]))),
+        'w': int(round(float(regions[2]))),
+        'h': int(round(float(regions[3])))
     }
 
 
