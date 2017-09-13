@@ -42,7 +42,8 @@ class TestApi(object):
         mock_abort = mocker.patch('libcrowds_analyst.api.abort')
         mocker.patch('libcrowds_analyst.api.Queue.enqueue_call')
         test_client.post('/convert-a-card', data=dict())
-        mock_abort.assert_called_with(400)
+        assert mock_abort.called
+        assert mock_abort.call_args[0][0] == 400
 
     def test_doi_added_to_payload(self, app, test_client, payload, mocker):
         """Test that the DOI is added to the payload."""
