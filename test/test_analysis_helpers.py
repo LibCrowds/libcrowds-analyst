@@ -79,7 +79,7 @@ class TestAnalysisHelpers(object):
         assert has_matches
 
     def test_doi_added_to_result_info(self):
-        doi = '10.5281/zenodo.888152'
+        doi = '10.5281/zenodo.890858'
         info = helpers.init_result_info(doi, None)
         assert info['analysis_doi'] == doi
 

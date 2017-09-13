@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/LibCrowds/libcrowds-analyst.svg?branch=master)](https://travis-ci.org/alexandermendes/libcrowds-analyst)
 [![Coverage Status](https://coveralls.io/repos/github/LibCrowds/libcrowds-analyst/badge.svg?branch=master)](https://coveralls.io/github/alexandermendes/libcrowds-analyst?branch=master)
-[![DOI](https://zenodo.org/badge/95394175.svg)](https://zenodo.org/badge/latestdoi/95394175)
+[![DOI](https://zenodo.org/badge/60735973.svg)](https://zenodo.org/badge/latestdoi/60735973)
 
 A headless web application to help with real-time analysis of LibCrowds results.
 
@@ -87,7 +87,7 @@ have to be checked manually, after which `analysis_complete` should be set to
   "comments": "",
   "shelfmark": "15673.d.13",
   "oclc": "865706215",
-  "doi": "10.5281/zenodo.888152",
+  "doi": "10.5281/zenodo.890858",
   "analysis_complete": true
 }
 ```
@@ -103,7 +103,7 @@ rectangles are clustered and `analysis_complete` is set to `True`.
 ```json
 {
   "annotations": [],
-  "doi": "10.5281/zenodo.888152",
+  "doi": "10.5281/zenodo.890858",
   "analysis_complete": true
 }
 ```
