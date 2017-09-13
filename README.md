@@ -62,6 +62,14 @@ DOI = ''
 
 Following is the analysis procudure for each project.
 
+While the preferred way of analysis is setting up webhooks using the endpoints
+listed below there are cases where you may want to trigger analysis manually.
+This can be done by adding `project_short_name={short_name}` as a URL
+parameter to any of the endpoints listed below. This will retrieve all results
+for a project and add them to the analysis queue. Exercise extreme caution
+here, this will overwrite all results currently stored for that project and
+there is no undo!
+
 ### Convert-a-Card
 
 **WEBHOOK ENDPOINT:** `/convert-a-card?api_key={your-api-key}`
