@@ -2,7 +2,7 @@
 """Main module for libcrowds-analyst."""
 
 import os
-from flask import Flask, jsonify
+from flask import Flask, make_response
 from libcrowds_analyst import default_settings
 from werkzeug.http import HTTP_STATUS_CODES
 
@@ -36,10 +36,11 @@ def setup_url_rules(app):
 def setup_error_handler(app):
     """Setup error handlers."""
     def error_response(status_code):  # pragma: no cover
-        response = jsonify({
-            'status': status_code,
-            'message': HTTP_STATUS_CODES.get(status_code),
+        response = make_response({
+            "message": HTTP_STATUS_CODES.get(status_code),
+            "status": status_code,
         })
+        response.mimetype = 'application/json'
         response.status_code = status_code
         return response
 

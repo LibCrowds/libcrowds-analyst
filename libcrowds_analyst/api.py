@@ -3,7 +3,7 @@
 
 from rq import Queue
 from redis import Redis
-from flask import Blueprint, request, current_app, jsonify, abort
+from flask import Blueprint, request, current_app, abort, make_response
 from libcrowds_analyst import analysis
 
 
@@ -28,10 +28,11 @@ def analyse(func):
 
 def ok_response():
     """Return a basic HTTP 200 response."""
-    response = jsonify({
+    response = make_response({
         "message": "OK",
-        "status": 200
+        "status": 200,
     })
+    response.mimetype = 'application/json'
     response.status_code = 200
     return response
 
