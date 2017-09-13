@@ -1,6 +1,6 @@
 # -*- coding: utf8 -*-
+"""API module for libcrowds-analyst."""
 
-import json
 from rq import Queue
 from redis import Redis
 from flask import Blueprint, request, current_app, jsonify, abort
@@ -15,7 +15,7 @@ MINUTE = 60
 def analyse(func):
     """Analyse a webhook."""
     payload = request.json or {}
-    if request.method != 'POST' or payload['event'] != 'task_completed':
+    if request.method != 'POST' or payload.get('event') != 'task_completed':
         abort(400)
 
     payload['api_key'] = current_app.config['API_KEY']

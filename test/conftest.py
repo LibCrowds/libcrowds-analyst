@@ -28,14 +28,6 @@ def test_client(app):
 
 
 @pytest.fixture
-def login(test_client, app):
-    data = {'api_key': app.config['API_KEY']}
-    with test_client as c:
-        c.post('/login', data=data)
-        yield c
-
-
-@pytest.fixture
 def project():
     return enki.pbclient.DomainObject({
         "id": 1,
@@ -104,7 +96,7 @@ def payload(project, task, result):
                 project_id=project.id,
                 task_id=task.id,
                 result_id=result.id,
-                event=u'task_completed')
+                event='task_completed')
     return json.dumps(load)
 
 
