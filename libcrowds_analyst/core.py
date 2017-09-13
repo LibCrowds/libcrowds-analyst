@@ -36,10 +36,12 @@ def setup_url_rules(app):
 def setup_error_handler(app):
     """Setup error handlers."""
     def error_response(status_code):  # pragma: no cover
-        response = make_response({
-            "message": HTTP_STATUS_CODES.get(status_code),
+        response = make_response(
+            json.dumps({
+                "message": HTTP_STATUS_CODES.get(status_code),
             "status": status_code,
-        })
+            })
+        )
         response.mimetype = 'application/json'
         response.status_code = status_code
         return response

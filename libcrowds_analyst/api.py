@@ -1,6 +1,7 @@
 # -*- coding: utf8 -*-
 """API module for libcrowds-analyst."""
 
+import json
 from rq import Queue
 from redis import Redis
 from flask import Blueprint, request, current_app, abort, make_response
@@ -28,10 +29,12 @@ def analyse(func):
 
 def ok_response():
     """Return a basic HTTP 200 response."""
-    response = make_response({
-        "message": "OK",
-        "status": 200,
-    })
+    response = make_response(
+        json.dumps({
+            "message": "OK",
+            "status": 200,
+        })
+    )
     response.mimetype = 'application/json'
     response.status_code = 200
     return response
