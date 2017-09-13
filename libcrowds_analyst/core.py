@@ -50,7 +50,7 @@ def setup_error_handler(app):
 
     @app.errorhandler(400)
     def _400_error(e):  # pragma: no cover
-        return error_response(405, e.description)
+        return error_response(400, e.description)
 
     @app.errorhandler(404)
     def _404_error(e):  # pragma: no cover
