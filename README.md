@@ -1,7 +1,7 @@
 # libcrowds-analyst
 
-[![Build Status](https://travis-ci.org/libcrowds/libcrowds-analyst.svg?branch=master)](https://travis-ci.org/alexandermendes/libcrowds-analyst)
-[![Coverage Status](https://coveralls.io/repos/github/libcrowds/libcrowds-analyst/badge.svg?branch=master)](https://coveralls.io/github/alexandermendes/libcrowds-analyst?branch=master)
+[![Build Status](https://travis-ci.org/LibCrowds/libcrowds-analyst.svg?branch=master)](https://travis-ci.org/alexandermendes/libcrowds-analyst)
+[![Coverage Status](https://coveralls.io/repos/github/LibCrowds/libcrowds-analyst/badge.svg?branch=master)](https://coveralls.io/github/alexandermendes/libcrowds-analyst?branch=master)
 
 A headless web application to help with real-time analysis of LibCrowds results.
 
