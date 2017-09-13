@@ -50,9 +50,6 @@ cp settings.py.tmpl settings.py
 The important settings to maintain are:
 
 ```
-# PyBossa API key for an admin user, used to update all results
-API_KEY = ''
-
 # URL of the PyBossa server
 ENDPOINT = 'http://{your-pybossa-server}'
 

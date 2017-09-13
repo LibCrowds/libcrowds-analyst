@@ -47,7 +47,7 @@ class TestApi(object):
     def test_doi_added_to_payload(self, app, test_client, payload, mocker):
         """Test that the DOI is added to the payload."""
         mock_enqueue = mocker.patch('libcrowds_analyst.api.Queue.enqueue_call')
-        test_client.post('/convert-a-card', data=payload,
+        test_client.post('/convert-a-card?api_key=token', data=payload,
                          content_type='application/json')
         kwargs = mock_enqueue.call_args[1]['kwargs']
         assert kwargs['doi'] == app.config['DOI']
@@ -56,15 +56,16 @@ class TestApi(object):
                                        mocker):
         """Test that the endpoint is added to the payload."""
         mock_enqueue = mocker.patch('libcrowds_analyst.api.Queue.enqueue_call')
-        test_client.post('/convert-a-card', data=payload,
+        test_client.post('/convert-a-card?api_key=token', data=payload,
                          content_type='application/json')
         kwargs = mock_enqueue.call_args[1]['kwargs']
         assert kwargs['endpoint'] == app.config['ENDPOINT']
 
-    def test_url_rule_added_to_payload(self, test_client, payload, mocker):
+    def test_analysis_path_added_to_payload(self, test_client, payload, mocker):
         """Test that the analysis path is added to the payload."""
         mock_enqueue = mocker.patch('libcrowds_analyst.api.Queue.enqueue_call')
         path = '/convert-a-card'
-        test_client.post(path, data=payload, content_type='application/json')
+        url = '{}?api_key=token'.format(path)
+        test_client.post(url, data=payload, content_type='application/json')
         kwargs = mock_enqueue.call_args[1]['kwargs']
         assert kwargs['path'] == path

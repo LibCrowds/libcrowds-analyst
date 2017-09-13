@@ -18,8 +18,10 @@ def analyse(func):
     payload = request.json or {}
     if request.method != 'POST' or payload.get('event') != 'task_completed':
         abort(400)
+    if not request.args.get('api_key'):
+        abort(400)
 
-    payload['api_key'] = current_app.config['API_KEY']
+    payload['api_key'] = request.args.get('api_key')
     payload['endpoint'] = current_app.config['ENDPOINT']
     payload['doi'] = current_app.config['DOI']
     payload['path'] = request.path
