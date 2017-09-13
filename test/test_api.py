@@ -69,7 +69,8 @@ class TestApi(object):
         kwargs = mock_enqueue.call_args[1]['kwargs']
         assert kwargs['api_key'] == 'token'
 
-    def test_analysis_path_added_to_payload(self, test_client, payload, mocker):
+    def test_analysis_path_added_to_payload(self, test_client, payload,
+                                            mocker):
         """Test that the analysis path is added to the payload."""
         mock_enqueue = mocker.patch('libcrowds_analyst.api.Queue.enqueue_call')
         path = '/convert-a-card'
