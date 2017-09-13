@@ -24,6 +24,14 @@ class TestApi(object):
         res = test_client.get('/convert-a-card')
         assert res.status_code == 200
 
+    def test_convert_a_card_analyse_all(self, mocker, test_client, project):
+        """Test that analyse all calls the right function."""
+        mock_analyse = mocker.patch('libcrowds_analyst.api.analyse_all')
+        mock_analyse.return_value = 'OK'
+        params = 'project_short_name={}'.format(project.short_name)
+        test_client.post('/convert-a-card?{}'.format(params))
+        mock_analyse.assert_called_with(analysis.convert_a_card.analyse_all)
+
     def test_playbills_select_calls_correct_function(self, test_client,
                                                      mocker):
         """Test that the correct function is used for analysis."""
@@ -37,6 +45,15 @@ class TestApi(object):
         res = test_client.get('/playbills/select')
         assert res.status_code == 200
 
+    def test_playbills_select_analyse_all(self, mocker, test_client, project):
+        """Test that analyse all calls the right function."""
+        mock_analyse = mocker.patch('libcrowds_analyst.api.analyse_all')
+        mock_analyse.return_value = 'OK'
+        params = 'project_short_name={}'.format(project.short_name)
+        test_client.post('/playbills/select?{}'.format(params))
+        func = analysis.playbills.analyse_all_selections
+        mock_analyse.assert_called_with(func)
+
     def test_invalid_webook_request_aborted(self, test_client, mocker):
         """Test that an invalid webhook analyse request returns 400."""
         mock_abort = mocker.patch('libcrowds_analyst.api.abort')
@@ -45,37 +62,45 @@ class TestApi(object):
         assert mock_abort.called
         assert mock_abort.call_args[0][0] == 400
 
-    def test_doi_added_to_payload(self, app, test_client, payload, mocker):
+    def test_doi_added_to_payload(self, mocker, app):
         """Test that the DOI is added to the payload."""
-        mock_enqueue = mocker.patch('libcrowds_analyst.api.Queue.enqueue_call')
-        test_client.post('/convert-a-card?api_key=token', data=payload,
-                         content_type='application/json')
-        kwargs = mock_enqueue.call_args[1]['kwargs']
-        assert kwargs['doi'] == app.config['DOI']
+        mock_request = mocker.patch('libcrowds_analyst.api.request')
+        mock_request.args = {'api_key': 'token'}
+        mock_request.json = {}
+        pl = api.process_payload()
+        assert pl['doi'] == app.config['DOI']
 
-    def test_endpoint_added_to_payload(self, app, test_client, payload,
-                                       mocker):
+    def test_endpoint_added_to_payload(self, mocker, app):
         """Test that the endpoint is added to the payload."""
-        mock_enqueue = mocker.patch('libcrowds_analyst.api.Queue.enqueue_call')
-        test_client.post('/convert-a-card?api_key=token', data=payload,
-                         content_type='application/json')
-        kwargs = mock_enqueue.call_args[1]['kwargs']
-        assert kwargs['endpoint'] == app.config['ENDPOINT']
+        mock_request = mocker.patch('libcrowds_analyst.api.request')
+        mock_request.args = {'api_key': 'token'}
+        mock_request.json = {}
+        pl = api.process_payload()
+        assert pl['endpoint'] == app.config['ENDPOINT']
 
-    def test_api_key_added_to_payload(self, app, test_client, payload, mocker):
+    def test_api_key_added_to_payload(self, mocker, app):
         """Test that the API key is added to the payload."""
-        mock_enqueue = mocker.patch('libcrowds_analyst.api.Queue.enqueue_call')
-        test_client.post('/convert-a-card?api_key=token', data=payload,
-                         content_type='application/json')
-        kwargs = mock_enqueue.call_args[1]['kwargs']
-        assert kwargs['api_key'] == 'token'
+        mock_request = mocker.patch('libcrowds_analyst.api.request')
+        key = 'token'
+        mock_request.args = {'api_key': key}
+        mock_request.json = {}
+        pl = api.process_payload()
+        assert pl['api_key'] == key
 
-    def test_analysis_path_added_to_payload(self, test_client, payload,
-                                            mocker):
+    def test_path_added_to_payload(self, mocker, app):
         """Test that the analysis path is added to the payload."""
+        mock_request = mocker.patch('libcrowds_analyst.api.request')
+        mock_request.args = {'api_key': 'token'}
+        path = '/example'
+        mock_request.path = path
+        mock_request.json = {}
+        pl = api.process_payload()
+        assert pl['path'] == path
+
+    def test_analyse_all_function_queued(self, mocker, app):
+        """Test that the correct function is added to the queue."""
         mock_enqueue = mocker.patch('libcrowds_analyst.api.Queue.enqueue_call')
-        path = '/convert-a-card'
-        url = '{}?api_key=token'.format(path)
-        test_client.post(url, data=payload, content_type='application/json')
-        kwargs = mock_enqueue.call_args[1]['kwargs']
-        assert kwargs['path'] == path
+        mocker.patch('libcrowds_analyst.api.request')
+        func = lambda x: x
+        api.analyse_all(func)
+        assert mock_enqueue.call_args[1]['func'] == func
