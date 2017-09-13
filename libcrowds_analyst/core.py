@@ -2,6 +2,7 @@
 """Main module for libcrowds-analyst."""
 
 import os
+import json
 from flask import Flask, make_response
 from libcrowds_analyst import default_settings
 from werkzeug.http import HTTP_STATUS_CODES
@@ -39,7 +40,7 @@ def setup_error_handler(app):
         response = make_response(
             json.dumps({
                 "message": HTTP_STATUS_CODES.get(status_code),
-            "status": status_code,
+              "status": status_code,
             })
         )
         response.mimetype = 'application/json'
