@@ -15,14 +15,22 @@ MINUTE = 60
 def analyse(func):
     """Analyse a webhook."""
     payload = request.json or {}
-    if request.method == 'POST' and payload['event'] != 'task_completed':
+    print payload
+    if request.method != 'POST' or payload['event'] != 'task_completed':
+        print request.method
+        print payload['event']
         abort(400)
-    elif request.method == 'POST' and payload['event'] == 'task_completed':
-        payload['api_key'] = current_app.config['API_KEY']
-        payload['endpoint'] = current_app.config['ENDPOINT']
-        payload['doi'] = current_app.config['DOI']
-        payload['url_rule'] = request.url_rule
-        QUEUE.enqueue_call(func=func, kwargs=payload, timeout=10*MINUTE)
+
+    payload['api_key'] = current_app.config['API_KEY']
+    payload['endpoint'] = current_app.config['ENDPOINT']
+    payload['doi'] = current_app.config['DOI']
+    payload['url_rule'] = request.url_rule
+    QUEUE.enqueue_call(func=func, kwargs=payload, timeout=10*MINUTE)
+    return ok_response()
+
+
+def ok_response():
+    """Return a basic HTTP 200 response."""
     response = jsonify({
         "message": "OK",
         "status": 200
@@ -34,10 +42,14 @@ def analyse(func):
 @BP.route('convert-a-card', methods=['GET', 'POST'])
 def convert_a_card():
     """Endpoint for Convert-a-Card webhooks."""
+    if request.method == 'GET':
+        return ok_response()
     return analyse(analysis.convert_a_card.analyse)
 
 
 @BP.route('playbills/select', methods=['GET', 'POST'])
 def playbills_mark():
     """Endpoint for In the Spotlight select task webhooks."""
+    if request.method == 'GET':
+        return ok_response()
     return analyse(analysis.playbills.analyse_selections)
