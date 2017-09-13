@@ -35,7 +35,7 @@ def setup_url_rules(app):
 
 def setup_error_handler(app):
     """Setup error handlers."""
-    def error_response(status_code):
+    def error_response(status_code):  # pragma: no cover
         response = jsonify({
             'status': status_code,
             'message': HTTP_STATUS_CODES.get(status_code),
