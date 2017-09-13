@@ -36,11 +36,12 @@ def setup_url_rules(app):
 
 def setup_error_handler(app):
     """Setup error handlers."""
-    def error_response(status_code):  # pragma: no cover
+    def error_response(status_code, description):  # pragma: no cover
         response = make_response(
             json.dumps({
                 "message": HTTP_STATUS_CODES.get(status_code),
                 "status": status_code,
+                "description": description
             })
         )
         response.mimetype = 'application/json'
@@ -48,17 +49,8 @@ def setup_error_handler(app):
         return response
 
     @app.errorhandler(400)
-    def _400_error(e):  # pragma: no cover
-        return error_response(400)
-
     @app.errorhandler(404)
-    def _404_error(e):  # pragma: no cover
-        return error_response(404)
-
     @app.errorhandler(405)
-    def _405_error(e):  # pragma: no cover
-        return error_response(405)
-
     @app.errorhandler(500)
-    def _500_error(e):  # pragma: no cover
-        return error_response(500)
+    def _400_error(status_code, description):  # pragma: no cover
+        return error_response(status_code, description)

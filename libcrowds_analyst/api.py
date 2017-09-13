@@ -17,10 +17,12 @@ def process_payload():
     """Check that a payload is valid and complete it."""
     payload = request.json or {}
     if request.method != 'POST':
-        abort(400)
+        err_msg = '{} is not accepted for this endpoint'.format(request.method)
+        abort(405, err_msg)
 
     if not request.args.get('api_key'):
-        abort(400)
+        err_msg = 'api_key is key missing'
+        abort(400, err_msg)
 
     payload['api_key'] = request.args.get('api_key')
     payload['endpoint'] = current_app.config['ENDPOINT']
@@ -33,7 +35,8 @@ def analyse(func):
     """Analyse a webhook."""
     payload = process_payload()
     if payload.get('event') != 'task_completed':
-        abort(400)
+        err_msg = 'This is not a task_completed event'
+        abort(400, err_msg)
 
     QUEUE.enqueue_call(func=func, kwargs=payload, timeout=10*MINUTE)
     return ok_response()
