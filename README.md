@@ -10,7 +10,7 @@ rules set out for that project (see [Analysis](README.md#Analysis)). The  task's
 result is updated accordingly.
 
 To facilitate reproducible research, since v3.0.0 the DOI of the version of
-LibCrowds Analyst used for analysis is added to each result.
+LibCrowds Analyst and the enpoint used for analysis are added to each result.
 
 ## Requirements
 
