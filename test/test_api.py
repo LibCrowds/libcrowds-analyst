@@ -101,6 +101,8 @@ class TestApi(object):
         """Test that the correct function is added to the queue."""
         mock_enqueue = mocker.patch('libcrowds_analyst.api.Queue.enqueue_call')
         mocker.patch('libcrowds_analyst.api.request')
-        func = lambda x: x
-        api.analyse_all(func)
-        assert mock_enqueue.call_args[1]['func'] == func
+
+        def mock_func():
+            return True
+        api.analyse_all(mock_func)
+        assert mock_enqueue.call_args[1]['func'] == mock_func

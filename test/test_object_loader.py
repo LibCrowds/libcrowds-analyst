@@ -8,13 +8,14 @@ class TestObjectLoader(object):
 
     def test_correct_objects_are_loaded(self, result):
         """Test that objects are loaded."""
-        func = lambda **x: [result]
-        object_list = object_loader.load(func)
+        def mock_func():
+            return [result]
+        object_list = object_loader.load(mock_func)
         assert object_list == [result]
 
     def test_all_objects_are_loaded(self, result):
         """Test that all objects are loaded."""
-        long_list = [result]*100
-        func = lambda **x: long_list
-        object_list = object_loader.load(func)
+        def mock_func():
+            return [result]*100
+        object_list = object_loader.load(mock_func)
         assert len(object_list) == 200
