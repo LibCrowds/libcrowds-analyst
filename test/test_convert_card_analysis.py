@@ -112,3 +112,29 @@ class TestConvertACardAnalysis(object):
             'analysis_doi': '123/456',
             'analysis_path': '/example'
         }
+
+    def test_all_results_analysed(self, mocker, result, project):
+        """Test that analysis of all results is triggered correctly."""
+        mock_enki = mocker.patch(
+            'libcrowds_analyst.analysis.convert_a_card.enki'
+        )
+        mock_enki.Enki().project = project
+        mock_analyse = mocker.patch(
+            'libcrowds_analyst.analysis.convert_a_card.analyse'
+        )
+        mock_object_loader = mocker.patch(
+            'libcrowds_analyst.analysis.convert_a_card.object_loader'
+        )
+        kwargs = {
+          'api_key': 'token',
+          'endpoint': 'example.com',
+          'doi': '123/456',
+          'path': '/example',
+          'project_short_name': 'some_project'
+        }
+        mock_object_loader.load.return_value = [result]
+        convert_a_card.analyse_all(**kwargs)
+        expected = kwargs.copy()
+        expected['result_id'] = result.id
+        expected['project_id'] = result.project_id
+        mock_analyse.assert_called_with(**expected)
