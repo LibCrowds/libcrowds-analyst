@@ -66,7 +66,7 @@ Following is the analysis procudure for each project.
 
 ### Convert-a-Card
 
-**WEBHOOK ENDPOINT:** `/convert-a-card`
+**WEBHOOK ENDPOINT:** `/convert-a-card?api_key={your-api-key}`
 
 All task runs are compared looking a match rate of at least 70% for the answer
 keys `oclc` and `shelfmark` (disregarding task runs where all answer fields
@@ -96,7 +96,7 @@ have to be checked manually, after which `analysis_complete` should be set to
 
 ### In the Spotlight: Selections
 
-**WEBHOOK ENDPOINT:** `/playbills/selections`
+**WEBHOOK ENDPOINT:** `/playbills/select?api_key={your-api-key}`
 
 The annotations for all task runs are compared. Those with similar selection
 rectangles are clustered and `analysis_complete` is set to `True`.
