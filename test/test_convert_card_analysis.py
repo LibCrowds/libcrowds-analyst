@@ -124,3 +124,12 @@ class TestConvertACardAnalysis(object):
         convert_a_card.analyse(**processed_payload)
         assert mock_init_info.call_args[0][0] == processed_payload['doi']
         assert mock_init_info.call_args[0][1] == processed_payload['path']
+
+    def test_analysis_throttled(self, mocker, processed_payload):
+        """Test that the result is initialised using the helper function."""
+        mocker.patch('libcrowds_analyst.analysis.convert_a_card.enki')
+        mock_sleep = mocker.patch(
+            'libcrowds_analyst.analysis.convert_a_card.time.sleep'
+        )
+        convert_a_card.analyse(**processed_payload)
+        mock_sleep.assert_called_with(processed_payload['throttle'])

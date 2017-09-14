@@ -157,3 +157,12 @@ class TestPlaybillsMarkAnalysis(object):
         playbills.analyse_selections(**processed_payload)
         assert mock_init_info.call_args[0][0] == processed_payload['doi']
         assert mock_init_info.call_args[0][1] == processed_payload['path']
+
+    def test_select_analysis_throttled(self, mocker, processed_payload):
+        """Test that the result is initialised using the helper function."""
+        mocker.patch('libcrowds_analyst.analysis.playbills.enki')
+        mock_sleep = mocker.patch(
+          'libcrowds_analyst.analysis.playbills.time.sleep'
+        )
+        playbills.analyse_selections(**processed_payload)
+        mock_sleep.assert_called_with(processed_payload['throttle'])
