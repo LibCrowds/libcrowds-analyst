@@ -99,6 +99,16 @@ def payload(project, task, result):
                 event='task_completed')
     return json.dumps(load)
 
+@pytest.fixture
+def processed_payload(payload, app):
+    processed_pl = json.loads(payload)
+    processed_pl['api_key'] = 'token'
+    processed_pl['endpoint'] = app.config['ENDPOINT']
+    processed_pl['doi'] = app.config['DOI']
+    processed_pl['path'] = '/example'
+    processed_pl['throttle'] = app.config['THROTTLE']
+    return processed_pl
+
 
 @pytest.fixture
 def select_annotation():

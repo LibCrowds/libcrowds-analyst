@@ -24,6 +24,7 @@ def process_payload():
     payload['endpoint'] = current_app.config['ENDPOINT']
     payload['doi'] = current_app.config['DOI']
     payload['path'] = request.path
+    payload['throttle'] = current_app.config['THROTTLE']
     return payload
 
 
