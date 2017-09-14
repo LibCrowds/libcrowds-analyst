@@ -99,6 +99,7 @@ def payload(project, task, result):
                 event='task_completed')
     return json.dumps(load)
 
+
 @pytest.fixture
 def processed_payload(payload, app):
     processed_pl = json.loads(payload)
