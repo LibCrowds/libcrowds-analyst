@@ -1,6 +1,7 @@
 # -*- coding: utf8 -*-
 """Convert-a-Card analysis module."""
 
+import time
 import enki
 from libcrowds_analyst.analysis import helpers
 from libcrowds_analyst import object_loader
@@ -11,7 +12,7 @@ VALID_KEYS = ['oclc', 'shelfmark', 'comments']
 
 
 def analyse(api_key, endpoint, doi, project_id, result_id, project_short_name,
-            path, **kwargs):
+            path, throttle, **kwargs):
     """Analyse Convert-a-Card results."""
     e = enki.Enki(api_key, endpoint, project_short_name, all=1)
     result = enki.pbclient.find_results(project_id, id=result_id, limit=1,
@@ -37,6 +38,7 @@ def analyse(api_key, endpoint, doi, project_id, result_id, project_short_name,
     elif has_answers:
         result.info['analysis_complete'] = False
     enki.pbclient.update_result(result)
+    time.sleep(throttle)
 
 
 def analyse_all(**kwargs):

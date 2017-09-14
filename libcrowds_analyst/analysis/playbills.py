@@ -1,6 +1,7 @@
 # -*- coding: utf8 -*-
 """In the Spotlight analysis module."""
 
+import time
 import datetime
 import itertools
 import enki
@@ -62,7 +63,7 @@ def update_selector(anno, rect):
 
 
 def analyse_selections(api_key, endpoint, project_id, result_id, path, doi,
-                       project_short_name, **kwargs):
+                       project_short_name, throttle, **kwargs):
     """Analyse In the Spotlight selection results."""
     e = enki.Enki(api_key, endpoint, project_short_name, all=1)
     result = enki.pbclient.find_results(project_id, id=result_id, limit=1,
@@ -97,11 +98,11 @@ def analyse_selections(api_key, endpoint, project_id, result_id, path, doi,
         result.info['annotations'] = clusters
 
     enki.pbclient.update_result(result)
+    time.sleep(throttle)
 
 
 def analyse_all_selections(**kwargs):
     """Analyse all In the Spotlight selection results."""
-    print kwargs
     e = enki.Enki(kwargs['api_key'], kwargs['endpoint'],
                   kwargs['project_short_name'], all=1)
     results = object_loader.load(enki.pbclient.find_results,
@@ -109,5 +110,4 @@ def analyse_all_selections(**kwargs):
     for result in results:
         kwargs['project_id'] = e.project.id
         kwargs['result_id'] = result.id
-        print kwargs
         analyse_selections(**kwargs.copy())
