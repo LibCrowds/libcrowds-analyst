@@ -117,3 +117,11 @@ def analyse_all_selections(**kwargs):
         kwargs['project_id'] = e.project.id
         kwargs['result_id'] = result.id
         analyse_selections(**kwargs.copy())
+
+    helpers.send_mail({
+        'recipients': kwargs['mail_recipients'],
+        'subject': 'Analysis complete',
+        'body': '''
+            All {0} results for {1} have been analysed.
+            '''.format(len(results), e.project.name)
+    })

@@ -26,6 +26,7 @@ def process_payload():
     payload['doi'] = current_app.config['DOI']
     payload['path'] = request.path
     payload['throttle'] = current_app.config['THROTTLE']
+    payload['mail_recipients'] = current_app.config['MAIL_RECIPIENTS']
     return payload
 
 

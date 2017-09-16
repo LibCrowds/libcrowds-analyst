@@ -108,6 +108,7 @@ def processed_payload(payload, app):
     processed_pl['doi'] = app.config['DOI']
     processed_pl['path'] = '/example'
     processed_pl['throttle'] = app.config['THROTTLE']
+    processed_pl['mail_recipients'] = app.config['MAIL_RECIPIENTS']
     return processed_pl
 
 

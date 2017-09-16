@@ -106,6 +106,15 @@ class TestApi(object):
         pl = api.process_payload()
         assert pl['throttle'] == throttle
 
+    def test_mail_recipients_added_to_payload(self, mocker, app):
+        """Test that the mail recipients are added to the payload."""
+        mock_request = mocker.patch('libcrowds_analyst.api.request')
+        mock_request.args = {'api_key': 'token'}
+        recipients = app.config['MAIL_RECIPIENTS']
+        mock_request.json = {}
+        pl = api.process_payload()
+        assert pl['mail_recipients'] == recipients
+
     def test_analyse_all_function_queued(self, mocker, app):
         """Test that the correct function is added to the queue."""
         mock_enqueue = mocker.patch('libcrowds_analyst.api.Queue.enqueue')

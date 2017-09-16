@@ -122,7 +122,7 @@ class TestPlaybillsMarkAnalysis(object):
         rect = playbills.get_rect_from_selection(anno)
         assert rect == {'x': 400, 'y': 200, 'w': 101, 'h': 101}
 
-    def test_all_selection_results_analysed(self, mocker, result, project):
+    def test_all_selection_results_analysed(self, mocker, result, project, processed_payload):
         """Test that analysis of all selection results triggered correctly."""
         mock_enki = mocker.patch(
             'libcrowds_analyst.analysis.playbills.enki'
@@ -134,19 +134,22 @@ class TestPlaybillsMarkAnalysis(object):
         mock_object_loader = mocker.patch(
             'libcrowds_analyst.analysis.playbills.object_loader'
         )
-        kwargs = {
-          'api_key': 'token',
-          'endpoint': 'example.com',
-          'doi': '123/456',
-          'path': '/example',
-          'project_short_name': 'some_project'
-        }
         mock_object_loader.load.return_value = [result]
-        playbills.analyse_all_selections(**kwargs)
-        expected = kwargs.copy()
-        expected['result_id'] = result.id
-        expected['project_id'] = result.project_id
+        playbills.analyse_all_selections(**processed_payload)
+        expected = processed_payload.copy()
+        expected['result_id'] = processed_payload['result_id']
+        expected['project_id'] = processed_payload['project_id']
         mock_analyse.assert_called_with(**expected)
+
+    def test_mail_sent_when_all_selection_results_analysed(self, mocker,
+                                                           processed_payload):
+        """Test that analysis of all selection results triggered correctly."""
+        mocker.patch('libcrowds_analyst.analysis.playbills.enki')
+        mock_send_mail = mocker.patch(
+            'libcrowds_analyst.analysis.playbills.helpers.send_mail'
+        )
+        playbills.analyse_all_selections(**processed_payload)
+        assert mock_send_mail.called
 
     def test_select_result_initialised_properly(self, mocker,
                                                 processed_payload):
