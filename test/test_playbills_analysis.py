@@ -168,8 +168,7 @@ class TestPlaybillsMarkAnalysis(object):
         mock_sleep.assert_called_with(processed_payload['throttle'])
 
     def test_comments_accepted(self, mocker, processed_payload, result,
-                               select_annotation, comment_annotation,
-                               create_task_run_df):
+                               comment_annotation, create_task_run_df):
         """Test that comment annotations are handled properly."""
         mock_enki = mocker.patch(
             'libcrowds_analyst.analysis.playbills.enki'
