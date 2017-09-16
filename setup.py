@@ -3,6 +3,7 @@ from setuptools import setup, find_packages
 
 requirements = [
     "Flask>=0.10.1, <0.10.2",
+    "Flask-Mail>=0.9.1, <1.0",
     "rq>=0.6.0, <1.0",
     "redis>=2.9, <2.10",
     "requests>=2.0.0, <3.0",

@@ -6,6 +6,7 @@ import json
 from flask import Flask, make_response
 from libcrowds_analyst import default_settings
 from werkzeug.http import HTTP_STATUS_CODES
+from libcrowds_analyst.extensions import mail
 
 
 def create_app():
@@ -14,6 +15,7 @@ def create_app():
     configure_app(app)
     setup_url_rules(app)
     setup_error_handler(app)
+    mail.init_app(app)
     return app
 
 
