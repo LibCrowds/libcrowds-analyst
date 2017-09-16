@@ -122,7 +122,8 @@ class TestPlaybillsMarkAnalysis(object):
         rect = playbills.get_rect_from_selection(anno)
         assert rect == {'x': 400, 'y': 200, 'w': 101, 'h': 101}
 
-    def test_all_selection_results_analysed(self, mocker, result, project, processed_payload):
+    def test_all_selection_results_analysed(self, mocker, result, project,
+                                            processed_payload):
         """Test that analysis of all selection results triggered correctly."""
         mock_enki = mocker.patch(
             'libcrowds_analyst.analysis.playbills.enki'
