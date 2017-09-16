@@ -11,6 +11,7 @@ from libcrowds_analyst import analysis
 BP = Blueprint('api', __name__)
 QUEUE = Queue('libcrowds_analyst', connection=Redis())
 MINUTE = 60
+HOUR = 60*MINUTE
 
 
 def process_payload():
@@ -43,7 +44,7 @@ def analyse_all(func):
     """Analyse all results for a project."""
     payload = process_payload()
     payload['project_short_name'] = request.args.get('project_short_name')
-    QUEUE.enqueue_call(func=func, kwargs=payload)
+    QUEUE.enqueue_call(func=func, kwargs=payload, timeout=12*HOUR)
     return ok_response()
 
 
