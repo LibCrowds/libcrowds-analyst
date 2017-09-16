@@ -145,6 +145,7 @@ def select_annotation():
         }
     return create
 
+
 @pytest.fixture
 def comment_annotation():
     def create(comment):
@@ -156,7 +157,7 @@ def comment_annotation():
                 "format": "text/plain"
             },
             "motivation": "commenting",
-            "target": "https://api.bl.uk/metadata/iiif/ark:/81055/vdc_100022589158.0x00007c",
+            "target": "http://example.org/iiif/book1/canvas/p1",
             "created": "2017-08-31T10:09:55.082Z",
             "modified": "2017-08-31T10:09:57.777Z",
             "generated": "2017-08-31T10:09:55.082Z",
