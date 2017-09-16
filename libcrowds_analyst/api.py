@@ -36,7 +36,7 @@ def analyse(func):
         err_msg = 'This is not a task_completed event'
         abort(400, err_msg)
 
-    QUEUE.enqueue_call(func=func, kwargs=payload, timeout=10*MINUTE)
+    QUEUE.enqueue(func=func, timeout=10*MINUTE, **payload)
     return ok_response()
 
 
@@ -44,7 +44,7 @@ def analyse_all(func):
     """Analyse all results for a project."""
     payload = process_payload()
     payload['project_short_name'] = request.args.get('project_short_name')
-    QUEUE.enqueue_call(func=func, kwargs=payload, timeout=12*HOUR)
+    QUEUE.enqueue(func=func, timeout=12*HOUR, **payload)
     return ok_response()
 
 
