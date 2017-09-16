@@ -122,7 +122,8 @@ class TestPlaybillsMarkAnalysis(object):
         rect = playbills.get_rect_from_selection(anno)
         assert rect == {'x': 400, 'y': 200, 'w': 101, 'h': 101}
 
-    def test_all_selection_results_analysed(self, mocker, result, project):
+    def test_all_selection_results_analysed(self, mocker, result, project,
+                                            processed_payload):
         """Test that analysis of all selection results triggered correctly."""
         mock_enki = mocker.patch(
             'libcrowds_analyst.analysis.playbills.enki'
@@ -134,19 +135,45 @@ class TestPlaybillsMarkAnalysis(object):
         mock_object_loader = mocker.patch(
             'libcrowds_analyst.analysis.playbills.object_loader'
         )
-        kwargs = {
-          'api_key': 'token',
-          'endpoint': 'example.com',
-          'doi': '123/456',
-          'path': '/example',
-          'project_short_name': 'some_project'
-        }
         mock_object_loader.load.return_value = [result]
-        playbills.analyse_all_selections(**kwargs)
-        expected = kwargs.copy()
-        expected['result_id'] = result.id
-        expected['project_id'] = result.project_id
+        playbills.analyse_all_selections(**processed_payload)
+        expected = processed_payload.copy()
+        expected['result_id'] = processed_payload['result_id']
+        expected['project_id'] = processed_payload['project_id']
         mock_analyse.assert_called_with(**expected)
+
+    def test_mail_sent_when_all_selection_results_analysed(self, mocker,
+                                                           processed_payload):
+        """Test that analysis of all selection results triggered correctly."""
+        mocker.patch('libcrowds_analyst.analysis.playbills.enki')
+        mock_send_mail = mocker.patch(
+            'libcrowds_analyst.analysis.playbills.helpers.send_mail'
+        )
+        playbills.analyse_all_selections(**processed_payload)
+        assert mock_send_mail.called
+
+    def test_mail_sent_for_each_comment_annotation(self, mocker, result,
+                                                   comment_annotation,
+                                                   create_task_run_df,
+                                                   processed_payload):
+        """Test that an email is sent for each comment annotation."""
+        mock_enki = mocker.patch(
+            'libcrowds_analyst.analysis.playbills.enki'
+        )
+        mock_send_mail = mocker.patch(
+            'libcrowds_analyst.analysis.playbills.helpers.send_mail'
+        )
+        n_comments = 3
+        comments = [comment_annotation(n) for n in range(n_comments)]
+        tr_info = [
+            comments
+        ]
+        df = create_task_run_df(tr_info)
+        mock_enki.pbclient.find_results.return_value = [result]
+        mock_enki.Enki().task_runs_df.__getitem__.return_value = df
+        playbills.analyse_selections(**processed_payload)
+        mock_enki.pbclient.update_result.assert_called_with(result)
+        assert mock_send_mail.call_count == n_comments
 
     def test_select_result_initialised_properly(self, mocker,
                                                 processed_payload):

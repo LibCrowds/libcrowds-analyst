@@ -104,6 +104,32 @@ def analyse_selections(api_key, endpoint, project_id, result_id, path, doi,
 
     result.info['annotations'] = clusters + comments
     enki.pbclient.update_result(result)
+
+    # Send an email for each comment annotation
+    if comments:
+        task = e.get_tasks(task_id=result.task_id)[0]
+        for comment in comments:
+            helpers.send_mail({
+                'recipients': kwargs['mail_recipients'],
+                'subject': 'Comment Annotation',
+                'body': '''
+                    The following comment was added for task {0} of {1}:
+
+                    {2}
+
+                    View the image at {3}
+
+                    Full annotation:
+
+                    {4}
+                    '''.format(
+                        result.task_id,
+                        e.project.name,
+                        comment['body']['value'],
+                        task['info']['shareUrl'],
+                        comment
+                    )
+            })
     time.sleep(throttle)
 
 
@@ -117,3 +143,11 @@ def analyse_all_selections(**kwargs):
         kwargs['project_id'] = e.project.id
         kwargs['result_id'] = result.id
         analyse_selections(**kwargs.copy())
+
+    helpers.send_mail({
+        'recipients': kwargs['mail_recipients'],
+        'subject': 'Analysis complete',
+        'body': '''
+            All {0} results for {1} have been analysed.
+            '''.format(len(results), e.project.name)
+    })
