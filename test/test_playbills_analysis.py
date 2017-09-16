@@ -151,6 +151,29 @@ class TestPlaybillsMarkAnalysis(object):
         playbills.analyse_all_selections(**processed_payload)
         assert mock_send_mail.called
 
+    def test_mail_sent_for_each_comment_annotation(self, mocker, result,
+                                                   comment_annotation,
+                                                   create_task_run_df,
+                                                   processed_payload):
+        """Test that an email is sent for each comment annotation."""
+        mock_enki = mocker.patch(
+            'libcrowds_analyst.analysis.playbills.enki'
+        )
+        mock_send_mail = mocker.patch(
+            'libcrowds_analyst.analysis.playbills.helpers.send_mail'
+        )
+        n_comments = 3
+        comments = [comment_annotation(n) for n in range(n_comments)]
+        tr_info = [
+            comments
+        ]
+        df = create_task_run_df(tr_info)
+        mock_enki.pbclient.find_results.return_value = [result]
+        mock_enki.Enki().task_runs_df.__getitem__.return_value = df
+        playbills.analyse_selections(**processed_payload)
+        mock_enki.pbclient.update_result.assert_called_with(result)
+        assert mock_send_mail.call_count == n_comments
+
     def test_select_result_initialised_properly(self, mocker,
                                                 processed_payload):
         """Test that the result is initialised using the helper function."""

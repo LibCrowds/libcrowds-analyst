@@ -113,15 +113,15 @@ def analyse_selections(api_key, endpoint, project_id, result_id, path, doi,
                 'recipients': kwargs['mail_recipients'],
                 'subject': 'Comment Annotation',
                 'body': '''
-                    The following comment was added for task {1} of {0}:
+                    The following comment was added for task {0} of {1}:
 
-                    {1}
+                    {2}
 
-                    View the image at {2}
+                    View the image at {3}
 
                     Full annotation:
 
-                    {3}
+                    {4}
                     '''.format(
                         result.task_id,
                         e.project.name,
