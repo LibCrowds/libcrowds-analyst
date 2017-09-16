@@ -99,7 +99,7 @@ def analyse_selections(api_key, endpoint, project_id, result_id, path, doi,
                 update_selector(anno, r1)  # still update to round rect params
                 clusters.append(anno)
 
-        else:
+        else:  # pragma: no cover
             raise ValueError('Unhandled motivation')
 
     result.info['annotations'] = clusters + comments
