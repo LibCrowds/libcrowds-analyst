@@ -75,12 +75,16 @@ def analyse_selections(api_key, endpoint, project_id, result_id, path, doi,
     anno_list = list(itertools.chain.from_iterable(anno_list))
     defaults = {'annotations': []}
     result.info = helpers.init_result_info(doi, path, defaults)
-    n_annotations = len(anno_list)
     clusters = []
+    comments = []
 
     # Cluster similar regions
-    if n_annotations > 0:
-        for anno in anno_list:
+    for anno in anno_list:
+        if anno['motivation'] == 'commenting':
+            comments.append(anno)
+            continue
+
+        elif anno['motivation'] == 'tagging':
             r1 = get_rect_from_selection(anno)
             matched = False
             for cluster in clusters:
@@ -95,8 +99,10 @@ def analyse_selections(api_key, endpoint, project_id, result_id, path, doi,
                 update_selector(anno, r1)  # still update to round rect params
                 clusters.append(anno)
 
-        result.info['annotations'] = clusters
+        else:  # pragma: no cover
+            raise ValueError('Unhandled motivation')
 
+    result.info['annotations'] = clusters + comments
     enki.pbclient.update_result(result)
     time.sleep(throttle)
 

@@ -57,7 +57,7 @@ class TestApi(object):
     def test_invalid_webook_request_aborted(self, test_client, mocker):
         """Test that an invalid webhook analyse request returns 400."""
         mock_abort = mocker.patch('libcrowds_analyst.api.abort')
-        mocker.patch('libcrowds_analyst.api.Queue.enqueue_call')
+        mocker.patch('libcrowds_analyst.api.Queue.enqueue')
         test_client.post('/convert-a-card', data=dict())
         assert mock_abort.called
         assert mock_abort.call_args[0][0] == 400
@@ -108,7 +108,7 @@ class TestApi(object):
 
     def test_analyse_all_function_queued(self, mocker, app):
         """Test that the correct function is added to the queue."""
-        mock_enqueue = mocker.patch('libcrowds_analyst.api.Queue.enqueue_call')
+        mock_enqueue = mocker.patch('libcrowds_analyst.api.Queue.enqueue')
         mocker.patch('libcrowds_analyst.api.request')
 
         def mock_func():
