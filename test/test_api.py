@@ -123,4 +123,4 @@ class TestApi(object):
         def mock_func():
             return True
         api.analyse_all(mock_func)
-        assert mock_enqueue.call_args[1]['func'] == mock_func
+        assert mock_enqueue.call_args[0][0] == mock_func
