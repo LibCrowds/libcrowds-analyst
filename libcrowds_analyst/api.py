@@ -43,7 +43,7 @@ def analyse_all(func):
     """Analyse all results for a project."""
     payload = process_payload()
     payload['project_short_name'] = request.args.get('project_short_name')
-    QUEUE.enqueue_call(func=func, kwargs=payload, timeout=30*MINUTE)
+    QUEUE.enqueue_call(func=func, kwargs=payload)
     return ok_response()
 
 
