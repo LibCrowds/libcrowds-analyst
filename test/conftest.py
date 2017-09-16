@@ -144,3 +144,24 @@ def select_annotation():
             "modified": "2017-07-16T13:53:18.795Z"
         }
     return create
+
+@pytest.fixture
+def comment_annotation():
+    def create(comment):
+        return {
+            "body": {
+                "type": "TextualBody",
+                "purpose": "commenting",
+                "value": comment,
+                "format": "text/plain"
+            },
+            "motivation": "commenting",
+            "target": "https://api.bl.uk/metadata/iiif/ark:/81055/vdc_100022589158.0x00007c",
+            "created": "2017-08-31T10:09:55.082Z",
+            "modified": "2017-08-31T10:09:57.777Z",
+            "generated": "2017-08-31T10:09:55.082Z",
+            "@context": "http://www.w3.org/ns/anno.jsonld",
+            "type": "Annotation",
+            "id": "4bad6560-9150-4558-bee7-a6b7fe055326"
+        }
+    return create
