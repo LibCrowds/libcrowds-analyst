@@ -6,7 +6,7 @@ import enki
 import pytest
 from libcrowds_analyst.core import create_app
 
-os.environ['libcrowds_analyst_SETTINGS'] = '../settings_test.py'
+os.environ['LIBCROWDS_ANALYST_SETTINGS'] = '../settings_test.py'
 flask_app = create_app()
 
 
