@@ -17,11 +17,7 @@ HOUR = 60*MINUTE
 def process_payload():
     """Check that a payload is valid and complete it."""
     payload = request.json or {}
-    if not request.args.get('api_key'):
-        err_msg = 'api_key is key missing'
-        abort(400, err_msg)
-
-    payload['api_key'] = request.args.get('api_key')
+    payload['api_key'] = current_app.config['API_KEY']
     payload['endpoint'] = current_app.config['ENDPOINT']
     payload['doi'] = current_app.config['DOI']
     payload['path'] = request.path

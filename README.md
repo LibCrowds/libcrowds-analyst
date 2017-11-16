@@ -54,9 +54,14 @@ The important settings to maintain are:
 # URL of the PyBossa server
 ENDPOINT = 'http://{your-pybossa-server}'
 
+# Admin API key used to update all results
+API_KEY = 'admin-api-key'
+
 # DOI of the current LibCrowds Analyst version
 DOI = ''
 ```
+
+
 
 ## Analysis
 
@@ -72,7 +77,7 @@ there is no undo!
 
 ### Convert-a-Card
 
-**WEBHOOK ENDPOINT:** `/convert-a-card?api_key={your-api-key}`
+**WEBHOOK ENDPOINT:** `/convert-a-card`
 
 All task runs are compared looking a match rate of at least 70% for the answer
 keys `oclc` and `shelfmark` (disregarding task runs where all answer fields
@@ -102,7 +107,7 @@ have to be checked manually, after which `analysis_complete` should be set to
 
 ### In the Spotlight: Selections
 
-**WEBHOOK ENDPOINT:** `/playbills/select?api_key={your-api-key}`
+**WEBHOOK ENDPOINT:** `/playbills/select`
 
 The annotations for all task runs are compared. Those with similar selection
 rectangles are clustered and `analysis_complete` is set to `True`.
