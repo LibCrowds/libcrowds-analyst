@@ -103,7 +103,7 @@ def payload(project, task, result):
 @pytest.fixture
 def processed_payload(payload, app):
     processed_pl = json.loads(payload)
-    processed_pl['api_key'] = 'token'
+    processed_pl['api_key'] = app.config['API_KEY']
     processed_pl['endpoint'] = app.config['ENDPOINT']
     processed_pl['doi'] = app.config['DOI']
     processed_pl['path'] = '/example'

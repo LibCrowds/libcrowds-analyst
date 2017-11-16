@@ -65,7 +65,6 @@ class TestApi(object):
     def test_doi_added_to_payload(self, mocker, app):
         """Test that the DOI is added to the payload."""
         mock_request = mocker.patch('libcrowds_analyst.api.request')
-        mock_request.args = {'api_key': 'token'}
         mock_request.json = {}
         pl = api.process_payload()
         assert pl['doi'] == app.config['DOI']
@@ -73,7 +72,6 @@ class TestApi(object):
     def test_endpoint_added_to_payload(self, mocker, app):
         """Test that the endpoint is added to the payload."""
         mock_request = mocker.patch('libcrowds_analyst.api.request')
-        mock_request.args = {'api_key': 'token'}
         mock_request.json = {}
         pl = api.process_payload()
         assert pl['endpoint'] == app.config['ENDPOINT']
@@ -81,16 +79,13 @@ class TestApi(object):
     def test_api_key_added_to_payload(self, mocker, app):
         """Test that the API key is added to the payload."""
         mock_request = mocker.patch('libcrowds_analyst.api.request')
-        key = 'token'
-        mock_request.args = {'api_key': key}
         mock_request.json = {}
         pl = api.process_payload()
-        assert pl['api_key'] == key
+        assert pl['api_key'] == app.config['API_KEY']
 
     def test_path_added_to_payload(self, mocker, app):
         """Test that the analysis path is added to the payload."""
         mock_request = mocker.patch('libcrowds_analyst.api.request')
-        mock_request.args = {'api_key': 'token'}
         path = '/example'
         mock_request.path = path
         mock_request.json = {}
@@ -100,7 +95,6 @@ class TestApi(object):
     def test_throttle_added_to_payload(self, mocker, app):
         """Test that the number of seconds to throttle is added."""
         mock_request = mocker.patch('libcrowds_analyst.api.request')
-        mock_request.args = {'api_key': 'token'}
         throttle = app.config['THROTTLE']
         mock_request.json = {}
         pl = api.process_payload()
@@ -109,7 +103,6 @@ class TestApi(object):
     def test_mail_recipients_added_to_payload(self, mocker, app):
         """Test that the mail recipients are added to the payload."""
         mock_request = mocker.patch('libcrowds_analyst.api.request')
-        mock_request.args = {'api_key': 'token'}
         recipients = app.config['MAIL_RECIPIENTS']
         mock_request.json = {}
         pl = api.process_payload()
